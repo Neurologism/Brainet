@@ -3,7 +3,7 @@
 
 int main()
 {
-    PERCEPTRON p(5,"ReLU");
+    PERCEPTRON p(5);
     std::cout<<p.calculate({1,1,1,1,1})<<'\n';
     
 }
