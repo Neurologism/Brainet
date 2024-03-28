@@ -71,6 +71,14 @@ void PERCEPTRON::adapt_weights(double amount, double learning_rate, bool print_w
     if(print_weights)std::cout<<'\n';
 }
 
+
+/**
+ * @attention Training process for a single perceptron classificator 
+ * @param inputs The data matrix 
+ * @param target The answer wished to predict for every row 
+ * @param epochs The number of training iterations
+ * @param learning_rate The step size of gradient descent 
+*/
 void PERCEPTRON::train(std::vector<std::vector<double>> inputs,std::vector<double> target, int epochs, double learning_rate)
 {
     if(inputs.size() != target.size())
@@ -82,7 +90,7 @@ void PERCEPTRON::train(std::vector<std::vector<double>> inputs,std::vector<doubl
         double error=0;
         for(int j=0;j < inputs.size(); j++)
         {
-            error += target[j]-predict(inputs[j]);
+            error += target[j]-predict(inputs[j]); // difference between prediction and target value is counted in the eroor
         }
         adapt_weights(error,learning_rate, i%1==0);
         std::cout<<error<<'\n';
