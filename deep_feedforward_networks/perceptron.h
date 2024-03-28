@@ -6,6 +6,7 @@
 #include<stdexcept>
 #include<functional>
 #include<string>
+#include<iostream>
 #include"activation_functions.h"
 
 class PERCEPTRON
@@ -15,9 +16,9 @@ private:
 public:
     PERCEPTRON(int);
     ~PERCEPTRON();
-    double calculate(std::vector<double>);
-    void adapt_weights(double, double);
-    void train(std::vector<std::vector<double>>);
+    double predict(std::vector<double>);
+    void adapt_weights(double, double, bool);
+    void train(std::vector<std::vector<double>>,std::vector<double>,int,double);
 };
 
 PERCEPTRON::PERCEPTRON(int weights)
@@ -35,11 +36,11 @@ PERCEPTRON::~PERCEPTRON()
     
 }
 
-double PERCEPTRON::calculate(std::vector<double> input)
 /**
  * @attention Determines the dot product of input and the weights vector. Performs the Heaviside step
  * function as activation function.
 */
+double PERCEPTRON::predict(std::vector<double> input)
 {
     using namespace activation_functions;
     if(input.size() != __weights.size()-1)
@@ -47,10 +48,6 @@ double PERCEPTRON::calculate(std::vector<double> input)
         throw std::invalid_argument("Dimensionality of Input and Weights do not match");
     }
 
-    if(input[0] != 1)
-    {
-        throw std::invalid_argument("First element of input should be 1");
-    }
     
     double potential = __weights[0];
     for(int i=1;i < input.size();i++)
@@ -64,11 +61,31 @@ double PERCEPTRON::calculate(std::vector<double> input)
  * @param amount The error of the last forward pass
  * @param learning_rate The current learning rate of the network
 */
-void PERCEPTRON::adapt_weights(double amount, double learning_rate)
+void PERCEPTRON::adapt_weights(double amount, double learning_rate, bool print_weights=false)
 {
     for(double & weight : __weights)
     {
         weight += amount * learning_rate;
+        if(print_weights)std::cout<<weight<<' ';
+    }
+    if(print_weights)std::cout<<'\n';
+}
+
+void PERCEPTRON::train(std::vector<std::vector<double>> inputs,std::vector<double> target, int epochs, double learning_rate)
+{
+    if(inputs.size() != target.size())
+    {
+        throw std::invalid_argument("Dimensions of Input Matrix and Target vector do not match");
+    }
+    for(int i=0;i < epochs;i++)
+    {
+        double error=0;
+        for(int j=0;j < inputs.size(); j++)
+        {
+            error += target[j]-predict(inputs[j]);
+        }
+        adapt_weights(error,learning_rate, i%1==0);
+        std::cout<<error<<'\n';
     }
 }
 
@@ -77,18 +94,35 @@ void PERCEPTRON::adapt_weights(double amount, double learning_rate)
 class PERCEPTRON_LAYER
 {
 private:
-    int size;
+    std::vector<PERCEPTRON>__layer;
+    int __input_size;
 public:
-    PERCEPTRON_LAYER(int);
+    PERCEPTRON_LAYER(int,int);
     ~PERCEPTRON_LAYER();
+    std::vector<double> forward_pass(std::vector<double> &);
 };
 
-PERCEPTRON_LAYER::PERCEPTRON_LAYER(int size)
+PERCEPTRON_LAYER::PERCEPTRON_LAYER(int size,int input_size) : __input_size(input_size)
 {
+    __layer.resize(size,PERCEPTRON(input_size));
 }
 
 PERCEPTRON_LAYER::~PERCEPTRON_LAYER()
 {
+}
+
+/**
+ * @attention performs simple vector matrix multiplication with the input vector and the weight matrix 
+ * @param input The input to propagate through the layer 
+*/
+std::vector<double> PERCEPTRON_LAYER::forward_pass(std::vector<double> & input)
+{
+    std::vector<double> output;
+    for(PERCEPTRON & perceptron : __layer)
+    {
+        output.push_back(perceptron.predict(input));
+    }
+    return output;
 }
 
 #endif
