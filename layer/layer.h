@@ -10,8 +10,6 @@ class LAYER
 {
 protected:
     std::vector<double> __input; 
-
-public:
     
     LAYER(){};
     ~LAYER();
