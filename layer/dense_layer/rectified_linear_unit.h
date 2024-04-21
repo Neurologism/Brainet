@@ -8,6 +8,8 @@
 */
 class ReLU : public DENSE_LAYER
 {
+protected:
+    double __left_gradient;
 public:
     ReLU(int input_size, int output_size);
     ~ReLU();
@@ -15,11 +17,12 @@ public:
     std::vector<double> differentiate_activation_function(std::vector<double>& input);
 };
 
+/**
+ * @brief Constructor for the ReLU class.
+ * @param input_size The dimensionality of the input.
+ * @param output_size The number of neurons.
+*/
 ReLU::ReLU(int input_size, int output_size) : DENSE_LAYER(input_size, output_size)
-{
-}
-
-ReLU::~ReLU()
 {
 }
 
@@ -27,7 +30,7 @@ std::vector<double> ReLU::activation_function(std::vector<double>& input)
 {
     for(int i=0; i < input.size(); i++)
     {
-        input[i] = input[i] > 0 ? input[i] : 0;
+        input[i] = input[i] > 0 ? input[i] : __left_gradient * input[i];
     }
     return input;
 }
@@ -36,88 +39,56 @@ std::vector<double> ReLU::differentiate_activation_function(std::vector<double>&
 {
     for(int i=0; i < input.size(); i++)
     {
-        input[i] = input[i] > 0 ? 1 : 0;
+        input[i] = input[i] > 0 ? 1 : __left_gradient;
     }
     return input;
 }
 
 
 /**
- * @brief Leaky rectified linear unit class, representing the Leaky ReLU activation function f(x) = max(x, 0.01x).
+ * @brief Leaky ReLU class, representing the activation function f(x) = max(x, 0) + left_gradient * min(x, 0).
 */
-class leaky_ReLU : public DENSE_LAYER
+class LeakyReLU : public ReLU
 {
 public:
-    leaky_ReLU(int input_size, int output_size);
-    ~leaky_ReLU();
-    std::vector<double> activation_function(std::vector<double>& input);
-    std::vector<double> differentiate_activation_function(std::vector<double>& input);
+    LeakyReLU(int input_size, int output_size, double left_gradient);
+    ~LeakyReLU();
 };
 
-leaky_ReLU::leaky_ReLU(int input_size, int output_size) : DENSE_LAYER(input_size, output_size)
+/**
+ * @brief Constructor for the LeakyReLU class.
+ * @param input_size The dimensionality of the input.
+ * @param output_size The number of neurons.
+ * @param left_gradient The gradient of the function for x < 0.
+*/
+LeakyReLU::LeakyReLU(int input_size, int output_size, double left_gradient) : ReLU(input_size, output_size)
 {
-}
-
-leaky_ReLU::~leaky_ReLU()
-{
-}
-
-std::vector<double> leaky_ReLU::activation_function(std::vector<double>& input)
-{
-    for(int i=0; i < input.size(); i++)
-    {
-        input[i] = input[i] > 0 ? input[i] : 0.01 * input[i];
-    }
-    return input;
-}
-
-std::vector<double> leaky_ReLU::differentiate_activation_function(std::vector<double>& input)
-{
-    for(int i=0; i < input.size(); i++)
-    {
-        input[i] = input[i] > 0 ? 1 : 0.01;
-    }
-    return input;
+    __left_gradient = left_gradient;
 }
 
 /**
- * @brief Absolute rectified linear unit class, representing the absolute ReLU activation function f(x) = max(x, -x).
+ * @brief Absolute ReLU class, representing the activation function f(x) = |x|.
 */
-class absolute_ReLU : public DENSE_LAYER
+class AbsoluteReLU : public ReLU
 {
 public:
-    absolute_ReLU(int input_size, int output_size);
-    ~absolute_ReLU();
+    AbsoluteReLU(int input_size, int output_size);
+    ~AbsoluteReLU();
     std::vector<double> activation_function(std::vector<double>& input);
     std::vector<double> differentiate_activation_function(std::vector<double>& input);
 };
 
-absolute_ReLU::absolute_ReLU(int input_size, int output_size) : DENSE_LAYER(input_size, output_size)
+/**
+ * @brief Constructor for the AbsoluteReLU class.
+ * @param input_size The dimensionality of the input.
+ * @param output_size The number of neurons.
+*/
+AbsoluteReLU::AbsoluteReLU(int input_size, int output_size) : ReLU(input_size, output_size)
 {
-}
-
-absolute_ReLU::~absolute_ReLU()
-{
-}
-
-std::vector<double> absolute_ReLU::activation_function(std::vector<double>& input)
-{
-    for(int i=0; i < input.size(); i++)
-    {
-        input[i] = input[i] > 0 ? input[i] : -input[i];
-    }
-    return input;
-}
-
-std::vector<double> absolute_ReLU::differentiate_activation_function(std::vector<double>& input)
-{
-    for(int i=0; i < input.size(); i++)
-    {
-        input[i] = input[i] > 0 ? 1 : -1;
-    }
-    return input;
+    __left_gradient = -1;
 }
 
 // add parametric RELU
+// add Maxout
 
 #endif
