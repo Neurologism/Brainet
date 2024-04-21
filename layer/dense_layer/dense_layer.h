@@ -1,7 +1,7 @@
 #ifndef DENSE_LAYER_INCLUDE_GUARD
 #define DENSE_LAYER_INCLUDE_GUARD
 
-#include "../layer.h"
+#include "layer.h"
 #include <vector>
 
 /**
