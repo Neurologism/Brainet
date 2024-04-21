@@ -40,10 +40,11 @@ protected:
      * @brief Linear transformation, which evaluates the Formula input * weights + bias.
     */
     std::vector<double> linear_transformation(std::vector<double>& input, bool bias=true);
-
+    ~DENSE_LAYER();
+    
 public:
     DENSE_LAYER(int input_size, int output_size);
-    ~DENSE_LAYER();
+    
     std::vector<double> operation(std::vector<double>&);
     void differentiate();
     std::vector<double> backpropagation(std::vector<double>&);
