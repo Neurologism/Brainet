@@ -10,11 +10,13 @@ class ReLU : public DENSE_LAYER
 {
 protected:
     double __left_gradient;
-public:
-    ReLU(int input_size, int output_size);
-    ~ReLU();
+    
     std::vector<double> activation_function(std::vector<double>& input);
     std::vector<double> differentiate_activation_function(std::vector<double>& input);
+
+public:    
+    ReLU(int input_size, int output_size);
+    ~ReLU();
 };
 
 /**
@@ -74,8 +76,6 @@ class AbsoluteReLU : public ReLU
 public:
     AbsoluteReLU(int input_size, int output_size);
     ~AbsoluteReLU();
-    std::vector<double> activation_function(std::vector<double>& input);
-    std::vector<double> differentiate_activation_function(std::vector<double>& input);
 };
 
 /**
