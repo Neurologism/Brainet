@@ -80,7 +80,44 @@ std::vector<double> leaky_ReLU::differentiate_activation_function(std::vector<do
     return input;
 }
 
+/**
+ * @brief Absolute rectified linear unit class, representing the absolute ReLU activation function f(x) = max(x, -x).
+*/
+class absolute_ReLU : public DENSE_LAYER
+{
+public:
+    absolute_ReLU(int input_size, int output_size);
+    ~absolute_ReLU();
+    std::vector<double> activation_function(std::vector<double>& input);
+    std::vector<double> differentiate_activation_function(std::vector<double>& input);
+};
 
+absolute_ReLU::absolute_ReLU(int input_size, int output_size) : DENSE_LAYER(input_size, output_size)
+{
+}
 
+absolute_ReLU::~absolute_ReLU()
+{
+}
+
+std::vector<double> absolute_ReLU::activation_function(std::vector<double>& input)
+{
+    for(int i=0; i < input.size(); i++)
+    {
+        input[i] = input[i] > 0 ? input[i] : -input[i];
+    }
+    return input;
+}
+
+std::vector<double> absolute_ReLU::differentiate_activation_function(std::vector<double>& input)
+{
+    for(int i=0; i < input.size(); i++)
+    {
+        input[i] = input[i] > 0 ? 1 : -1;
+    }
+    return input;
+}
+
+// add parametric RELU
 
 #endif
