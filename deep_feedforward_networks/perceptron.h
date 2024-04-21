@@ -7,7 +7,6 @@
 #include<functional>
 #include<string>
 #include<iostream>
-#include"activation_functions.h"
 
 class PERCEPTRON
 {

@@ -3,6 +3,7 @@
 
 #include "layer.h"
 #include <vector>
+#include <random>
 
 /**
  * @brief Dense layer class, representing fully connected layers.
@@ -50,8 +51,18 @@ public:
 
 DENSE_LAYER::DENSE_LAYER(int input_size, int output_size)
 {
-    __weights.resize(input_size * output_size);
-    __bias.resize(output_size);
+    //////////////////////////////////////////
+    std::default_random_engine generator; // this is unifnished and should be replaced by a more sophisticated initialization
+    std::normal_distribution<double> distribution(-0.01,0.01); // initialize weights to small random values
+    for(int i = 0;i < input_size * output_size;i++) 
+    {
+        __weights.push_back(distribution(generator));
+    }
+    for(int i = 0;i < output_size;i++) 
+    {
+        __bias.push_back(distribution(generator));
+    }
+    //////////////////////////////////////////
     __bias_gradient.resize(output_size);
     __weights_gradient.resize(input_size * output_size);
     __input_size = input_size;
