@@ -114,4 +114,4 @@ std::vector<double> DENSE_LAYER::backpropagation(std::vector<double>& gradient)
     gradient = linear_transformation(gradient, false); // compute the gradient for the next layer
 }
 
-#endif
+#endif // DENSE_LAYER_INCLUDE_GUARD

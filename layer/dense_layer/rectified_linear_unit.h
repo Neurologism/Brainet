@@ -91,4 +91,4 @@ AbsoluteReLU::AbsoluteReLU(int input_size, int output_size) : ReLU(input_size, o
 // add parametric RELU
 // add Maxout
 
-#endif
+#endif // RECTIFIED_LINEAR_UNIT_INCLUDE_GUARD

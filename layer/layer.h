@@ -20,4 +20,4 @@ public:
     virtual std::vector<double> backpropagation(std::vector<double>&) =0; // backward pass over the layer 
 };
 
-#endif
+#endif // LAYER_INCLUDE_GUARD
