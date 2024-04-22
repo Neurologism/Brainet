@@ -2,17 +2,23 @@
 #define OPERATION_INCLUDE_GUARD
 
 #include <vector>
+#include "variable.h"
 
 /**
  * @brief OPERATION class is an abstract class that defines the interface for all operations.
 */
 class OPERATION
 {
-
 public:
     OPERATION(){};
-    virtual void f() =0; 
-    virtual void bprop() =0;
+    /**
+     * @brief mathematical function the operation implements
+    */
+    virtual void f(std::vector<VARIABLE *>& inputs) =0; 
+    /**
+     * @brief derivative of the function
+    */
+    virtual void bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) =0;
 };
 
 #endif // OPERATION_INCLUDE_GUARD
