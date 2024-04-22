@@ -9,7 +9,7 @@
 class ACTIVATION_FUNCTION : public OPERATION
 {
 public:
-    ACTIVATION_FUNCTION(){};
+    ACTIVATION_FUNCTION(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
     void bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
 
@@ -32,7 +32,8 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
         _data.push_back(activation_function(data));
     }
 
-
+    __variable->set_data(_data);
+    __variable->set_shape(_shape);
 }
 
 
