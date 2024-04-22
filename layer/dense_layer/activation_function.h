@@ -43,12 +43,22 @@ void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focu
         throw std::invalid_argument("ACTIVATION_FUNCTION::bprop: Invalid number of input variables.");
     }
 
-    // load derivative into data 
+    // load derivative of activation into data 
     std::vector<double> _data;
 
     for (double data : inputs.front()->get_data()) // apply activation function derivative to all elements
     {
         _data.push_back(activation_function_derivative(data));
+    }
+
+    for (int i = 0; i < _data.size(); i++)
+    {
+        double gradient = 0;
+        for (VARIABLE * output : outputs)
+        {
+            gradient += output->get_data()[i];
+        }
+        _data[i] *= gradient;
     }
 
     __variable->set_data(_data);
