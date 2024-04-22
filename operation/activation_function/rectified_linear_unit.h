@@ -1,50 +1,40 @@
 #ifndef RECTIFIED_LINEAR_UNIT_INCLUDE_GUARD
 #define RECTIFIED_LINEAR_UNIT_INCLUDE_GUARD
 
-#include "dense_layer.h"
+#include "activation_function.h"
 
 /**
  * @brief Rectified linear unit class, representing the ReLU activation function f(x) = max(x, 0).
 */
-class ReLU : public DENSE_LAYER
+class ReLU : public ACTIVATION_FUNCTION
 {
 protected:
-    double __left_gradient;
+    double __gradient; // gradient of left part of the function
     
-    std::vector<double> activation_function(std::vector<double> input);
-    std::vector<double> differentiate_activation_function(std::vector<double> input);
+    double activation_function(double input);
+    double activation_function_derivative(double input);
 
 public:    
-    ReLU(int input_size, int output_size);
+    ReLU(VARIABLE * variable);
 };
 
 /**
  * @brief Constructor for the ReLU class.
- * @param input_size The dimensionality of the input.
- * @param output_size The number of neurons.
 */
-ReLU::ReLU(int input_size, int output_size) : DENSE_LAYER(input_size, output_size)
+ReLU::ReLU(VARIABLE * variable) : ACTIVATION_FUNCTION(variable)
 {
+    __gradient = 0;
 }
 
-std::vector<double> ReLU::activation_function(std::vector<double> input)
+double ReLU::activation_function(double input)
 {
-    for(int i=0; i < input.size(); i++)
-    {
-        input[i] = input[i] > 0 ? input[i] : __left_gradient * input[i];
-    }
-    return input;
+    return input > 0 ? input : __gradient * input;
 }
 
-std::vector<double> ReLU::differentiate_activation_function(std::vector<double> input)
+double ReLU::activation_function_derivative(double input)
 {
-    for(int i=0; i < input.size(); i++)
-    {
-        input[i] = input[i] > 0 ? 1 : __left_gradient;
-    }
-    return input;
+    return input > 0 ? 1 : __gradient;
 }
-
 
 /**
  * @brief Leaky ReLU class, representing the activation function f(x) = max(x, 0) + left_gradient * min(x, 0).
@@ -52,18 +42,16 @@ std::vector<double> ReLU::differentiate_activation_function(std::vector<double> 
 class LeakyReLU : public ReLU
 {
 public:
-    LeakyReLU(int input_size, int output_size, double left_gradient);
+    LeakyReLU(VARIABLE * variable, double left_gradient);
 };
 
 /**
  * @brief Constructor for the LeakyReLU class.
- * @param input_size The dimensionality of the input.
- * @param output_size The number of neurons.
- * @param left_gradient The gradient of the function for x < 0.
+ * @param gradient The gradient of the function for x < 0.
 */
-LeakyReLU::LeakyReLU(int input_size, int output_size, double left_gradient) : ReLU(input_size, output_size)
+LeakyReLU::LeakyReLU(VARIABLE * variable, double gradient) : ReLU(variable)
 {
-    __left_gradient = left_gradient;
+    __gradient = gradient;
 }
 
 /**
@@ -72,17 +60,15 @@ LeakyReLU::LeakyReLU(int input_size, int output_size, double left_gradient) : Re
 class AbsoluteReLU : public ReLU
 {
 public:
-    AbsoluteReLU(int input_size, int output_size);
+    AbsoluteReLU(VARIABLE * variable);
 };
 
 /**
  * @brief Constructor for the AbsoluteReLU class.
- * @param input_size The dimensionality of the input.
- * @param output_size The number of neurons.
 */
-AbsoluteReLU::AbsoluteReLU(int input_size, int output_size) : ReLU(input_size, output_size)
+AbsoluteReLU::AbsoluteReLU(VARIABLE * variable) : ReLU(variable)
 {
-    __left_gradient = -1;
+    __gradient = -1;
 }
 
 // add parametric RELU
