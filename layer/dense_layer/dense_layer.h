@@ -26,7 +26,7 @@ protected:
      * @note input is a reference and should be modified in place
     */
 
-    virtual std::vector<double> activation_function(std::vector<double>& input) =0;
+    virtual std::vector<double> activation_function(std::vector<double> input) =0;
 
     /**
      * @brief Derivative of the activation function.
@@ -34,7 +34,7 @@ protected:
      * This function should be called after activation_function() and before backpropagation(). 
      * @note input is a reference and should be modified in place
     */
-    virtual std::vector<double> differentiate_activation_function(std::vector<double>& input) =0;
+    virtual std::vector<double> differentiate_activation_function(std::vector<double> input) =0;
 
     /**
      * @brief Linear transformation, which evaluates the Formula input * weights + bias.
@@ -83,7 +83,7 @@ DENSE_LAYER::~DENSE_LAYER()
  * @attention This function is a placeholder and should be replaced by a more efficient implementation.
  * @param bias If true, the bias is added to the output.
 */
-std::vector<double> DENSE_LAYER::linear_transformation(std::vector<double>& input, bool bias=true)
+std::vector<double> DENSE_LAYER::linear_transformation(std::vector<double>& input, bool bias)
 {
     std::vector<double> output;
     for(int i=0; i < __output_size; i++) // export later in seperate matrix class and overload operator

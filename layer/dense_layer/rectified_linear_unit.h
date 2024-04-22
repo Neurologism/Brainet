@@ -11,8 +11,8 @@ class ReLU : public DENSE_LAYER
 protected:
     double __left_gradient;
     
-    std::vector<double> activation_function(std::vector<double>& input);
-    std::vector<double> differentiate_activation_function(std::vector<double>& input);
+    std::vector<double> activation_function(std::vector<double> input);
+    std::vector<double> differentiate_activation_function(std::vector<double> input);
 
 public:    
     ReLU(int input_size, int output_size);
@@ -28,7 +28,7 @@ ReLU::ReLU(int input_size, int output_size) : DENSE_LAYER(input_size, output_siz
 {
 }
 
-std::vector<double> ReLU::activation_function(std::vector<double>& input)
+std::vector<double> ReLU::activation_function(std::vector<double> input)
 {
     for(int i=0; i < input.size(); i++)
     {
@@ -37,7 +37,7 @@ std::vector<double> ReLU::activation_function(std::vector<double>& input)
     return input;
 }
 
-std::vector<double> ReLU::differentiate_activation_function(std::vector<double>& input)
+std::vector<double> ReLU::differentiate_activation_function(std::vector<double> input)
 {
     for(int i=0; i < input.size(); i++)
     {
