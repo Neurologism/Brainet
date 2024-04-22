@@ -24,14 +24,15 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
         throw std::invalid_argument("ACTIVATION_FUNCTION::f: Invalid number of input variables.");
     }
     
-    
+    std::vector<int> _shape = inputs.front()->get_shape(); // shape stays the same 
+    std::vector<double> _data;
 
-    __shape = inputs.front()->get_operation()->get_shape(); // shape stays the same 
-
-    for (double data : inputs.front()->get_operation()->get_data()) // apply activation function to all elements
+    for (double data : inputs.front()->get_data()) // apply activation function to all elements
     {
-        __data.push_back(activation_function(data));
+        _data.push_back(activation_function(data));
     }
+
+
 }
 
 

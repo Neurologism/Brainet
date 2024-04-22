@@ -9,8 +9,10 @@
 */
 class OPERATION
 {
+protected:
+    VARIABLE * __variable;
 public:
-    OPERATION(){};
+    OPERATION(VARIABLE * variable) : __variable(variable){};
     /**
      * @brief mathematical function the operation implements
     */
