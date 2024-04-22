@@ -3,8 +3,7 @@
 
 #include <vector>
 #include <stdexcept>
-#include"operation.h"
-#include"variable.h"
+#include"..\operation.h"
 
 class ACTIVATION_FUNCTION : public OPERATION
 {

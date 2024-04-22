@@ -2,7 +2,7 @@
 #define OPERATION_INCLUDE_GUARD
 
 #include <vector>
-#include "variable.h"
+#include "..\variable.h"
 
 /**
  * @brief OPERATION class is an abstract class that defines the interface for all operations.

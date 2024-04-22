@@ -2,7 +2,7 @@
 #define VARIABLE_INCLUDE_GUARD
 
 #include <vector>
-#include "layer/operation.h"
+#include "operation/operation.h"
 
 /**
  * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
