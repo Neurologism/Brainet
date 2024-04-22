@@ -95,6 +95,7 @@ std::vector<double> DENSE_LAYER::linear_transformation(std::vector<double>& inpu
         }
         if(bias)output[i] += __bias[i];
     }
+    return output;
 }
 
 /**
@@ -124,6 +125,7 @@ std::vector<double> DENSE_LAYER::backpropagation(std::vector<double>& gradient)
         }
     }
     gradient = linear_transformation(gradient, false); // compute the gradient for the next layer
+    return gradient;
 }
 
 #endif // DENSE_LAYER_INCLUDE_GUARD

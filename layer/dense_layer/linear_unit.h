@@ -7,7 +7,6 @@ class Linear_Unit : public DENSE_LAYER
 {
 public:
     Linear_Unit(int input_size, int output_size);
-    ~Linear_Unit();
     std::vector<double> activation_function(std::vector<double> input);
     std::vector<double> differentiate_activation_function(std::vector<double> input);
 };

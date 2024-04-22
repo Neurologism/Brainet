@@ -11,7 +11,6 @@ class HeavysideStep : public DENSE_LAYER
 {
 public:
     HeavysideStep(int input_size, int output_size);
-    ~HeavysideStep();
     std::vector<double> activation_function(std::vector<double> input);
     std::vector<double> differentiate_activation_function(std::vector<double> input);
 };

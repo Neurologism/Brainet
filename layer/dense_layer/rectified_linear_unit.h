@@ -16,7 +16,6 @@ protected:
 
 public:    
     ReLU(int input_size, int output_size);
-    ~ReLU();
 };
 
 /**
@@ -54,7 +53,6 @@ class LeakyReLU : public ReLU
 {
 public:
     LeakyReLU(int input_size, int output_size, double left_gradient);
-    ~LeakyReLU();
 };
 
 /**
@@ -75,7 +73,6 @@ class AbsoluteReLU : public ReLU
 {
 public:
     AbsoluteReLU(int input_size, int output_size);
-    ~AbsoluteReLU();
 };
 
 /**
