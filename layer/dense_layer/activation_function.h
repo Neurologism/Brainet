@@ -36,7 +36,23 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
     __variable->set_shape(_shape);
 }
 
+void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
+{
+    if (inputs.size() != 1)
+    {
+        throw std::invalid_argument("ACTIVATION_FUNCTION::bprop: Invalid number of input variables.");
+    }
 
+    // load derivative into data 
+    std::vector<double> _data;
+
+    for (double data : inputs.front()->get_data()) // apply activation function derivative to all elements
+    {
+        _data.push_back(activation_function_derivative(data));
+    }
+
+    __variable->set_data(_data);
+}
 
 
 #endif // ACTIVATION_FUNCTION_INCLUDE_GUARD
