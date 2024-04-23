@@ -12,8 +12,8 @@ class VARIABLE
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
 
-    std::vector<double> __data;
-    std::vector<int> __shape;
+    std::vector<double> __data; // tensor of data 
+    std::vector<int> __shape; // shape of the tensor 
 
 public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
