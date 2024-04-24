@@ -23,16 +23,16 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
         throw std::invalid_argument("ACTIVATION_FUNCTION::f: Invalid number of input variables.");
     }
     
-    std::vector<int> _shape = inputs.front()->get_shape(); // shape stays the same 
-    std::vector<double> _data;
+    TENSOR _tensor;
+    _tensor = inputs.front()->get_tensor(); // copy input tensor
 
-    for (double data : inputs.front()->get_data()) // apply activation function to all elements
+    for (int i = 0; i < _tensor.size(); i++) // apply activation function to all elements
     {
-        _data.push_back(activation_function(data));
+        for (int j = 0; i < _tensor[i]->size(); j++)
+        {
+            _tensor[i]->operator[](j)->set_data(activation_function(_tensor[i]->operator[](j)->get_data()));
+        }   
     }
-
-    __variable->set_data(_data);
-    __variable->set_shape(_shape);
 }
 
 void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs)
@@ -42,25 +42,30 @@ void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, std::vector<VAR
         throw std::invalid_argument("ACTIVATION_FUNCTION::bprop: Invalid number of input variables.");
     }
 
-    // load derivative of activation into data 
-    std::vector<double> _data;
+    // load derivative of activation into tensor
+    TENSOR _tensor;
 
-    for (double data : inputs.front()->get_data()) // apply activation function derivative to all elements
-    {
-        _data.push_back(activation_function_derivative(data));
-    }
+    // sum the gradients of the outputs
 
-    for (int i = 0; i < _data.size(); i++)
+    for (VARIABLE * output : outputs)
     {
-        double gradient = 0;
-        for (VARIABLE * output : outputs)
+        TENSOR * tensor = output->get_tensor();
+        for (int i = 0; i < tensor->size(); i++)
         {
-            gradient += output->get_data()[i];
+            for (int j = 0; j < tensor->operator[](i)->size(); j++)
+            {
+                _tensor[i]->operator[](j)->set_data(_tensor[i]->operator[](j)->get_data() + tensor->operator[](i)->operator[](j)->get_data());
+            }
         }
-        _data[i] *= gradient;
     }
 
-    __variable->set_data(_data);
+    for (int i = 0; i < _tensor.size(); i++) // apply activation function derivative to all elements
+    {
+        for (int j = 0; i < _tensor[i]->size(); j++)
+        {
+            _tensor[i]->operator[](j)->set_data(activation_function_derivative(_tensor[i]->operator[](j)->get_data()));
+        }
+    }
 }
 
 

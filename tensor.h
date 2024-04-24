@@ -11,15 +11,21 @@ class TENSOR
 {
 private:
     std::vector<TENSOR *> __elements;
-
+    double __data = 0;
 public:
     TENSOR(){};
+    TENSOR(double data) : __data(data){};
     TENSOR(std::vector<TENSOR *> elements) : __elements(elements){};
     ~TENSOR();
     void push_back(TENSOR * element);
     void pop_back();
     TENSOR * operator[](int index);
     int size();
+    void operator=(TENSOR * tensor);
+    void set_data(double data);
+    double get_data();
+    bool is_scalar();
+    
 };
 
 TENSOR::~TENSOR()
@@ -35,6 +41,10 @@ TENSOR::~TENSOR()
 */
 void TENSOR::push_back(TENSOR * element)
 {
+    if (__data)
+    {
+        throw std::invalid_argument("TENSOR::push_back: Cannot push to scalar.");
+    }
     __elements.push_back(element);
 }
 
@@ -43,6 +53,14 @@ void TENSOR::push_back(TENSOR * element)
 */
 void TENSOR::pop_back()
 {
+    if (__data)
+    {
+        throw std::invalid_argument("TENSOR::pop_back: Cannot pop from scalar.");
+    }
+    if (__elements.size() == 0)
+    {
+        throw std::invalid_argument("TENSOR::pop_back: Cannot pop from empty tensor.");
+    }
     __elements.pop_back();
 }
 
@@ -63,28 +81,34 @@ TENSOR * TENSOR::operator[](int index)
 */
 int TENSOR::size()
 {
+    if (__data)
+    {
+        throw std::invalid_argument("TENSOR::size: Cannot get size of scalar.");
+    }
     return __elements.size();
 }
 
-
-
 /**
- * @brief Scalar class is a wrapper class for double. It is used to store data in a scalar format.
+ * @brief assign the data of the tensor
 */
-class SCALAR : private TENSOR
+void TENSOR::operator=(TENSOR * tensor)
 {
-    double __data;
-public:
-    SCALAR(double data) : __data(data){};
-    double get_data();
-    void set_data(double data);
-};
+    __elements = tensor->__elements;
+    if (__data)
+    {
+        throw std::invalid_argument("TENSOR::operator=: Cannot assign tensor to scalar.");
+    }
+}
 
 /**
  * @brief get the data of the scalar
 */
-double SCALAR::get_data()
+double TENSOR::get_data()
 {
+    if (__elements.size())
+    {
+        throw std::invalid_argument("TENSOR::get_data: Cannot get data of tensor with elements.");
+    }
     return __data;
 }
 
@@ -92,9 +116,21 @@ double SCALAR::get_data()
  * @brief set the data of the scalar
 */
 
-void SCALAR::set_data(double data)
+void TENSOR::set_data(double data)
 {
     __data = data;
+    if (__elements.size())
+    {
+        throw std::invalid_argument("TENSOR::set_data: Cannot set data of tensor with elements.");
+    }
+}
+
+/**
+ * @brief check if the tensor is a scalar
+*/
+bool TENSOR::is_scalar()
+{
+    return __elements.size() == 0;
 }
 
 #endif // TENSOR_INCLUDE_GUARD
