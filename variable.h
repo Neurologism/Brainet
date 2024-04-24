@@ -11,14 +11,14 @@ template <typename T>
 class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
-    OPERATION * __op;
+    OPERATION<VARIABLE<T>> __op;
     T __data;
     
 
 public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
     ~VARIABLE();
-    OPERATION * get_operation();
+    OPERATION<VARIABLE<T>> * get_operation();
     std::vector<VARIABLE *> get_consumers();
     std::vector<VARIABLE *> get_inputs();
 };
@@ -41,7 +41,7 @@ VARIABLE<T>::~VARIABLE()
  * @brief returns the operation object
 */
 template <typename T>
-OPERATION * VARIABLE<T>::get_operation()
+OPERATION<VARIABLE<T>> * VARIABLE<T>::get_operation()
 {
     return __op;
 }
