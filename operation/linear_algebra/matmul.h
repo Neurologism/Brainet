@@ -9,8 +9,7 @@
 /**
  * @brief Matrix multiplication operation class.
 */
-template<typename T>
-class MATMUL : public OPERATION<T>
+class MATMUL : public OPERATION
 {
 public:
 
@@ -26,10 +25,9 @@ public:
  * @brief Matrix multiplication function.
  * @attention to be replaced 
 */
-template<typename T>
-void MATMUL<T>::matmul(T * data1, T * data2, T * result)
+void MATMUL::matmul(std::vector<double> * data1, std::vector<double> * data2, std::vector<double> * result)
 {
-    for()
+    
 }
 
 

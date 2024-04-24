@@ -7,11 +7,10 @@
 /**
  * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
 */
-template <typename T>
 class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
-    OPERATION<T> __op;
+    OPERATION __op;
     T __data;
     
 
