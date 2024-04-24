@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "..\variable.h"
+#include "..\tensor.h"
 
 /**
  * @brief OPERATION class is an abstract class that defines the interface for all operations.
