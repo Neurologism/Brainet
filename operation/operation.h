@@ -19,6 +19,10 @@ public:
     virtual void f(std::vector<VARIABLE *>& inputs) =0; 
     /**
      * @brief derivative of the function
+     * assumes that the gradient is already calculated for the output variables 
+     * @param inputs the input variables of the operation
+     * @param focus the variable to calculate the gradient for
+     * @param outputs the output variables of the operation
     */
     virtual void bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) =0;
 };
