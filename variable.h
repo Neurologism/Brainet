@@ -12,7 +12,7 @@ class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
-    std::vector<DATA_TYPE *> __data;
+    std::vector<DATATYPE *> __data;
     
 
 public:
@@ -21,7 +21,7 @@ public:
     OPERATION * get_operation();
     std::vector<VARIABLE *> get_consumers();
     std::vector<VARIABLE *> get_inputs();
-    TENSOR * get_tensor();
+    DATATYPE * get_data();
 };
 
 VARIABLE::~VARIABLE()
@@ -62,11 +62,11 @@ std::vector<VARIABLE *> VARIABLE::get_inputs()
 }
 
 /**
- * @brief returns the data of the operation
+ * @brief returns the data of the variable
 */
-TENSOR * VARIABLE::get_tensor()
+DATATYPE * VARIABLE::get_data()
 {
-    return &__tensor;
+    return __data[0];
 }
 
 #endif
