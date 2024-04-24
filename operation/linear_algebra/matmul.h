@@ -14,7 +14,7 @@ public:
     MATMUL(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
     void bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs) override;
-    void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
+    void matmul(TENSOR * data1, TENSOR * data2, TENSOR * result);
 };
 
 
@@ -22,25 +22,9 @@ public:
  * @brief Matrix multiplication function.
  * @attention to be replaced 
 */
-void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2)
+void MATMUL::matmul(TENSOR * data1, TENSOR * data2, TENSOR * result)
 {
-    std::vector<double> result;
-
-    for (int i = 0; i < shape1[0]; i++) // replace this 
-    {
-        for (int j = 0; j < shape2[1]; j++)
-        {
-            double sum = 0;
-            for (int k = 0; k < shape1[1]; k++)
-            {
-                sum += data1[i * shape1[1] + k] * data2[k * shape2[1] + j];
-            }
-            result.push_back(sum);
-        }
-    }
-
-    data1 = result;
-    shape1 = {shape1[0], shape2[1]};
+    for()
 }
 
 
@@ -97,7 +81,7 @@ void MATMUL::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outp
     std::vector<double> data1 = inputs[0]->get_data();
     std::vector<double> data2 = inputs[1]->get_data();
 
-    
+
 
 
 }

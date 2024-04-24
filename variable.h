@@ -2,8 +2,8 @@
 #define VARIABLE_INCLUDE_GUARD
 
 #include <vector>
-#include "tensor.h"
 #include "operation/operation.h"
+#include "operation/linear_algebra/data_types.h"
 
 /**
  * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
@@ -12,8 +12,8 @@ class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
-
-    TENSOR __tensor; // tensor of data 
+    std::vector<DATA_TYPE *> __data;
+    
 
 public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
