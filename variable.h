@@ -7,27 +7,24 @@
 /**
  * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
 */
+template <typename T>
 class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
-    OPERATION * __op;
-
-    std::vector<double> __data; // tensor of data 
-    std::vector<int> __shape; // shape of the tensor 
+    OPERATION<T> __op;
+    T __data;
+    
 
 public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
     ~VARIABLE();
-    OPERATION * get_operation();
+    OPERATION<VARIABLE<T>> * get_operation();
     std::vector<VARIABLE *> get_consumers();
     std::vector<VARIABLE *> get_inputs();
-    std::vector<double> get_data();
-    std::vector<int> get_shape();
-    void set_data(std::vector<double> & data);
-    void set_shape(std::vector<int> & shape);
 };
 
-VARIABLE::~VARIABLE()
+template <typename T>
+VARIABLE<T>::~VARIABLE()
 {
     free(__op);
     for (VARIABLE * parent : __parents)
@@ -43,7 +40,8 @@ VARIABLE::~VARIABLE()
 /**
  * @brief returns the operation object
 */
-OPERATION * VARIABLE::get_operation()
+template <typename T>
+OPERATION<VARIABLE<T>> * VARIABLE<T>::get_operation()
 {
     return __op;
 }
@@ -51,7 +49,8 @@ OPERATION * VARIABLE::get_operation()
 /**
  * @brief returns the children of the variable
 */
-std::vector<VARIABLE *> VARIABLE::get_consumers()
+template <typename T>
+std::vector<VARIABLE<T> *> VARIABLE<T>::get_consumers()
 {
     return __children;
 }
@@ -59,10 +58,12 @@ std::vector<VARIABLE *> VARIABLE::get_consumers()
 /**
  * @brief returns the parents of the variable
 */
-std::vector<VARIABLE *> VARIABLE::get_inputs()
+template <typename T>
+std::vector<VARIABLE<T> *> VARIABLE<T>::get_inputs()
 {
     return __parents;
 }
+
 
 /**
  * @brief returns the data of the operation

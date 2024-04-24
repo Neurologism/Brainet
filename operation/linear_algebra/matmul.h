@@ -9,13 +9,16 @@
 /**
  * @brief Matrix multiplication operation class.
 */
-class MATMUL : public OPERATION
+template<typename T>
+class MATMUL : public OPERATION<T>
 {
 public:
+
     MATMUL(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
     std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
     void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
+
 };
 
 
@@ -23,25 +26,10 @@ public:
  * @brief Matrix multiplication function.
  * @attention to be replaced 
 */
-void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2)
+template<typename T>
+void MATMUL<T>::matmul(T * data1, T * data2, T * result)
 {
-    std::vector<double> result;
-
-    for (int i = 0; i < shape1[0]; i++) // replace this 
-    {
-        for (int j = 0; j < shape2[1]; j++)
-        {
-            double sum = 0;
-            for (int k = 0; k < shape1[1]; k++)
-            {
-                sum += data1[i * shape1[1] + k] * data2[k * shape2[1] + j];
-            }
-            result.push_back(sum);
-        }
-    }
-
-    data1 = result;
-    shape1 = {shape1[0], shape2[1]};
+    for()
 }
 
 
@@ -50,7 +38,8 @@ void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, st
  * handels input and output for the operation and does error checking
  * wraper function for matrix_multiply
 */
-void MATMUL::f(std::vector<VARIABLE *>& inputs)
+template<typename T>
+void MATMUL<T>::f(std::vector<VARIABLE<T> *>& inputs)
 {
     if (inputs.size() != 2)
     {
@@ -80,6 +69,7 @@ void MATMUL::f(std::vector<VARIABLE *>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
+
 std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
 {
     if (inputs.size() != 2)
