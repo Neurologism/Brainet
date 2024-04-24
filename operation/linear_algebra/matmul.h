@@ -1,5 +1,5 @@
-#ifndef MATRX_MULTIPLY_INCLUDE_GUARD
-#define MATRX_MULTIPLY_INCLUDE_GUARD
+#ifndef MATMUL_INCLUDE_GUARD
+#define MATMUL_INCLUDE_GUARD
 
 #include <vector>
 #include <stdexcept>
@@ -8,13 +8,13 @@
 /**
  * @brief Matrix multiplication operation class.
 */
-class MATRIX_MULTIPLY : public OPERATION
+class MATMUL : public OPERATION
 {
 public:
-    MATRIX_MULTIPLY(VARIABLE * variable) : OPERATION(variable){};
+    MATMUL(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
     void bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
-    void matrix_multiply(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
+    void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
 };
 
 
@@ -22,7 +22,7 @@ public:
  * @brief Matrix multiplication function.
  * @attention to be replaced 
 */
-void matrix_multiply(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2)
+void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2)
 {
     std::vector<double> result;
 
@@ -49,7 +49,7 @@ void matrix_multiply(std::vector<double> & data1, std::vector<double> & data2, s
  * handels input and output for the operation and does error checking
  * wraper function for matrix_multiply
 */
-void MATRIX_MULTIPLY::f(std::vector<VARIABLE *>& inputs)
+void MATMUL::f(std::vector<VARIABLE *>& inputs)
 {
     if (inputs.size() != 2)
     {
@@ -67,7 +67,7 @@ void MATRIX_MULTIPLY::f(std::vector<VARIABLE *>& inputs)
     std::vector<double> data1 = inputs[0]->get_data();
     std::vector<double> data2 = inputs[1]->get_data();
 
-    matrix_multiply(data1, data2, shape1, shape2);
+    matmul(data1, data2, shape1, shape2);
 
     __variable->set_data(data1);
     __variable->set_shape(shape1);
@@ -75,8 +75,11 @@ void MATRIX_MULTIPLY::f(std::vector<VARIABLE *>& inputs)
 }
 
 
-
-void MATRIX_MULTIPLY::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
+/**
+ * @brief backpropagation for matrix multiplication
+ * handels input and output for the operation and does error checking
+*/
+void MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
 {
     if (inputs.size() != 2)
     {
@@ -99,10 +102,13 @@ void MATRIX_MULTIPLY::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, s
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Focus variable is not in the input variables.");
     }
 
-    if (inputs[0] != focus)
+    if (inputs[0] != focus) // variable to be differentiated is in the second input 
     {
-        data1.swap(data2);
+        data1.swap(data2); // swap inputs  
+        shape1.swap(shape2);
     }
+    // variable to be differentiated is in the first input
+
 
 
 }
