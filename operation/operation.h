@@ -20,11 +20,11 @@ public:
     /**
      * @brief derivative of the function
      * assumes that the gradient is already calculated for the output variables 
+     * gives space to storage optmisations as we are computing the gradient for all inputs at once
      * @param inputs the input variables of the operation
-     * @param focus the variable to calculate the gradient for
      * @param outputs the output variables of the operation
     */
-    virtual void bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) =0;
+    virtual void bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs) =0;
 };
 
 #endif // OPERATION_INCLUDE_GUARD
