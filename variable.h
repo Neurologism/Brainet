@@ -2,6 +2,7 @@
 #define VARIABLE_INCLUDE_GUARD
 
 #include <vector>
+#include "tensor.h"
 #include "operation/operation.h"
 
 /**
@@ -12,8 +13,7 @@ class VARIABLE
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
 
-    std::vector<double> __data; // tensor of data 
-    std::vector<int> __shape; // shape of the tensor 
+    TENSOR __tensor; // tensor of data 
 
 public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
@@ -21,10 +21,7 @@ public:
     OPERATION * get_operation();
     std::vector<VARIABLE *> get_consumers();
     std::vector<VARIABLE *> get_inputs();
-    std::vector<double> get_data();
-    std::vector<int> get_shape();
-    void set_data(std::vector<double> & data);
-    void set_shape(std::vector<int> & shape);
+    TENSOR * get_tensor();
 };
 
 VARIABLE::~VARIABLE()
@@ -67,33 +64,9 @@ std::vector<VARIABLE *> VARIABLE::get_inputs()
 /**
  * @brief returns the data of the operation
 */
-std::vector<double> VARIABLE::get_data()
+TENSOR * VARIABLE::get_tensor()
 {
-    return __data;
-}
-
-/**
- * @brief returns the shape of the data
-*/
-std::vector<int> VARIABLE::get_shape()
-{
-    return __shape;
-}
-
-/**
- * @brief sets the data of the variable
-*/
-void VARIABLE::set_data(std::vector<double> & data)
-{
-    __data = data;
-}
-
-/**
- * @brief sets the shape of the data
-*/
-void VARIABLE::set_shape(std::vector<int> & shape)
-{
-    __shape = shape;
+    return &__tensor;
 }
 
 #endif
