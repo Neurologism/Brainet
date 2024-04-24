@@ -97,7 +97,7 @@ void MATMUL::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outp
     std::vector<double> data1 = inputs[0]->get_data();
     std::vector<double> data2 = inputs[1]->get_data();
 
-
+    
 
 
 }
