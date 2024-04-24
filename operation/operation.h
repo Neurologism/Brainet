@@ -24,7 +24,7 @@ public:
      * @param inputs the input variables of the operation
      * @param outputs the output variables of the operation
     */
-    virtual void bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs) =0;
+    virtual std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) =0;
 };
 
 #endif // OPERATION_INCLUDE_GUARD

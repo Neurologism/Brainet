@@ -13,7 +13,7 @@ class MATMUL : public OPERATION
 public:
     MATMUL(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
-    void bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs) override;
+    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
     void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
 };
 
@@ -79,7 +79,7 @@ void MATMUL::f(std::vector<VARIABLE *>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-void MATMUL::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs)
+std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
 {
     if (inputs.size() != 2)
     {
