@@ -3,16 +3,16 @@
 
 #include <vector>
 #include "operation/operation.h"
-#include "operation/linear_algebra/data_types.h"
 
 /**
  * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
 */
+template <typename T>
 class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
-    std::vector<DATATYPE *> __data;
+    T __data;
     
 
 public:
@@ -21,10 +21,10 @@ public:
     OPERATION * get_operation();
     std::vector<VARIABLE *> get_consumers();
     std::vector<VARIABLE *> get_inputs();
-    DATATYPE * get_data();
 };
 
-VARIABLE::~VARIABLE()
+template <typename T>
+VARIABLE<T>::~VARIABLE()
 {
     free(__op);
     for (VARIABLE * parent : __parents)
@@ -40,7 +40,8 @@ VARIABLE::~VARIABLE()
 /**
  * @brief returns the operation object
 */
-OPERATION * VARIABLE::get_operation()
+template <typename T>
+OPERATION * VARIABLE<T>::get_operation()
 {
     return __op;
 }
@@ -48,7 +49,8 @@ OPERATION * VARIABLE::get_operation()
 /**
  * @brief returns the children of the variable
 */
-std::vector<VARIABLE *> VARIABLE::get_consumers()
+template <typename T>
+std::vector<VARIABLE<T> *> VARIABLE<T>::get_consumers()
 {
     return __children;
 }
@@ -56,17 +58,10 @@ std::vector<VARIABLE *> VARIABLE::get_consumers()
 /**
  * @brief returns the parents of the variable
 */
-std::vector<VARIABLE *> VARIABLE::get_inputs()
+template <typename T>
+std::vector<VARIABLE<T> *> VARIABLE<T>::get_inputs()
 {
     return __parents;
-}
-
-/**
- * @brief returns the data of the variable
-*/
-DATATYPE * VARIABLE::get_data()
-{
-    return __data[0];
 }
 
 #endif

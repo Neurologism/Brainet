@@ -23,16 +23,8 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
         throw std::invalid_argument("ACTIVATION_FUNCTION::f: Invalid number of input variables.");
     }
     
-    TENSOR _tensor;
-    _tensor = inputs.front()->get_tensor(); // copy input tensor
-
-    for (int i = 0; i < _tensor.size(); i++) // apply activation function to all elements
-    {
-        for (int j = 0; i < _tensor[i]->size(); j++)
-        {
-            _tensor[i]->operator[](j)->set_data(activation_function(_tensor[i]->operator[](j)->get_data()));
-        }   
-    }
+    DATATYPE data = inputs[0]->get_data()[0];
+    data
 }
 
 void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs)

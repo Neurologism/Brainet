@@ -7,6 +7,7 @@
 /**
  * @brief OPERATION class is an abstract class that defines the interface for all operations.
 */
+
 class OPERATION
 {
 protected:

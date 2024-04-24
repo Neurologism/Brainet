@@ -1,37 +1,41 @@
 #ifndef DATA_TYPES_INCLUDE_GUARD
 #define DATA_TYPES_INCLUDE_GUARD
-
+// this is a template and not finished 
 #include <vector>
 
+class DATATYPE
+{
 
-class DATATYPE{};
+};
 
+template <typename T>
 class SCALAR : public DATATYPE
 {
-    double __value;
+    T __value;
 public:
-    SCALAR(double value) : __value(value){};
-    double get_value(){return __value;};
+    SCALAR(T value) : __value(value){};
+    T get_value(){return __value;};
 };
 
+template <typename T>
 class VECTOR : public DATATYPE
 {
-    std::vector<double> __value;
+    std::vector<T> __value;
 public:
     VECTOR() : __value(){};
-    VECTOR(std::vector<double> value) : __value(value){};
-    std::vector<double> * get_value(){return &__value;};
+    VECTOR(std::vector<T> value) : __value(value){};
+    std::vector<T> * get_value(){return &__value;};
 };
 
 
-
+template <typename T>
 class MATRIX : public DATATYPE
 {
-    std::vector<std::vector<double>> __value;
+    std::vector<std::vector<T>> __value;
 public:
     MATRIX() : __value(){};
-    MATRIX(std::vector<std::vector<double>> value) : __value(value){};
-    std::vector<std::vector<double>> * get_value(){return &__value;};
+    MATRIX(std::vector<std::vector<T>> value) : __value(value){};
+    std::vector<std::vector<T>> * get_value(){return &__value;};
 };
 
 #endif // DATA_TYPES_INCLUDE_GUARD
