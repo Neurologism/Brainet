@@ -64,4 +64,39 @@ std::vector<VARIABLE<T> *> VARIABLE<T>::get_inputs()
     return __parents;
 }
 
+
+/**
+ * @brief returns the data of the operation
+*/
+std::vector<double> VARIABLE::get_data()
+{
+    return __data;
+}
+
+/**
+ * @brief returns the shape of the data
+*/
+std::vector<int> VARIABLE::get_shape()
+{
+    return __shape;
+}
+
+/**
+ * @brief sets the data of the variable
+ * @attention uses swap operation 
+*/
+void VARIABLE::set_data(std::vector<double> & data)
+{
+    __data.swap(data);
+}
+
+/**
+ * @brief sets the shape of the data
+ * @attention uses swap operation
+*/
+void VARIABLE::set_shape(std::vector<int> & shape)
+{
+    __shape.swap(shape);
+}
+
 #endif

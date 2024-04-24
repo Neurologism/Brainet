@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <array>
 #include "..\operation.h"
 
 /**
@@ -12,10 +13,12 @@ template<typename T>
 class MATMUL : public OPERATION<T>
 {
 public:
-    MATMUL(VARIABLE<T><T> * variable) : OPERATION(variable){};
-    void f(std::vector<VARIABLE<T> *>& inputs) override;
-    void bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs) override;
-    void matmul(T * data1, T * data2, T * result);
+
+    MATMUL(VARIABLE * variable) : OPERATION(variable){};
+    void f(std::vector<VARIABLE *>& inputs) override;
+    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
+    void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
+
 };
 
 
@@ -66,8 +69,8 @@ void MATMUL<T>::f(std::vector<VARIABLE<T> *>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-template<typename T>
-void MATMUL<T>::bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs)
+
+std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
 {
     if (inputs.size() != 2)
     {
@@ -85,8 +88,7 @@ void MATMUL<T>::bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T
     std::vector<double> data1 = inputs[0]->get_data();
     std::vector<double> data2 = inputs[1]->get_data();
 
-
-
+    
 
 }
 

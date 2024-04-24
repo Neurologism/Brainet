@@ -12,9 +12,9 @@ template <typename T>
 class ACTIVATION_FUNCTION : public OPERATION
 {
 public:
-    ACTIVATION_FUNCTION(VARIABLE<T> * variable) : OPERATION(variable){};
-    void f(std::vector<VARIABLE<T> *>& inputs) override;
-    void bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs) override;
+    ACTIVATION_FUNCTION(VARIABLE * variable) : OPERATION(variable){};
+    void f(std::vector<VARIABLE *>& inputs) override;
+    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
 
     virtual double activation_function(double x) = 0;
     virtual double activation_function_derivative(double x) = 0;
@@ -32,8 +32,8 @@ void ACTIVATION_FUNCTION<T>::f(std::vector<VARIABLE<T> *>& inputs)
     data
 }
 
-template <typename T>
-void ACTIVATION_FUNCTION<T>::bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs)
+std::vector<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
+
 {
     if (inputs.size() != 1)
     {
