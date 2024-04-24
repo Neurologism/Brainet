@@ -60,7 +60,7 @@ std::vector<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, 
         _data[i] *= gradient;
     }
 
-    __variable->set_data(_data);
+    return _data;
 }
 
 
