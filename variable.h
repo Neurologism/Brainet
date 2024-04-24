@@ -11,7 +11,7 @@ template <typename T>
 class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
-    OPERATION<VARIABLE<T>> __op;
+    OPERATION<T> __op;
     T __data;
     
 

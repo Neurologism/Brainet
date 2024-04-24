@@ -5,18 +5,23 @@
 #include <stdexcept>
 #include"..\operation.h"
 
+/**
+ * @brief ACTIVATION_FUNCTION class is an abstract class that defines the interface for all activation functions.
+*/
+template <typename T>
 class ACTIVATION_FUNCTION : public OPERATION
 {
 public:
-    ACTIVATION_FUNCTION(VARIABLE * variable) : OPERATION(variable){};
-    void f(std::vector<VARIABLE *>& inputs) override;
-    void bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs) override;
+    ACTIVATION_FUNCTION(VARIABLE<T> * variable) : OPERATION(variable){};
+    void f(std::vector<VARIABLE<T> *>& inputs) override;
+    void bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs) override;
 
     virtual double activation_function(double x) = 0;
     virtual double activation_function_derivative(double x) = 0;
 };
 
-void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
+template <typename T>
+void ACTIVATION_FUNCTION<T>::f(std::vector<VARIABLE<T> *>& inputs)
 {
     if (inputs.size() != 1)
     {
@@ -27,7 +32,8 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
     data
 }
 
-void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs)
+template <typename T>
+void ACTIVATION_FUNCTION<T>::bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs)
 {
     if (inputs.size() != 1)
     {
@@ -39,7 +45,7 @@ void ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, std::vector<VAR
 
     // sum the gradients of the outputs
 
-    for (VARIABLE * output : outputs)
+    for (VARIABLE<T> * output : outputs)
     {
         TENSOR * tensor = output->get_tensor();
         for (int i = 0; i < tensor->size(); i++)

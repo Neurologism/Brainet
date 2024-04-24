@@ -8,13 +8,14 @@
 /**
  * @brief Matrix multiplication operation class.
 */
-class MATMUL : public OPERATION
+template<typename T>
+class MATMUL : public OPERATION<T>
 {
 public:
-    MATMUL(VARIABLE * variable) : OPERATION(variable){};
-    void f(std::vector<VARIABLE *>& inputs) override;
-    void bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs) override;
-    void matmul(TENSOR * data1, TENSOR * data2, TENSOR * result);
+    MATMUL(VARIABLE<T><T> * variable) : OPERATION(variable){};
+    void f(std::vector<VARIABLE<T> *>& inputs) override;
+    void bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs) override;
+    void matmul(T * data1, T * data2, T * result);
 };
 
 
@@ -22,7 +23,8 @@ public:
  * @brief Matrix multiplication function.
  * @attention to be replaced 
 */
-void MATMUL::matmul(TENSOR * data1, TENSOR * data2, TENSOR * result)
+template<typename T>
+void MATMUL<T>::matmul(T * data1, T * data2, T * result)
 {
     for()
 }
@@ -33,7 +35,8 @@ void MATMUL::matmul(TENSOR * data1, TENSOR * data2, TENSOR * result)
  * handels input and output for the operation and does error checking
  * wraper function for matrix_multiply
 */
-void MATMUL::f(std::vector<VARIABLE *>& inputs)
+template<typename T>
+void MATMUL<T>::f(std::vector<VARIABLE<T> *>& inputs)
 {
     if (inputs.size() != 2)
     {
@@ -63,7 +66,8 @@ void MATMUL::f(std::vector<VARIABLE *>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-void MATMUL::bprop(std::vector<VARIABLE *>& inputs, std::vector<VARIABLE *> outputs)
+template<typename T>
+void MATMUL<T>::bprop(std::vector<VARIABLE<T> *>& inputs, std::vector<VARIABLE<T> *> outputs)
 {
     if (inputs.size() != 2)
     {
