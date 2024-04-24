@@ -82,18 +82,20 @@ std::vector<int> VARIABLE::get_shape()
 
 /**
  * @brief sets the data of the variable
+ * @attention uses swap operation 
 */
 void VARIABLE::set_data(std::vector<double> & data)
 {
-    __data = data;
+    __data.swap(data);
 }
 
 /**
  * @brief sets the shape of the data
+ * @attention uses swap operation
 */
 void VARIABLE::set_shape(std::vector<int> & shape)
 {
-    __shape = shape;
+    __shape.swap(shape);
 }
 
 #endif

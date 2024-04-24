@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <array>
 #include "..\operation.h"
 
 /**
@@ -97,8 +98,7 @@ std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * fo
     std::vector<double> data1 = inputs[0]->get_data();
     std::vector<double> data2 = inputs[1]->get_data();
 
-
-
+    
 
 }
 
