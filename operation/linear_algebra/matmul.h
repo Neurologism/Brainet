@@ -39,7 +39,7 @@ void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, st
         }
     }
 
-    data1 = result;
+    data1.swap(result);
     shape1 = {shape1[0], shape2[1]};
 }
 
@@ -97,9 +97,24 @@ std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * fo
     std::vector<double> data1 = inputs[0]->get_data();
     std::vector<double> data2 = inputs[1]->get_data();
 
+    if (inputs[0] != focus)
+    {
+        data1.swap(data2);
+        shape1.swap(shape2);
+    }
 
+    std::vector<double> answer(outputs[0]->get_data().size(), 0);
+    for(VARIABLE * var : outputs)
+    {
+        for (int i = 0; i < var->get_data().size(); i++)
+        {
+            answer[i] += var->get_data()[i];
+        }        
+    }
 
+    matmul(answer, data2, shape1, shape2);
 
+    return answer;
 }
 
 #endif // MATRX_MULTIPLY_INCLUDE_GUARD
