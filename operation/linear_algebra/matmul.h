@@ -1,8 +1,6 @@
 #ifndef MATMUL_INCLUDE_GUARD
 #define MATMUL_INCLUDE_GUARD
 
-#include <vector>
-#include <stdexcept>
 #include "..\operation.h"
 
 /**
@@ -13,7 +11,7 @@ class MATMUL : public OPERATION
 public:
     MATMUL(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
-    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
+    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient) override;
     void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
 };
 
@@ -79,7 +77,7 @@ void MATMUL::f(std::vector<VARIABLE *>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
+std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient)
 {
     if (inputs.size() != 2)
     {
@@ -94,27 +92,20 @@ std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * fo
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid shapes of input matrices.");
     }
 
-    std::vector<double> data1 = inputs[0]->get_data();
-    std::vector<double> data2 = inputs[1]->get_data();
+    std::vector<double> data;
 
     if (inputs[0] != focus)
     {
-        data1.swap(data2);
+        data = inputs[1]->get_data();
         shape1.swap(shape2);
     }
+    else data = inputs[0]->get_data();
 
-    std::vector<double> answer(outputs[0]->get_data().size(), 0);
-    for(VARIABLE * var : outputs)
-    {
-        for (int i = 0; i < var->get_data().size(); i++)
-        {
-            answer[i] += var->get_data()[i];
-        }        
-    }
 
-    matmul(answer, data2, shape1, shape2);
 
-    return answer;
+    matmul(data, gradient, shape1, shape2);
+
+    return data;
 }
 
 #endif // MATRX_MULTIPLY_INCLUDE_GUARD

@@ -1,7 +1,7 @@
 #ifndef OPERATION_INCLUDE_GUARD
 #define OPERATION_INCLUDE_GUARD
 
-#include <vector>
+#include "..\dependencies.h"
 #include "..\variable.h"
 
 /**
@@ -20,12 +20,11 @@ public:
     /**
      * @brief derivative of the function
      * assumes that the gradient is already calculated for the output variables 
-     * gives space to storage optmisations as we are computing the gradient for all inputs at once
      * @param inputs the input variables of the operation
      * @param focus the variable that the gradient is calculated for
      * @param outputs the output variables of the operation
     */
-    virtual std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) =0;
+    virtual std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient) =0;
 };
 
 #endif // OPERATION_INCLUDE_GUARD
