@@ -8,7 +8,7 @@ class ACTIVATION_FUNCTION : public OPERATION
 public:
     ACTIVATION_FUNCTION(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
-    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs) override;
+    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient) override;
 
     virtual double activation_function(double x) = 0;
     virtual double activation_function_derivative(double x) = 0;
@@ -33,7 +33,7 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
     __variable->set_shape(_shape);
 }
 
-std::vector<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<VARIABLE *> outputs)
+std::vector<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient)
 {
     if (inputs.size() != 1)
     {
@@ -43,19 +43,9 @@ std::vector<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, 
     // load derivative of activation into data 
     std::vector<double> _data;
 
-    for (double data : inputs.front()->get_data()) // apply activation function derivative to all elements
+    for (int i = 0; i < focus->get_data().size(); i++) // apply activation function derivative to all elements
     {
-        _data.push_back(activation_function_derivative(data));
-    }
-
-    for (int i = 0; i < _data.size(); i++)
-    {
-        double gradient = 0;
-        for (VARIABLE * output : outputs)
-        {
-            gradient += output->get_data()[i];
-        }
-        _data[i] *= gradient;
+        _data.push_back(activation_function_derivative(focus->get_data()[i])*gradient[i]);
     }
 
     return _data;
