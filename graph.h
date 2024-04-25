@@ -16,7 +16,7 @@ public:
     void build_grad(int focus, std::vector<std::vector<double>> & grad_table);
 }; 
 
-GRAPH::GRAPH()
+GRAPH::GRAPH() 
 {
 }
 
