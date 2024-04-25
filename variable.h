@@ -11,7 +11,7 @@ class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
-
+    // could use void pointer if required 
     std::vector<double> __data; // tensor of data 
     std::vector<int> __shape; // shape of the tensor 
 
@@ -29,7 +29,6 @@ public:
 
 VARIABLE::~VARIABLE()
 {
-    free(__op);
     for (VARIABLE * parent : __parents)
     {
         free(parent);

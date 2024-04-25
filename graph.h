@@ -6,6 +6,7 @@
 
 class GRAPH
 {
+    
 public:
     GRAPH();
     ~GRAPH();
