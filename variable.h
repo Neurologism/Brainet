@@ -20,8 +20,8 @@ public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
     ~VARIABLE();
     OPERATION * get_operation();
-    std::vector<VARIABLE *> get_consumers();
-    std::vector<VARIABLE *> get_inputs();
+    std::vector<VARIABLE *> & get_consumers();
+    std::vector<VARIABLE *> & get_inputs();
     std::vector<double> get_data();
     std::vector<int> get_shape();
     int get_id();
@@ -53,7 +53,7 @@ OPERATION * VARIABLE::get_operation()
 /**
  * @brief returns the children of the variable
 */
-std::vector<VARIABLE *> VARIABLE::get_consumers()
+std::vector<VARIABLE *> & VARIABLE::get_consumers()
 {
     return __children;
 }
@@ -61,7 +61,7 @@ std::vector<VARIABLE *> VARIABLE::get_consumers()
 /**
  * @brief returns the parents of the variable
 */
-std::vector<VARIABLE *> VARIABLE::get_inputs()
+std::vector<VARIABLE *> & VARIABLE::get_inputs()
 {
     return __parents;
 }
