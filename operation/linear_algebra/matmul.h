@@ -1,8 +1,6 @@
 #ifndef MATMUL_INCLUDE_GUARD
 #define MATMUL_INCLUDE_GUARD
 
-#include <vector>
-#include <stdexcept>
 #include "..\operation.h"
 
 /**
