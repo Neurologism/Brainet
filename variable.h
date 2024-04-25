@@ -14,6 +14,7 @@ class VARIABLE
     // could use void pointer if required 
     std::vector<double> __data; // tensor of data 
     std::vector<int> __shape; // shape of the tensor 
+    int __id;
 
 public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
@@ -23,8 +24,10 @@ public:
     std::vector<VARIABLE *> get_inputs();
     std::vector<double> get_data();
     std::vector<int> get_shape();
+    int get_id();
     void set_data(std::vector<double> & data);
     void set_shape(std::vector<int> & shape);
+    void set_id(int id);
 };
 
 VARIABLE::~VARIABLE()
@@ -93,6 +96,22 @@ void VARIABLE::set_data(std::vector<double> & data)
 void VARIABLE::set_shape(std::vector<int> & shape)
 {
     __shape = shape;
+}
+
+/**
+ * @brief returns the id of the variable
+*/
+int VARIABLE::get_id()
+{
+    return __id;
+}
+
+/**
+ * @brief sets the id of the variable
+*/
+void VARIABLE::set_id(int id)
+{
+    __id = id;
 }
 
 #endif
