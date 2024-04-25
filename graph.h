@@ -31,4 +31,5 @@ VARIABLE * GRAPH::operator[](int index)
 
 
 
+
 #endif // GRAPH_INCLUDE_GUARD
