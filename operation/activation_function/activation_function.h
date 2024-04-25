@@ -1,8 +1,6 @@
 #ifndef ACTIVATION_FUNCTION_INCLUDE_GUARD
 #define ACTIVATION_FUNCTION_INCLUDE_GUARD
 
-#include <vector>
-#include <stdexcept>
 #include"..\operation.h"
 
 class ACTIVATION_FUNCTION : public OPERATION

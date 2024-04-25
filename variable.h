@@ -1,7 +1,7 @@
 #ifndef VARIABLE_INCLUDE_GUARD
 #define VARIABLE_INCLUDE_GUARD
 
-#include <vector>
+#include "dependencies.h"
 #include "operation/operation.h"
 
 /**

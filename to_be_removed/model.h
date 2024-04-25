@@ -2,7 +2,6 @@
 #define TRAIN_INCLUDE_GUARD
 
 #include<rectified_linear_unit.h>
-#include<vector>
 
 /**
  * @attention This is just a rough sketch to try basic functionality
