@@ -12,6 +12,7 @@ class OPERATION
 protected:
     VARIABLE * __variable;
 public:
+    OPERATION() = default;
     OPERATION(VARIABLE * variable) : __variable(variable){};
     /**
      * @brief mathematical function the operation implements
@@ -25,6 +26,16 @@ public:
      * @param outputs the output variables of the operation
     */
     virtual std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) =0;
+    /**
+     * @brief sets the variable of the operation
+    */
+    VARIABLE * set_variable(VARIABLE * variable);
 };
+
+VARIABLE * OPERATION::set_variable(VARIABLE * variable)
+{
+    __variable = variable;
+    return __variable;
+}
 
 #endif // OPERATION_INCLUDE_GUARD
