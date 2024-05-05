@@ -2,7 +2,7 @@
 #define OPERATION_INCLUDE_GUARD
 
 #include "..\dependencies.h"
-#include "..\variable.h"
+#include "..\abstract_variable.h"
 
 /**
  * @brief OPERATION class is an abstract class that defines the interface for all operations.
@@ -11,14 +11,14 @@ class OPERATION
 {
 protected:
 
-    VARIABLE * __variable;
+    ABS_VARIABLE * __variable;
 public:
     OPERATION() = default;
-    OPERATION(VARIABLE * variable) : __variable(variable){};
+    OPERATION(ABS_VARIABLE * variable) : __variable(variable){};
     /**
      * @brief mathematical function the operation implements
     */
-    virtual void f(std::vector<VARIABLE *>& inputs) =0; 
+    virtual void f(std::vector<ABS_VARIABLE *>& inputs) =0; 
     /**
      * @brief derivative of the function
      * assumes that the gradient is already calculated for the output variables 
@@ -26,7 +26,7 @@ public:
      * @param focus the variable that the gradient is calculated for
      * @param outputs the output variables of the operation
     */
-    virtual std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) =0;
+    virtual std::vector<double> bprop(std::vector<ABS_VARIABLE *>& inputs, ABS_VARIABLE & focus, std::vector<double> & gradient) =0;
     /**
      * @brief sets the variable of the operation
     */
