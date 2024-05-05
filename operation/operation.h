@@ -9,12 +9,8 @@
 */
 class OPERATION
 {
-protected:
-
-    ABS_VARIABLE * __variable;
 public:
     OPERATION() = default;
-    OPERATION(ABS_VARIABLE * variable) : __variable(variable){};
     /**
      * @brief mathematical function the operation implements
     */
