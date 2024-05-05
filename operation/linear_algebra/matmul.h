@@ -11,7 +11,7 @@ class MATMUL : public OPERATION
 public:
     MATMUL(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
-    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient) override;
+    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) override;
     void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
 };
 
@@ -77,7 +77,7 @@ void MATMUL::f(std::vector<VARIABLE *>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * focus, std::vector<double> & gradient)
+std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient)
 {
     if (inputs.size() != 2)
     {
@@ -94,7 +94,7 @@ std::vector<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE * fo
 
     std::vector<double> data;
 
-    if (inputs[0] != focus)
+    if (inputs[0]->get_id() != focus.get_id())
     {
         data = inputs[1]->get_data();
         shape1.swap(shape2);

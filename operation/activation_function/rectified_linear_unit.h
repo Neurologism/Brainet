@@ -11,6 +11,7 @@ class ReLU : public ACTIVATION_FUNCTION
 protected:
     double __gradient; // gradient of left part of the function
     
+
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 
@@ -23,6 +24,7 @@ public:
 */
 ReLU::ReLU(VARIABLE * variable) : ACTIVATION_FUNCTION(variable)
 {
+    
     __gradient = 0;
 }
 
