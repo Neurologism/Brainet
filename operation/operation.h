@@ -10,6 +10,7 @@
 class OPERATION
 {
 protected:
+
     VARIABLE * __variable;
 public:
     OPERATION() = default;
