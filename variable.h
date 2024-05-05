@@ -3,12 +3,13 @@
 
 #include "dependencies.h"
 #include "operation/operation.h"
-#include "abstract_variable.h"
+
+class OPERATION;
 
 /**
  * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
 */
-class VARIABLE : public ABS_VARIABLE
+class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
@@ -23,12 +24,12 @@ public:
     OPERATION * get_operation();
     std::vector<VARIABLE *> & get_consumers();
     std::vector<VARIABLE *> & get_inputs();
-    std::vector<double> get_data() override;
-    std::vector<int> get_shape() override;
-    int get_id() override;
-    void set_data(std::vector<double> & data) override;
-    void set_shape(std::vector<int> & shape) override;
-    void set_id(int id) override;
+    std::vector<double> get_data();
+    std::vector<int> get_shape();
+    int get_id();
+    void set_data(std::vector<double> & data);
+    void set_shape(std::vector<int> & shape);
+    void set_id(int id);
 };
 
 VARIABLE::~VARIABLE()
