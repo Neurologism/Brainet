@@ -17,6 +17,10 @@ public:
 void DENSE_BUILDER::add_relu()
 {
     ReLU * relu = new ReLU();
+    VARIABLE * variable = new VARIABLE(relu, {__end_of_stream}, {});
+    __end_of_stream->get_consumers().push_back(variable);
+    __graph->add_variable(variable);
+    __end_of_stream = variable;
 }
 
 #endif // DENSE_BUILDER_INCLUDE_GUARD
