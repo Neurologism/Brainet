@@ -6,7 +6,6 @@
 class ACTIVATION_FUNCTION : public OPERATION
 {
 public:
-    ACTIVATION_FUNCTION(VARIABLE * variable) : OPERATION(variable){};
     void f(std::vector<VARIABLE *>& inputs) override;
     std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) override;
 
