@@ -14,6 +14,8 @@ protected:
 
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
+
+public:
     ReLU();
 };
 
