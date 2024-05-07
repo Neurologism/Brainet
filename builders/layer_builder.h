@@ -5,6 +5,7 @@
 #include "../dependencies.h"
 #include "../operation/activation_function/rectified_linear_unit.h"
 #include "../operation/linear_algebra/matmul.h"
+#include "../operation/void_operation.h"
 
 /**
  * @brief LAYER_BUILDER class is a builder class for creating a layer in a model.
@@ -22,7 +23,13 @@ public:
 void LAYER_BUILDER::add_matrix_multiplication()
 {
     if(__end_of_stream!=nullptr) throw std::exception("End of stream is not set.");
-    VARIABLE * variable = new VARIABLE(new MATMUL(), {__end_of_stream}, {});
+    VARIABLE * weights = new VARIABLE(new VOID_OPERATION(), {}, {});
+    __graph->add_variable(weights);
+    VARIABLE * variable = new VARIABLE(new MATMUL(), {__end_of_stream, weights}, {});
+    __end_of_stream->get_consumers().push_back(variable);
+    weights->get_consumers().push_back(variable);
+    __graph->add_variable(variable);
+    __end_of_stream = variable;
 }
 
 
