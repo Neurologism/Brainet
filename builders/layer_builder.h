@@ -16,14 +16,16 @@ protected:
     static VARIABLE * __end_of_stream=nullptr;
     
 public:
-    void add_matrix_multiplication();
-    void add_activation_function();
+    void add_matrix_multiplication(std::vector<double> & weights, std::vector<int> & shape);
+    void add_activation_function(OPERATION * activation_function);
 };
 
-void LAYER_BUILDER::add_matrix_multiplication()
+void LAYER_BUILDER::add_matrix_multiplication(std::vector<double> & weights, std::vector<int> & shape)
 {
     if(__end_of_stream!=nullptr) throw std::exception("End of stream is not set.");
     VARIABLE * weights = new VARIABLE(new VOID_OPERATION(), {}, {});
+    weights->set_data(weights);
+    weights->set_shape(shape);
     __graph->add_variable(weights);
     VARIABLE * variable = new VARIABLE(new MATMUL(), {__end_of_stream, weights}, {});
     __end_of_stream->get_consumers().push_back(variable);
