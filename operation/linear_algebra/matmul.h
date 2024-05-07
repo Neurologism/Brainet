@@ -9,7 +9,7 @@
 class MATMUL : public OPERATION
 {
 public:
-    MATMUL(VARIABLE * variable) : OPERATION(variable){};
+    MATMUL(){};
     void f(std::vector<VARIABLE *>& inputs) override;
     std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) override;
     void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
