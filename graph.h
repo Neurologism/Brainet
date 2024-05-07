@@ -7,15 +7,13 @@
 class GRAPH // dag of variables and operations
 {
     std::vector<VARIABLE> __variables;
-    std::vector<OPERATION> __operations;
+    void build_grad(int focus, std::vector<std::vector<double>> & grad_table);
 public:
     GRAPH();
     ~GRAPH();
     VARIABLE * operator[](int index);
     std::vector<std::vector<double>> backprop(std::vector<bool> & target, int z);
-    void build_grad(int focus, std::vector<std::vector<double>> & grad_table);
     std::vector<VARIABLE> & get_variables();
-    std::vector<OPERATION> & get_operations();
 }; 
 
 GRAPH::GRAPH() 
@@ -85,11 +83,6 @@ void GRAPH::build_grad(int focus, std::vector<std::vector<double>> & grad_table)
 std::vector<VARIABLE> & GRAPH::get_variables()
 {
     return __variables;
-}
-
-std::vector<OPERATION> & GRAPH::get_operations()
-{
-    return __operations;
 }
 
 

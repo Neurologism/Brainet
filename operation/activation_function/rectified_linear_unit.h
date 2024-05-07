@@ -15,14 +15,14 @@ protected:
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 
-public:    
-    ReLU(VARIABLE * variable);
+public:
+    ReLU();
 };
 
 /**
  * @brief Constructor for the ReLU class.
 */
-ReLU::ReLU(VARIABLE * variable) : ACTIVATION_FUNCTION(variable)
+ReLU::ReLU()
 {
     
     __gradient = 0;
@@ -44,14 +44,14 @@ double ReLU::activation_function_derivative(double input)
 class LeakyReLU : public ReLU
 {
 public:
-    LeakyReLU(VARIABLE * variable, double left_gradient);
+    LeakyReLU(double left_gradient);
 };
 
 /**
  * @brief Constructor for the LeakyReLU class.
  * @param gradient The gradient of the function for x < 0.
 */
-LeakyReLU::LeakyReLU(VARIABLE * variable, double gradient) : ReLU(variable)
+LeakyReLU::LeakyReLU(double gradient)
 {
     __gradient = gradient;
 }
@@ -62,13 +62,13 @@ LeakyReLU::LeakyReLU(VARIABLE * variable, double gradient) : ReLU(variable)
 class AbsoluteReLU : public ReLU
 {
 public:
-    AbsoluteReLU(VARIABLE * variable);
+    AbsoluteReLU();
 };
 
 /**
  * @brief Constructor for the AbsoluteReLU class.
 */
-AbsoluteReLU::AbsoluteReLU(VARIABLE * variable) : ReLU(variable)
+AbsoluteReLU::AbsoluteReLU()
 {
     __gradient = -1;
 }

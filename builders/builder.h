@@ -11,7 +11,6 @@
 
 class BUILDER
 {
-    static VARIABLE * __end_of_stream;
     GRAPH * __graph;
 public:
     BUILDER(GRAPH * graph) : __graph(graph){};
