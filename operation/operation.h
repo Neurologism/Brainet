@@ -12,11 +12,9 @@ class VARIABLE;
 class OPERATION
 {
 protected:
-
-    VARIABLE * __variable;
+    VARIABLE * __variable = nullptr;
 public:
     OPERATION() = default;
-    OPERATION(VARIABLE * variable) : __variable(variable){};
     /**
      * @brief mathematical function the operation implements
     */
