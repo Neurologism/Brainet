@@ -12,37 +12,49 @@
 */
 class LAYER_BUILDER : public BUILDER
 {
-protected:
-    static VARIABLE * __end_of_stream=nullptr;
-    
 public:
-    void add_matrix_multiplication(std::vector<double> & weights, std::vector<int> & shape);
-    void add_activation_function(OPERATION * activation_function);
+    VARIABLE * add_linear_transformation(VARIABLE * head, std::vector<double> & weights, std::vector<int> & shape);
+    VARIABLE * add_activation_function(VARIABLE * parent, OPERATION * activation_function);
 };
 
-void LAYER_BUILDER::add_matrix_multiplication(std::vector<double> & weights, std::vector<int> & shape)
+/**
+ * @brief adds a linear transformation to the model
+ * creates two VARIABLES, one to store the weights, which is a pseudo-variable with a VOID_OPERATION, and one to store the result of the matrix multiplication
+ * it creates a MATMUL operation. 
+ * @param parent the variable that should be the parent of the variable of the linear transformation
+ * @param weights the weights used to initalize the pseudo-variable
+ * @param shape the shape of the weight matrix
+ * @return the new child that was added to the parent variable and represents the result of the matrix multiplication
+*/
+VARIABLE * LAYER_BUILDER::add_linear_transformation(VARIABLE * parent,std::vector<double> & weights, std::vector<int> & shape)
 {
-    if(__end_of_stream!=nullptr) throw std::exception("End of stream is not set.");
-    VARIABLE * weights = new VARIABLE(new VOID_OPERATION(), {}, {});
-    weights->set_data(weights);
-    weights->set_shape(shape);
+    VARIABLE * _weights = new VARIABLE(new VOID_OPERATION(), {}, {});
+    _weights->set_data(weights);
+    _weights->set_shape(shape);
     __graph->add_variable(weights);
-    VARIABLE * variable = new VARIABLE(new MATMUL(), {__end_of_stream, weights}, {});
-    __end_of_stream->get_consumers().push_back(variable);
-    weights->get_consumers().push_back(variable);
+    VARIABLE * variable = new VARIABLE(new MATMUL(), {parent, _weights}, {});
+    parent->get_consumers().push_back(variable);
+    _weights->get_consumers().push_back(variable);
     __graph->add_variable(variable);
-    __end_of_stream = variable;
+    return &VARIABLE;
 }
 
 
-
-void LAYER_BUILDER::add_activation_function(OPERATION * activation_function)
+/**
+ * @brief adds an activation function to the model
+ * creates a new VARIABLE with the activation function as the operation and the parent as the input
+ * @param parent the variable that should be the parent of the variable of the activation function
+ * @param activation_function the activation function that should be used
+ * @return the new child that was added to the parent variable and represents the result of the activation function
+*/
+VARIABLE * LAYER_BUILDER::add_activation_function(VARIABLE * parent, OPERATION * activation_function)
 {
-    if(__end_of_stream!=nullptr) throw std::exception("End of stream is not set.");
-    VARIABLE * variable = new VARIABLE(activation_function, {__end_of_stream}, {});
-    __end_of_stream->get_consumers().push_back(variable);
+    VARIABLE * variable = new VARIABLE(activation_function, {parent}, {});
+    parent->get_consumers().push_back(variable);
     __graph->add_variable(variable);
-    __end_of_stream = variable;
+    return variable;
 }
+
+
 
 #endif // LAYER_BUILDER_INCLUDE_GUARD
