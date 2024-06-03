@@ -12,6 +12,7 @@ class MODEL
     LAYER_BUILDER * __layer_builder;
 public:
     void add_dense(OPERATION * op, int units);
+    void train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate);
 };
 
 void MODEL::add_dense(OPERATION * op, int units)
@@ -26,6 +27,11 @@ void MODEL::add_dense(OPERATION * op, int units)
     }
     __sequential_head = __layer_builder->add_linear_transformation(__sequential_head,weights,shape);
     __sequential_head = __layer_builder->add_activation_function(__sequential_head, op);
+}
+
+void MODEL::train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate)
+{
+    
 }
 
 #endif // MODEL_INCLUDE_GUARD
