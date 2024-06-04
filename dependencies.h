@@ -5,5 +5,6 @@
 #include <vector>
 #include <stdexcept>
 #include <exception>
+#include <random>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
