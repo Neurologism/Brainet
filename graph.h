@@ -1,18 +1,19 @@
 #ifndef GRAPH_INCLUDE_GUARD
 #define GRAPH_INCLUDE_GUARD
 
-
+#include "dependencies.h"
 #include "variable.h"
 
 class GRAPH // dag of variables and operations
 {
     std::vector<VARIABLE> __variables;
     void build_grad(int focus, std::vector<std::vector<double>> & grad_table);
+    std::vector<VARIABLE *> __topo_sort();
 public:
     GRAPH();
     ~GRAPH();
     VARIABLE * operator[](int index);
-    std::vector<double> forward();
+    void forward();
     std::vector<std::vector<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
 }; 
@@ -31,12 +32,20 @@ VARIABLE * GRAPH::operator[](int index)
 }
 
 /**
+ * @brief topological sort of the graph
+ * @return Returns a list of pointers to the variables in topological order
+*/
+std::vector<VARIABLE *> GRAPH::__topo_sort()
+{
+}
+
+/**
  * @brief algorithm executing the forward pass
  * @return Returns the value of all variables 
 */
-std::vector<double> GRAPH::forward()
+void GRAPH::forward()
 {
-
+    
 }
 
 
