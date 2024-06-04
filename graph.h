@@ -12,6 +12,7 @@ public:
     GRAPH();
     ~GRAPH();
     VARIABLE * operator[](int index);
+    std::vector<double> forward();
     std::vector<std::vector<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
 }; 
@@ -29,26 +30,35 @@ VARIABLE * GRAPH::operator[](int index)
     return &__variables[index];
 }
 
+/**
+ * @brief algorithm executing the forward pass
+ * @return Returns the value of all variables 
+*/
+std::vector<double> GRAPH::forward()
+{
+
+}
+
 
 /**
  * @brief backpropagation algorithm
- * @param target boolen list indicating for each variable in __variables if its gradient should be computed 
+ * @attention assumes that the graph is a dag and forward has been called before
+ * @param targets boolen list indicating for each variable in __variables if its gradient should be computed 
  * @param z the variable to be differentiated (gradient is 1)
 */
-std::vector<std::vector<double>> GRAPH::backprop(std::vector<bool> & target, int z)
+std::vector<std::vector<double>> GRAPH::backprop(std::vector<bool> & targets, int z)
 {
     std::vector<std::vector<double>> grad_table(__variables.size()); // data 
-    grad_table[z] = {1};
+    grad_table[z] = {1}; // change to make possible to differentiate with respect to multiple variables ?
 
     for (int i = 0; i < __variables.size(); i++)
     {
-        if (target[i]) // call build grad for each target variable
+        if (targets[i]) // call build grad for each target variable
         {
             build_grad(i, grad_table);
         }
     }
     return grad_table;
-    
 }
 
 /**
