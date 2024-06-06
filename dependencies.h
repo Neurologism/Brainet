@@ -5,5 +5,6 @@
 #include <vector>
 #include <stdexcept>
 #include <exception>
+#include <thread>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
