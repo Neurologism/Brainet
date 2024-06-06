@@ -3,6 +3,6 @@
 
 // include all the headers here 
 
-#include "builders/dense_builder.h"
+#include "model.h"
 
 #endif // BRAINET_INCLUDE_GUARD
