@@ -1,18 +1,19 @@
 #ifndef GRAPH_INCLUDE_GUARD
 #define GRAPH_INCLUDE_GUARD
 
-
+#include "dependencies.h"
 #include "variable.h"
 
 class GRAPH // dag of variables and operations
 {
     std::vector<VARIABLE> __variables;
     void build_grad(int focus, std::vector<std::vector<double>> & grad_table);
+    std::vector<VARIABLE *> __topo_sort();
 public:
     GRAPH();
     ~GRAPH();
     VARIABLE * operator[](int index);
-    std::vector<double> forward();
+    void forward();
     std::vector<std::vector<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
 }; 
@@ -31,12 +32,48 @@ VARIABLE * GRAPH::operator[](int index)
 }
 
 /**
+ * @brief topological sort of the graph
+ * @return Returns a list of pointers to the variables in topological order
+*/
+std::vector<VARIABLE *> GRAPH::__topo_sort()
+{
+    std::vector<VARIABLE *> sorted;
+    std::vector<bool> visited(__variables.size(), false);
+    std::function<void(int)> dfs = [&](int node)
+    {
+        visited[node] = true;
+        for (int i = 0; i < __variables[node].get_consumers().size(); i++)
+        {
+            if (!visited[__variables[node].get_consumers()[i]->get_id()])
+            {
+                dfs(__variables[node].get_consumers()[i]->get_id());
+            }
+        }
+        sorted.push_back(&__variables[node]);
+    };
+
+    for (int i = 0; i < __variables.size(); i++)
+    {
+        if (!visited[i])
+        {
+            dfs(i);
+        }
+    }
+    std::reverse(sorted.begin(), sorted.end());
+    return sorted;
+}
+
+/**
  * @brief algorithm executing the forward pass
  * @return Returns the value of all variables 
 */
-std::vector<double> GRAPH::forward()
+void GRAPH::forward()
 {
-
+    std::vector<VARIABLE *> sorted = __topo_sort();
+    for (int i = 0; i < sorted.size(); i++)
+    {
+        sorted[i]->get_operation()->f(sorted[i]->get_inputs());
+    }
 }
 
 

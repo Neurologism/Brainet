@@ -8,5 +8,4 @@
 #include <random>
 #include <thread>
 
-
 #endif // DEPENDENCIES_INCLUDE_GUARD
