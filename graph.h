@@ -37,6 +37,30 @@ VARIABLE * GRAPH::operator[](int index)
 */
 std::vector<VARIABLE *> GRAPH::__topo_sort()
 {
+    std::vector<VARIABLE *> sorted;
+    std::vector<bool> visited(__variables.size(), false);
+    std::function<void(int)> dfs = [&](int node)
+    {
+        visited[node] = true;
+        for (int i = 0; i < __variables[node].get_consumers().size(); i++)
+        {
+            if (!visited[__variables[node].get_consumers()[i]->get_id()])
+            {
+                dfs(__variables[node].get_consumers()[i]->get_id());
+            }
+        }
+        sorted.push_back(&__variables[node]);
+    };
+
+    for (int i = 0; i < __variables.size(); i++)
+    {
+        if (!visited[i])
+        {
+            dfs(i);
+        }
+    }
+    std::reverse(sorted.begin(), sorted.end());
+    return sorted;
 }
 
 /**
