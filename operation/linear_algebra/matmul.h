@@ -3,6 +3,9 @@
 
 #include "..\operation.h"
 
+const int block_size = 8; 
+const int threads = 200;
+
 /**
  * @brief Matrix multiplication operation class.
 */
@@ -13,30 +16,41 @@ public:
     void f(std::vector<VARIABLE *>& inputs) override;
     std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) override;
     void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
+    //void blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int start, int ende);
+    void blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int j);
 };
+
+
+void MATMUL::blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> & shape1, std::vector<int> & shape2, int j)
+{
+    for (int i = 0; i < shape1[0]; ++i)
+    {
+        for (int k = 0; k < shape1[1]; ++k)
+        {
+            result[i*shape2[1]+j] += data1[i * shape1[1] + k] * data2[k * shape2[1] + j];
+        }
+    }
+}
 
 
 /**
  * @brief Matrix multiplication function.
- * @attention to be replaced 
 */
 void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2)
 {
-    std::vector<double> result;
+    std::vector<double> result(shape1[0]*shape2[1], 0);
 
-    for (int i = 0; i < shape1[0]; i++) // replace this 
+    //devide into threads
+    std::vector<std::thread> workers(shape2[1]);
+    for (int i = 0; i < shape2[1]; ++i)
     {
-        for (int j = 0; j < shape2[1]; j++)
-        {
-            double sum = 0;
-            for (int k = 0; k < shape1[1]; k++)
-            {
-                sum += data1[i * shape1[1] + k] * data2[k * shape2[1] + j];
-            }
-            result.push_back(sum);
-        }
+        workers[i] = std::thread (&MATMUL::blockmul, this, std::ref(data1), std::ref(data2), std::ref(result), std::ref(shape1), std::ref(shape2), i);
     }
-
+    for (std::thread &worker:workers)
+    {
+        worker.join();
+    }
+    
     data1.swap(result);
     shape1 = {shape1[0], shape2[1]};
 }

@@ -6,6 +6,6 @@
 #include <stdexcept>
 #include <exception>
 #include <random>
-#include <queue>
+#include <thread>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
