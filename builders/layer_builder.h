@@ -13,6 +13,7 @@
 class LAYER_BUILDER : public BUILDER
 {
 public:
+    LAYER_BUILDER(GRAPH * graph) : BUILDER(graph){};
     VARIABLE * add_linear_transformation(VARIABLE * head, std::vector<double> & weights, std::vector<int> & shape);
     VARIABLE * add_activation_function(VARIABLE * parent, OPERATION * activation_function);
 };
