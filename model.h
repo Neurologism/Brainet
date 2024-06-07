@@ -9,7 +9,7 @@ class MODEL
 {
     GRAPH __graph;
     VARIABLE * __sequential_head;
-    LAYER_BUILDER __layer_builder;
+    LAYER_BUILDER __layer_builder(&__graph);
 public:
     void add_dense(OPERATION * op, int units);
     void train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate);
