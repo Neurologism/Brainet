@@ -69,7 +69,11 @@ std::vector<VARIABLE *> GRAPH::__topo_sort()
 */
 void GRAPH::forward()
 {
-    
+    std::vector<VARIABLE *> sorted = __topo_sort();
+    for (int i = 0; i < sorted.size(); i++)
+    {
+        sorted[i]->get_operation()->f(sorted[i]->get_inputs());
+    }
 }
 
 
