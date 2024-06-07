@@ -31,7 +31,8 @@ void MODEL::add_dense(OPERATION * op, int units)
 
 void MODEL::train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate)
 {
-    __g
+    __graph.forward();
+    __graph.backprop(vector<bool>(__graph.get_variables().size(),true),10);
 }
 
 #endif // MODEL_INCLUDE_GUARD
