@@ -12,3 +12,5 @@ public:
     void f(){};
     std::vector<double> bprop(std::vector<double> & gradient){};
 };
+
+#endif // VOID_OPERATION_INCLUDE_GUARD
