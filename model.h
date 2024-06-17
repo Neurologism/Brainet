@@ -9,7 +9,7 @@ class MODEL
 {
     GRAPH __graph;
     VARIABLE * __sequential_head;
-    LAYER_BUILDER __layer_builder(&__graph);
+    LAYER_BUILDER __layer_builder = LAYER_BUILDER(&__graph);
 public:
     void add_dense(OPERATION * op, int units);
     void train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate);
@@ -32,7 +32,8 @@ void MODEL::add_dense(OPERATION * op, int units)
 void MODEL::train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate)
 {
     __graph.forward();
-    __graph.backprop(vector<bool>(__graph.get_variables().size(),true),10);
+    std::vector<bool> v(__graph.get_variables().size(),true);
+    __graph.backprop(v,10);
 }
 
 #endif // MODEL_INCLUDE_GUARD
