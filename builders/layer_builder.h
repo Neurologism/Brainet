@@ -16,6 +16,7 @@ public:
     LAYER_BUILDER(GRAPH * graph) : BUILDER(graph){};
     VARIABLE * add_linear_transformation(VARIABLE * head, std::vector<double> & weights, std::vector<int> & shape);
     VARIABLE * add_activation_function(VARIABLE * parent, OPERATION * activation_function);
+    VARIABLE * add_input_layer(std::vector<std::vector<double>> & input);
 };
 
 /**
@@ -57,6 +58,35 @@ VARIABLE * LAYER_BUILDER::add_activation_function(VARIABLE * parent, OPERATION *
     return _variable;
 }
 
+/**
+ * @brief adds an input layer to the model
+ * creates a new VARIABLE with no operation and the input as the data
+ * @param input the input data
+ * @return the new child that was added to the parent variable and represents the input
+*/
+// think about adding a param for padding input 
+VARIABLE * LAYER_BUILDER::add_input_layer(std::vector<std::vector<double>> & input)
+{
+    __graph->add_variable(VARIABLE(nullptr, {}, {}));
+    VARIABLE * _variable = &__graph->get_variables().back();
+
+    std::vector<int> shape = {input.size(), input[0].size()};
+    std::vector<double> data;
+    for(int i = 0;i < input.size();i++)
+    {
+        if(input[i].size() != shape[1])
+        {
+            throw std::invalid_argument("All rows in the input must have the same size");
+        }
+        for(int j = 0;j < input[i].size();j++)
+        {
+            data.push_back(input[i][j]);
+        }
+    }    
+    _variable->set_data(data);
+    _variable->set_shape(shape);
+    return _variable;
+}
 
 
 #endif // LAYER_BUILDER_INCLUDE_GUARD
