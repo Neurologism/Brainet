@@ -7,5 +7,7 @@
 #include <exception>
 #include <random>
 #include <thread>
+#include <algorithm>
+#include <functional>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
