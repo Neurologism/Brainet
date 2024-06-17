@@ -20,7 +20,7 @@ public:
 
 /**
  * @brief adds a linear transformation to the model
- * creates two VARIABLES, one to store the weights, which is a pseudo-variable with a VOID_OPERATION, and one to store the result of the matrix multiplication
+ * creates two VARIABLES, one to store the weights, which has no operation, and one to store the result of the matrix multiplication
  * it creates a MATMUL operation. 
  * @param parent the variable that should be the parent of the variable of the linear transformation
  * @param weights the weights used to initalize the pseudo-variable
@@ -29,7 +29,7 @@ public:
 */
 VARIABLE * LAYER_BUILDER::add_linear_transformation(VARIABLE * parent,std::vector<double> & weights, std::vector<int> & shape)
 {
-    __graph->add_variable(VARIABLE(new VOID_OPERATION(), {}, {}));
+    __graph->add_variable(VARIABLE(nullptr, {}, {})); // nullptr because there is no operation
     VARIABLE * _weights = &__graph->get_variables().back();
     __graph->add_variable(VARIABLE(new MATMUL(), {parent, _weights}, {}));
     VARIABLE * _variable = &__graph->get_variables().back();
