@@ -49,6 +49,10 @@ VARIABLE::~VARIABLE()
 */
 OPERATION * VARIABLE::get_operation()
 {
+    if (__op == nullptr)
+    {
+        throw std::invalid_argument("This operation is a pseudo-variable and has no operation.");
+    }
     return __op;
 }
 
