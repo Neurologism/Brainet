@@ -9,6 +9,7 @@
 class VOID_OPERATION : public OPERATION
 {
 public:
+    VOID_OPERATION(){};
     void f(){};
     std::vector<double> bprop(std::vector<double> & gradient){return gradient;};
 };

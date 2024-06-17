@@ -29,15 +29,15 @@ public:
 */
 VARIABLE * LAYER_BUILDER::add_linear_transformation(VARIABLE * parent,std::vector<double> & weights, std::vector<int> & shape)
 {
-    VARIABLE * _weights = new VARIABLE(new VOID_OPERATION(), {}, {});
-    _weights->set_data(weights);
-    _weights->set_shape(shape);
-    __graph->add_variable(weights);
-    VARIABLE * variable = new VARIABLE(new MATMUL(), {parent, _weights}, {});
-    parent->get_consumers().push_back(variable);
-    _weights->get_consumers().push_back(variable);
-    __graph->add_variable(variable);
-    return &variable;
+    VARIABLE _weights = VARIABLE(new VOID_OPERATION(), {}, {});
+    _weights.set_data(weights);
+    _weights.set_shape(shape);
+    VARIABLE _variable = new VARIABLE(new MATMUL(), {parent, _weights}, {});
+    parent->get_consumers().push_back(&_variable);
+    _weights.get_consumers().push_back(&_variable);
+    __graph->add_variable(_weights);
+    __graph->add_variable(_variable);
+    return &_variable;
 }
 
 
@@ -50,10 +50,10 @@ VARIABLE * LAYER_BUILDER::add_linear_transformation(VARIABLE * parent,std::vecto
 */
 VARIABLE * LAYER_BUILDER::add_activation_function(VARIABLE * parent, OPERATION * activation_function)
 {
-    VARIABLE * variable = new VARIABLE(activation_function, {parent}, {});
-    parent->get_consumers().push_back(variable);
-    __graph->add_variable(variable);
-    return variable;
+    VARIABLE _variable = VARIABLE(activation_function, {parent}, {});
+    parent->get_consumers().push_back(&_variable);
+    __graph->add_variable(_variable);
+    return &_variable;
 }
 
 
