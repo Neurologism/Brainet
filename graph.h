@@ -16,7 +16,7 @@ public:
     void forward();
     std::vector<std::vector<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
-    void add_variable(VARIABLE & var){__variables.push_back(var);};
+    void add_variable(VARIABLE var){__variables.push_back(var);};
 }; 
 
 GRAPH::GRAPH() 
