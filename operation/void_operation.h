@@ -10,7 +10,7 @@ class VOID_OPERATION : public OPERATION
 {
 public:
     void f(){};
-    std::vector<double> bprop(std::vector<double> & gradient){};
+    std::vector<double> bprop(std::vector<double> & gradient){return gradient;};
 };
 
 #endif // VOID_OPERATION_INCLUDE_GUARD
