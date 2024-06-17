@@ -3,7 +3,7 @@
 
 #include "dependencies.h"
 #include "graph.h"
-#include "layer_builder.h"
+#include "builders/layer_builder.h"
 
 class MODEL
 {
