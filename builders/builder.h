@@ -11,6 +11,7 @@
 
 class BUILDER
 {
+protected:
     GRAPH * __graph;
 public:
     BUILDER(GRAPH * graph) : __graph(graph){};
