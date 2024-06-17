@@ -37,7 +37,7 @@ VARIABLE * LAYER_BUILDER::add_linear_transformation(VARIABLE * parent,std::vecto
     parent->get_consumers().push_back(variable);
     _weights->get_consumers().push_back(variable);
     __graph->add_variable(variable);
-    return &VARIABLE;
+    return &variable;
 }
 
 
