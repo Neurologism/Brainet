@@ -61,7 +61,8 @@ VARIABLE * LAYER_BUILDER::add_activation_function(VARIABLE * parent, OPERATION *
 /**
  * @brief adds an input layer to the model
  * creates a new VARIABLE with no operation and the input as the data
- * @param input the input data
+ * @param data the input data
+ * @param shape the shape of the input data
  * @return the new child that was added to the parent variable and represents the input
 */
 // think about adding a param for padding input 
