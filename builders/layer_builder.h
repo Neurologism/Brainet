@@ -5,7 +5,6 @@
 #include "../dependencies.h"
 #include "../operation/activation_function/rectified_linear_unit.h"
 #include "../operation/linear_algebra/matmul.h"
-#include "../operation/void_operation.h"
 
 /**
  * @brief LAYER_BUILDER class is a builder class for creating a layer in a model.
