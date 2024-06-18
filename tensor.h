@@ -57,5 +57,7 @@ void TENSOR<T>::set(std::vector<int> index, T value)
         _block_size /= __shape[i];
         _index += index[i] * _block_size;
     }
+    if(_index >= __data.size())
+        throw std::out_of_range("Index out of range");
     __data[_index] = value;
 }
