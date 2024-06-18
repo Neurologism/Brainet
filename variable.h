@@ -14,8 +14,7 @@ class VARIABLE
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
     // could use void pointer if required 
-    std::vector<double> __data; // tensor of data 
-    std::vector<int> __shape; // shape of the tensor 
+    std::vector<std::vector<double>> __data; // each variable can store a batch of the data 
     int __id;
 
 public:
@@ -24,11 +23,9 @@ public:
     OPERATION * get_operation();
     std::vector<VARIABLE *> & get_consumers();
     std::vector<VARIABLE *> & get_inputs();
-    std::vector<double> get_data();
-    std::vector<int> get_shape();
+    std::vector<std::vector<double>> get_data();
     int get_id();
-    void set_data(std::vector<double> & data);
-    void set_shape(std::vector<int> & shape);
+    void set_data(std::vector<std::vector<double>> & data);
     void set_id(int id);
 };
 
@@ -75,33 +72,17 @@ std::vector<VARIABLE *> & VARIABLE::get_inputs()
 /**
  * @brief returns the data of the operation
 */
-std::vector<double> VARIABLE::get_data()
+std::vector<std::vector<double>> VARIABLE::get_data()
 {
     return __data;
 }
 
 /**
- * @brief returns the shape of the data
-*/
-std::vector<int> VARIABLE::get_shape()
-{
-    return __shape;
-}
-
-/**
  * @brief sets the data of the variable
 */
-void VARIABLE::set_data(std::vector<double> & data)
+void VARIABLE::set_data(std::vector<std::vector<double>> & data)
 {
     __data = data;
-}
-
-/**
- * @brief sets the shape of the data
-*/
-void VARIABLE::set_shape(std::vector<int> & shape)
-{
-    __shape = shape;
 }
 
 /**
