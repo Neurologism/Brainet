@@ -24,7 +24,7 @@ public:
      * assumes that the gradient is already calculated for the output variables 
      * @param inputs the input variables of the operation
      * @param focus the variable that the gradient is calculated for
-     * @param outputs the output variables of the operation
+     * @param gradient the sum of the gradients of the output variables
     */
     virtual TENSOR<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient) =0;
     /**
