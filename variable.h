@@ -27,7 +27,6 @@ public:
     TENSOR<double> get_data();
     int get_id();
     void set_data(TENSOR<double> & data);
-    void set_id(int id);
 };
 
 VARIABLE::~VARIABLE()
@@ -92,14 +91,6 @@ void VARIABLE::set_data(TENSOR<double> & data)
 int VARIABLE::get_id()
 {
     return __id;
-}
-
-/**
- * @brief sets the id of the variable
-*/
-void VARIABLE::set_id(int id)
-{
-    __id = id;
 }
 
 #endif
