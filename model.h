@@ -16,7 +16,7 @@ public:
     void train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate);
 };
 
-void MODEL::add_input(std::vector<std::vector<double>> & input)
+void MODEL::add_input(int units)
 {
     std::vector<double> data;
     std::vector<int> shape = {input.size(), input[0].size()};
