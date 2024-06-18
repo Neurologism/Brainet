@@ -37,6 +37,8 @@ T TENSOR<T>::at(std::vector<int> index)
         _block_size /= __shape[i];
         _index += index[i] * _block_size;
     }
+    if(_index >= __data.size())
+        throw std::out_of_range("Index out of range");
     return __data[_index];
 }
 
