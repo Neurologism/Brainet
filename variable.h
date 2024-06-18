@@ -24,7 +24,7 @@ public:
     OPERATION * get_operation();
     std::vector<VARIABLE *> & get_consumers();
     std::vector<VARIABLE *> & get_inputs();
-    TENSOR<double> get_data();
+    TENSOR<double> * get_data();
     int get_id();
     void set_data(TENSOR<double> & data);
 };
@@ -72,9 +72,9 @@ std::vector<VARIABLE *> & VARIABLE::get_inputs()
 /**
  * @brief returns the data of the operation
 */
-TENSOR<double> VARIABLE::get_data()
+TENSOR<double> * VARIABLE::get_data()
 {
-    return __data;
+    return &__data;
 }
 
 /**
