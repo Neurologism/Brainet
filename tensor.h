@@ -20,6 +20,8 @@ public:
     }
     T at(std::vector<int> index);
     void set(std::vector<int> index, T value);
+    std::vector<int> shape(){return __shape;};
+    int dimensionality(){return __shape.size();};
 };
 
 /**
