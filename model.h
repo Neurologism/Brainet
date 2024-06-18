@@ -16,6 +16,24 @@ public:
     void train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate);
 };
 
+void MODEL::add_input(std::vector<std::vector<double>> & input)
+{
+    std::vector<double> data;
+    std::vector<int> shape = {input.size(), input[0].size()};
+    for(int i = 0;i < input.size();i++)
+    {
+        if(input[i].size() != shape[1])
+        {
+            throw std::invalid_argument("All rows in the input must have the same size");
+        }
+        for(int j = 0;j < input[i].size();j++)
+        {
+            data.push_back(input[i][j]);
+        }
+    }    
+    __sequential_head = __layer_builder.add_input_layer(data,shape);
+}
+
 void MODEL::add_dense(OPERATION * op, int units)
 {
     std::vector<double> weights;
