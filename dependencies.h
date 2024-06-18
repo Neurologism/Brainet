@@ -9,5 +9,6 @@
 #include <thread>
 #include <algorithm>
 #include <functional>
+#include <numeric>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
