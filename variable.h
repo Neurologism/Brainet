@@ -3,6 +3,7 @@
 
 #include "dependencies.h"
 #include "operation/operation.h"
+#include "tensor.h"
 
 class OPERATION;
 
@@ -13,19 +14,19 @@ class VARIABLE
 {
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
-    // could use void pointer if required 
-    std::vector<std::vector<double>> __data; // each variable can store a batch of the data 
+    TENSOR<double> __data; // each variable can store a batch of the data 
+    static int __counter = 0;
     int __id;
 
 public:
-    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){};
+    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++;};
     ~VARIABLE();
     OPERATION * get_operation();
     std::vector<VARIABLE *> & get_consumers();
     std::vector<VARIABLE *> & get_inputs();
-    std::vector<std::vector<double>> get_data();
+    TENSOR<double> get_data();
     int get_id();
-    void set_data(std::vector<std::vector<double>> & data);
+    void set_data(TENSOR<double> & data);
     void set_id(int id);
 };
 
@@ -72,7 +73,7 @@ std::vector<VARIABLE *> & VARIABLE::get_inputs()
 /**
  * @brief returns the data of the operation
 */
-std::vector<std::vector<double>> VARIABLE::get_data()
+TENSOR<double> VARIABLE::get_data()
 {
     return __data;
 }
@@ -80,7 +81,7 @@ std::vector<std::vector<double>> VARIABLE::get_data()
 /**
  * @brief sets the data of the variable
 */
-void VARIABLE::set_data(std::vector<std::vector<double>> & data)
+void VARIABLE::set_data(TENSOR<double> & data)
 {
     __data = data;
 }
