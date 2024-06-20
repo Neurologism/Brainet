@@ -63,3 +63,5 @@ void TENSOR<T>::set(std::vector<int> index, T value)
         throw std::out_of_range("Index out of range");
     __data[_index] = value;
 }
+
+#endif // TENSOR_INCLUDE_GUARD
