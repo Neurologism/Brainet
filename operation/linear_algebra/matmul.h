@@ -33,7 +33,7 @@ void MATMUL::blockmul(TENSOR<double> & data1, TENSOR<double> & data2, TENSOR<dou
     {
         for (int k = 0; k < data1.shape()[1]; ++k)
         {
-            result.set({i*data2.shape()[1],j}, result.at({i*data2.shape()[1],j}) + data1.at({i * data1.shape()[1], k})* data2.at({k * data2.shape()[1], j}));
+            result.set({i,j}, result.at({i,j}) + data1.at({i, k})* data2.at({k, j}));
         }
     }
 }
