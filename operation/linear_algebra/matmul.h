@@ -11,13 +11,13 @@ const int threads = 200;
 */
 class MATMUL : public OPERATION
 {
-    void matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2);
+    void matmul(TENSOR<double> & data1, TENSOR<double> & data2);
     //void blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int start, int ende);
-    void blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int j);
+    void blockmul(TENSOR<double> & data1, TENSOR<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int j);
 public:
     MATMUL(){};
     void f(std::vector<VARIABLE *>& inputs) override;
-    std::vector<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, std::vector<double> & gradient) override;
+    std::TENSOR<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient) override;
 };
 
 

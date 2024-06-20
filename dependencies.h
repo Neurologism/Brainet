@@ -1,7 +1,7 @@
 #ifndef DEPENDENCIES_INCLUDE_GUARD
 #define DEPENDENCIES_INCLUDE_GUARD
 
-// all dependecies of the C++ standard library
+// all external libraries are included here
 #include <vector>
 #include <stdexcept>
 #include <exception>

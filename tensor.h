@@ -20,6 +20,8 @@ public:
     }
     T at(std::vector<int> index);
     void set(std::vector<int> index, T value);
+    std::vector<int> shape(){return __shape;};
+    int dimensionality(){return __shape.size();};
 };
 
 /**
@@ -37,6 +39,8 @@ T TENSOR<T>::at(std::vector<int> index)
         _block_size /= __shape[i];
         _index += index[i] * _block_size;
     }
+    if(_index >= __data.size())
+        throw std::out_of_range("Index out of range");
     return __data[_index];
 }
 
@@ -55,5 +59,9 @@ void TENSOR<T>::set(std::vector<int> index, T value)
         _block_size /= __shape[i];
         _index += index[i] * _block_size;
     }
+    if(_index >= __data.size())
+        throw std::out_of_range("Index out of range");
     __data[_index] = value;
 }
+
+#endif // TENSOR_INCLUDE_GUARD
