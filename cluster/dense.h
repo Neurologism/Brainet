@@ -9,7 +9,7 @@
 class DENSE : public CLUSTER
 {
 public:
-    DENSE(OPERATION & input, int units, TENSOR & weight_matrix = TENSOR())
+    DENSE(OPERATION & input, int units, TENSOR & weight_matrix = TENSOR({0, 0}))
     {
         if(__graph == nullptr)
         {
