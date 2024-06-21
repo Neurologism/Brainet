@@ -3,41 +3,29 @@
 
 #include "dependencies.h"
 #include "graph.h"
-#include "builders/layer_builder.h"
+#include "cluster/input.h"
+#include "cluster/cluster.h"
+#include "cluster/dense.h"
 
 class MODEL
 {
     GRAPH __graph;
-    VARIABLE * __sequential_head;
-    LAYER_BUILDER __layer_builder = LAYER_BUILDER(&__graph);
+        
 public:
-    void add_input(int units);
-    void add_dense(OPERATION * op, int units);
+    void sequential(std::vector<& CLUSTER> layers);
     void train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate);
 };
 
-void MODEL::add_input(int units)
+void MODEL::sequential(std::vector<& CLUSTER> layers)
 {
-    TENSOR<double> _data = TENSOR<double>({0, units});
-    __sequential_head = __layer_builder.add_input_layer(_data);
-    inputs.push_back(__sequential_head);
-}
-
-void MODEL::add_dense(OPERATION * op, int units)
-{
-    std::vector<double> weights;
-    std::vector<int> shape = {__sequential_head->get_shape().back(), units};
-    std::default_random_engine generator;
-    std::normal_distribution<double> distribution(-0.1,0.1); // initialize weights to small random values
-    for(int i = 0;i < shape[0]*shape[1];i++) 
+    for(int i = 0; i < layers.size() - 1; i++)
     {
-        weights.push_back(distribution(generator));
+        layers[i]->add_output(layers[i+1]);
+        layers[i+1]->add_input(layers[i]);
     }
-    __sequential_head = __layer_builder.add_linear_transformation(__sequential_head,weights,shape);
-    __sequential_head = __layer_builder.add_activation_function(__sequential_head, op);
 }
 
-void MODEL::train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate)
+void MODEL::train(TENSOR & data, TENSOR & target, int epochs, double learning_rate)
 {
     __graph.forward();
     std::vector<bool> v(__graph.get_variables().size(),true);
