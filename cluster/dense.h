@@ -15,12 +15,12 @@ class DENSE : public CLUSTER
 
 public:
     DENSE(OPERATION & activation_function, int units, TENSOR<double> & weight_matrix = TENSOR<double>({0, 0}));
-    void add_input(VARIABLE * input)
+    void add_input(VARIABLE * input) override
     {
         _matmul_variable->get_inputs().push_back(input);
         _weight_matrix_variable->get_data() = TENSOR<double>({__units, input->get_shape()[0]}, 1);
     }
-    void add_output(VARIABLE * output)
+    void add_output(VARIABLE * output) override
     {
         _activation_variable->get_consumers().push_back(output);
     }
