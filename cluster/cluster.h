@@ -22,9 +22,9 @@ public:
 class __INIT__CLUSTER : public CLUSTER
 {
 public:
-    __INIT__CLUSTER(GRAPH & graph)
+    __INIT__CLUSTER(GRAPH * graph)
     {
-        __graph = &graph;
+        __graph = graph;
     }
 };
 
