@@ -16,4 +16,16 @@ public:
     virtual void add_output(VARIABLE * output){}
 };
 
+/**
+ * @brief class used to load the graph into the cluster class
+ */
+class __INIT__CLUSTER : public CLUSTER
+{
+public:
+    __INIT__CLUSTER(GRAPH & graph)
+    {
+        __graph = &graph;
+    }
+};
+
 #endif // CLUSTER_INCLUDE_GUARD
