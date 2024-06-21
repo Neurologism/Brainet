@@ -12,7 +12,7 @@ class VARIABLE;
 */
 class OPERATION
 {
-protected:
+private:
     VARIABLE * __variable = nullptr;
 public:
     OPERATION() = default;
@@ -31,12 +31,24 @@ public:
     /**
      * @brief sets the variable of the operation
     */
-    VARIABLE * set_variable(VARIABLE * variable);
+    void set_variable(VARIABLE * variable);
+    /**
+     * @brief returns the variable of the operation
+    */
+    VARIABLE * get_variable(){return __variable;};
 };
 
-VARIABLE * OPERATION::set_variable(VARIABLE * variable)
+void OPERATION::set_variable(VARIABLE * variable)
 {
     __variable = variable;
+}
+
+VARIABLE * OPERATION::get_variable()
+{
+    if(__variable == nullptr)
+    {
+        throw std::runtime_error("variable is not set");
+    }
     return __variable;
 }
 
