@@ -13,6 +13,7 @@ class TENSOR
     std::vector<T> __data;
     std::vector<int> __shape;
 public:
+    TENSOR(){};
     TENSOR(std::vector<int> dimensionality, bool random = false)
     {
         __shape = dimensionality;
