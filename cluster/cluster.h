@@ -12,8 +12,20 @@ class CLUSTER
 {
     static GRAPH * __graph = nullptr;
 public:
-    // constructor should be called to set graph
-    CLUSTER(GRAPH * graph) { __graph = graph; }
+    virtual void add_input(VARIABLE * input){}
+    virtual void add_output(VARIABLE * output){}
+};
+
+/**
+ * @brief class used to load the graph into the cluster class
+ */
+class __INIT__CLUSTER : public CLUSTER
+{
+public:
+    __INIT__CLUSTER(GRAPH * graph)
+    {
+        __graph = graph;
+    }
 };
 
 #endif // CLUSTER_INCLUDE_GUARD

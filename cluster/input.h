@@ -9,15 +9,31 @@
  */
 class INPUT : public CLUSTER
 {
+    VARIABLE * _input_variable;
 public:
-    INPUT(TENSOR & data, int units)
-    {
-        if(__graph == nullptr)
-        {
-            throw std::runtime_error("graph is not set");
-        }
-        __graph->add_variable(VARIABLE(nullptr, {}, {}, data));
-    }
+    INPUT(TENSOR & data, int units);
+    void add_input(VARIABLE * input) override;
+    void add_output(VARIABLE * output) override;
 };
+
+INPUT::INPUT(TENSOR & data, int units)
+{
+    if(__graph == nullptr)
+    {
+        throw std::runtime_error("graph is not set");
+    }
+    __graph->add_variable(VARIABLE(nullptr, {}, {}, data));
+    _input_variable = &__graph->get_variables().back();
+}
+
+void INPUT::add_input(VARIABLE * input)
+{
+    throw std::runtime_error("Input variable cannot have an input");
+}
+
+void INPUT::add_output(VARIABLE * output)
+{
+    _input_variable->get_consumers().push_back(output);
+}
 
 #endif // INPUT_INCLUDE_GUARD
