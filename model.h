@@ -10,18 +10,16 @@ class MODEL
     GRAPH __graph;
     VARIABLE * __sequential_head;
     LAYER_BUILDER __layer_builder = LAYER_BUILDER(&__graph);
-    std::vector<VARIABLE *> inputs;
 public:
     void add_input(int units);
     void add_dense(OPERATION * op, int units);
-    void train(std::vector<std::vector<double>> & data, std::vector<std::vector<double>> & target, int epochs, double learning_rate);
+    void train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate);
 };
 
 void MODEL::add_input(int units)
 {
-    std::vector<double> data;
-    std::vector<int> shape = {0, units};
-    __sequential_head = __layer_builder.add_input_layer(data,shape);
+    TENSOR<double> _data = TENSOR<double>({0, units});
+    __sequential_head = __layer_builder.add_input_layer(_data);
     inputs.push_back(__sequential_head);
 }
 

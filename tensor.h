@@ -13,14 +13,25 @@ class TENSOR
     std::vector<T> __data;
     std::vector<int> __shape;
 public:
-    TENSOR(std::vector<int> dimensionality)
+    TENSOR(std::vector<int> dimensionality, bool random = false)
     {
         __shape = dimensionality;
         __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()), 0);
+        if(random)
+        {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<> dis(-0.1, 0.1);
+            for(int i = 0; i < __data.size(); i++)
+            {
+                __data[i] = dis(gen);
+            }
+        }
     }
     T at(std::vector<int> index);
     void set(std::vector<int> index, T value);
     std::vector<int> shape(){return __shape;};
+    int shape(int index){return __shape[index];};
     int dimensionality(){return __shape.size();};
 };
 
