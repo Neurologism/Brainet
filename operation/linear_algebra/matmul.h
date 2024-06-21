@@ -13,21 +13,27 @@ class MATMUL : public OPERATION
 {
     void matmul(TENSOR<double> & data1, TENSOR<double> & data2);
     //void blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int start, int ende);
-    void blockmul(TENSOR<double> & data1, TENSOR<double> & data2, std::vector<double> & result, std::vector<int> &shape1, std::vector<int> &shape2, int j);
+    void blockmul(TENSOR<double> & data1, TENSOR<double> & data2, TENSOR<double> & result, int j);
 public:
     MATMUL(){};
     void f(std::vector<VARIABLE *>& inputs) override;
-    std::TENSOR<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient) override;
+    TENSOR<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient) override;
 };
 
-
-void MATMUL::blockmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<double> & result, std::vector<int> & shape1, std::vector<int> & shape2, int j)
+/**
+ * @brief Multithreaded matrix multiplication function by coloum
+ * @param data1 first matrix
+ * @param data2 second matrix
+ * @param result the matrix that should be returned
+ * @param j the current coloum in the result matrix
+*/
+void MATMUL::blockmul(TENSOR<double> & data1, TENSOR<double> & data2, TENSOR<double> & result, int j)
 {
-    for (int i = 0; i < shape1[0]; ++i)
+    for (int i = 0; i < data1.shape()[0]; ++i)
     {
-        for (int k = 0; k < shape1[1]; ++k)
+        for (int k = 0; k < data1.shape()[1]; ++k)
         {
-            result[i*shape2[1]+j] += data1[i * shape1[1] + k] * data2[k * shape2[1] + j];
+            result.set({i,j}, result.at({i,j}) + data1.at({i, k})* data2.at({k, j}));
         }
     }
 }
@@ -35,24 +41,25 @@ void MATMUL::blockmul(std::vector<double> & data1, std::vector<double> & data2, 
 
 /**
  * @brief Matrix multiplication function.
+ * @param data1 first matrix
+ * @param data2 second matrix
 */
-void MATMUL::matmul(std::vector<double> & data1, std::vector<double> & data2, std::vector<int> & shape1, std::vector<int> & shape2)
+void MATMUL::matmul(TENSOR<double> & data1, TENSOR<double> & data2)
 {
-    std::vector<double> result(shape1[0]*shape2[1], 0);
+    TENSOR<double> result({data1.shape()[0], data2.shape()[1]});
 
     //devide into threads
-    std::vector<std::thread> workers(shape2[1]);
-    for (int i = 0; i < shape2[1]; ++i)
+    std::vector<std::thread> workers(data2.shape()[1]);
+    for (int i = 0; i < data2.shape()[1]; ++i)
     {
-        workers[i] = std::thread (&MATMUL::blockmul, this, std::ref(data1), std::ref(data2), std::ref(result), std::ref(shape1), std::ref(shape2), i);
+        workers[i] = std::thread (&MATMUL::blockmul, this, std::ref(data1), std::ref(data2), std::ref(result), i);
     }
     for (std::thread &worker:workers)
     {
         worker.join();
     }
     
-    data1.swap(result);
-    shape1 = {shape1[0], shape2[1]};
+    data1 = result;
 }
 
 
