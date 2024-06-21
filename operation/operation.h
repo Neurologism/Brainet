@@ -3,6 +3,7 @@
 
 #include "..\dependencies.h"
 #include "..\variable.h"
+#include "..\tensor.h"
 
 class VARIABLE;
 
