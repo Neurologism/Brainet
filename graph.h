@@ -14,7 +14,7 @@ public:
     ~GRAPH();
     VARIABLE * operator[](int index);
     void forward();
-    std::vector<std::vector<double>> backprop(std::vector<bool> & target, int z);
+    std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
     void add_variable(VARIABLE var){__variables.push_back(var);};
 }; 
@@ -84,10 +84,12 @@ void GRAPH::forward()
  * @param targets boolen list indicating for each variable in __variables if its gradient should be computed 
  * @param z the variable to be differentiated (gradient is 1)
 */
-std::vector<std::vector<double>> GRAPH::backprop(std::vector<bool> & targets, int z)
+std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, int z)
 {
-    std::vector<std::vector<double>> grad_table(__variables.size()); // data 
-    grad_table[z] = {1}; // change to make possible to differentiate with respect to multiple variables ?
+    std::vector<TENSOR<double>> grad_table(__variables.size()); // data 
+    TENSOR<double> grad({1});
+    grad.set({0},1);
+    grad_table[z] = grad; // change to make possible to differentiate with respect to multiple variables ?
 
     for (int i = 0; i < __variables.size(); i++)
     {
@@ -104,14 +106,14 @@ std::vector<std::vector<double>> GRAPH::backprop(std::vector<bool> & targets, in
  * @param focus the variable to be differentiated
  * @param grad_table the gradient table to be built
 */
-void GRAPH::build_grad(int focus, std::vector<std::vector<double>> & grad_table)
+void GRAPH::build_grad(int focus, std::vector<TENSOR<double>> & grad_table)
 {
     if (grad_table[focus].size() != 0) // gradient of this variable already computed
     {
         return;
     }
 
-    grad_table[focus].resize(__variables[focus].get_data().size()); // make space for the gradient
+    grad_table[focus] = TENSOR(__variables[focus].get_data().shape()); // make space for the gradient
 
     for (int i = 0; i < __variables[focus].get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
