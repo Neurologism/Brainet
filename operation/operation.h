@@ -35,7 +35,7 @@ public:
     /**
      * @brief returns the variable of the operation
     */
-    VARIABLE * get_variable(){return __variable;};
+    VARIABLE * get_variable();
 };
 
 void OPERATION::set_variable(VARIABLE * variable)
