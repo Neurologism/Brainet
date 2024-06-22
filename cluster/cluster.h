@@ -10,7 +10,8 @@
  */
 class CLUSTER
 {
-    static GRAPH * __graph = nullptr;
+protected:
+    static GRAPH * __graph;
 public:
     virtual void add_input(VARIABLE * input){}
     virtual void add_output(VARIABLE * output){}

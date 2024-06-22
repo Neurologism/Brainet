@@ -11,12 +11,12 @@ class INPUT : public CLUSTER
 {
     VARIABLE * _input_variable;
 public:
-    INPUT(TENSOR & data, int units);
+    INPUT(TENSOR<double> & data, int units);
     void add_input(VARIABLE * input) override;
     void add_output(VARIABLE * output) override;
 };
 
-INPUT::INPUT(TENSOR & data, int units)
+INPUT::INPUT(TENSOR<double> & data, int units)
 {
     if(__graph == nullptr)
     {

@@ -15,11 +15,11 @@ class VARIABLE
     std::vector<VARIABLE *> __children, __parents;
     OPERATION * __op;
     TENSOR<double> __data; // each variable can store a tensor of the data 
-    static int __counter = 0; // keep track of the number of variables created
+    static int __counter; // keep track of the number of variables created
     int __id;
 
 public:
-    VARIABLE(OPERATION * op) : __op(op){__id = __counter++;};
+    VARIABLE(OPERATION * op) : __op(op){__op=op,__id = __counter++;};
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++;};
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data) : __op(op), __parents(parents), __children(children), __data(data){__id = __counter++;};
     ~VARIABLE();
@@ -75,7 +75,7 @@ std::vector<VARIABLE *> & VARIABLE::get_inputs()
 */
 TENSOR<double> & VARIABLE::get_data()
 {
-    return &__data;
+    return __data;
 }
 
 /**
