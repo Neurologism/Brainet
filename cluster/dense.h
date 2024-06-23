@@ -25,7 +25,14 @@ public:
     {
         _activation_variable->get_consumers().push_back(output);
     }
-
+    VARIABLE * input(int index) override
+    {
+        return _matmul_variable;
+    }
+    VARIABLE * output(int index) override
+    {
+        return _activation_variable;
+    }
 };
 
 DENSE::DENSE(OPERATION & activation_function, int units, TENSOR<double> weight_matrix)
