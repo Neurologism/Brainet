@@ -2,7 +2,6 @@
 #define VARIABLE_INCLUDE_GUARD
 
 #include "dependencies.h"
-#include "operation/operation.h"
 #include "tensor.h"
 
 class OPERATION;
