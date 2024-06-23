@@ -7,7 +7,7 @@
 class GRAPH // dag of variables and operations
 {
     std::vector<VARIABLE> __variables;
-    void build_grad(int focus, std::vector<std::vector<double>> & grad_table);
+    void build_grad(int focus, std::vector<TENSOR<double>> & grad_table);
     std::vector<VARIABLE *> __topo_sort();
 public:
     GRAPH();
