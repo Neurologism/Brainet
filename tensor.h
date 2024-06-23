@@ -34,6 +34,8 @@ public:
     std::vector<int> shape(){return __shape;};
     int shape(int index){return __shape[index];};
     int dimensionality(){return __shape.size();};
+    int size(){return __data.size();};
+    std::vector<T> & data(){return __data;};
 };
 
 /**
