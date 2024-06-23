@@ -85,4 +85,6 @@ int VARIABLE::get_id()
     return __id;
 }
 
+int VARIABLE::__counter = 0;
+
 #endif
