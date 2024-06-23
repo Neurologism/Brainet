@@ -14,6 +14,8 @@ public:
     INPUT(TENSOR<double> & data, int units);
     void add_input(VARIABLE * input) override;
     void add_output(VARIABLE * output) override;
+    VARIABLE * input(int index) override;
+    VARIABLE * output(int index) override;
 };
 
 INPUT::INPUT(TENSOR<double> & data, int units)
@@ -36,4 +38,14 @@ void INPUT::add_output(VARIABLE * output)
     _input_variable->get_consumers().push_back(output);
 }
 
+VARIABLE * INPUT::input(int index)
+{
+    throw std::runtime_error("Input variable cannot have an input");
+    return nullptr;
+}
+
+VARIABLE * INPUT::output(int index)
+{
+    return _input_variable;
+}
 #endif // INPUT_INCLUDE_GUARD
