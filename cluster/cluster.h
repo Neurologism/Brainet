@@ -15,6 +15,8 @@ protected:
 public:
     virtual void add_input(VARIABLE * input){}
     virtual void add_output(VARIABLE * output){}
+    virtual VARIABLE * input(int index = 0){return nullptr;}
+    virtual VARIABLE * output(int index = 0){return nullptr;}
 };
 
 /**
