@@ -14,7 +14,7 @@ public:
     MODEL(){CLUSTER::set_graph(&__graph);};
     void load();
     void sequential(std::vector<CLUSTER> layers);
-    void train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate);
+    void train(int epochs, double learning_rate);
 };
 
 void MODEL::load()
