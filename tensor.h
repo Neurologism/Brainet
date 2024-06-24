@@ -14,26 +14,15 @@ class TENSOR
     std::vector<int> __shape;
 public:
     TENSOR(){};
-    TENSOR(std::vector<int> dimensionality, bool random = false)
-    {
-        __shape = dimensionality;
-        __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()), 0);
-        if(random)
-        {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_real_distribution<> dis(-0.1, 0.1);
-            for(int i = 0; i < __data.size(); i++)
-            {
-                __data[i] = dis(gen);
-            }
-        }
-    }
+    TENSOR(std::vector<int> dimensionality, bool random = false);
+    
     T at(std::vector<int> index);
     void set(std::vector<int> index, T value);
     std::vector<int> shape(){return __shape;};
     int shape(int index){return __shape[index];};
     int dimensionality(){return __shape.size();};
+    int size(){return __data.size();};
+    std::vector<T> & data(){return __data;};
 };
 
 /**
@@ -54,6 +43,24 @@ T TENSOR<T>::at(std::vector<int> index)
     if(_index >= __data.size())
         throw std::out_of_range("Index out of range");
     return __data[_index];
+}
+
+
+template <class T>
+TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
+{
+    __shape = dimensionality;
+    __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()), 0);
+    if(random)
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(-0.1, 0.1);
+        for(int i = 0; i < __data.size(); i++)
+        {
+            __data[i] = dis(gen);
+        }
+    }
 }
 
 /**

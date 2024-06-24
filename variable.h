@@ -2,7 +2,6 @@
 #define VARIABLE_INCLUDE_GUARD
 
 #include "dependencies.h"
-#include "operation/operation.h"
 #include "tensor.h"
 
 class OPERATION;
@@ -85,5 +84,7 @@ int VARIABLE::get_id()
 {
     return __id;
 }
+
+int VARIABLE::__counter = 0;
 
 #endif

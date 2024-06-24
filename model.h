@@ -10,22 +10,28 @@
 class MODEL
 {
     GRAPH __graph;
-        
 public:
-    void sequential(std::vector<& CLUSTER> layers);
+    MODEL(){CLUSTER::set_graph(&__graph);};
+    void load();
+    void sequential(std::vector<CLUSTER> layers);
     void train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate);
 };
 
-void MODEL::sequential(std::vector<& CLUSTER> layers)
+void MODEL::load()
+{
+    CLUSTER::set_graph(&__graph);
+}
+
+void MODEL::sequential(std::vector<CLUSTER> layers)
 {
     for(int i = 0; i < layers.size() - 1; i++)
     {
-        layers[i]->add_output(layers[i+1]);
-        layers[i+1]->add_input(layers[i]);
+        layers[i].add_output(layers[i+1].input());
+        layers[i+1].add_input(layers[i].output());
     }
 }
 
-void MODEL::train(TENSOR & data, TENSOR & target, int epochs, double learning_rate)
+void MODEL::train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate)
 {
     __graph.forward();
     std::vector<bool> v(__graph.get_variables().size(),true);
