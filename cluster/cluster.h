@@ -17,6 +17,9 @@ public:
     virtual void add_output(VARIABLE * output){}
     virtual VARIABLE * input(int index = 0){return nullptr;}
     virtual VARIABLE * output(int index = 0){return nullptr;}
+    static void set_graph(GRAPH * graph){__graph = graph;}
 };
+
+GRAPH * CLUSTER::__graph = nullptr;
 
 #endif // CLUSTER_INCLUDE_GUARD
