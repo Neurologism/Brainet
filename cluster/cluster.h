@@ -19,16 +19,4 @@ public:
     virtual VARIABLE * output(int index = 0){return nullptr;}
 };
 
-/**
- * @brief class used to load the graph into the cluster class
- */
-class __INIT__CLUSTER : public CLUSTER
-{
-public:
-    __INIT__CLUSTER(GRAPH * graph)
-    {
-        __graph = graph;
-    }
-};
-
 #endif // CLUSTER_INCLUDE_GUARD
