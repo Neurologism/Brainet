@@ -18,6 +18,7 @@ public:
 
 void MODEL::sequential(std::vector<CLUSTER> layers)
 {
+    GRAPH * CLUSTER::__graph = &__graph; // set graph in cluster class
     for(int i = 0; i < layers.size() - 1; i++)
     {
         layers[i].add_output(layers[i+1].input());
