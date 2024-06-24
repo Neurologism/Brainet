@@ -3,6 +3,7 @@
 
 #include "dependencies.h"
 #include "variable.h"
+#include "operation/operation.h"
 
 class GRAPH // dag of variables and operations
 {
