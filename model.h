@@ -31,7 +31,7 @@ void MODEL::sequential(std::vector<CLUSTER> layers)
     }
 }
 
-void MODEL::train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate)
+void MODEL::train(int epochs, double learning_rate)
 {
     __graph.forward();
     std::vector<bool> v(__graph.get_variables().size(),true);
