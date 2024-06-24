@@ -10,15 +10,20 @@
 class MODEL
 {
     GRAPH __graph;
-        
 public:
+    MODEL(){CLUSTER::set_graph(&__graph);};
+    void load();
     void sequential(std::vector<CLUSTER> layers);
     void train(TENSOR<double> & data, TENSOR<double> & target, int epochs, double learning_rate);
 };
 
+void MODEL::load()
+{
+    CLUSTER::set_graph(&__graph);
+}
+
 void MODEL::sequential(std::vector<CLUSTER> layers)
 {
-    GRAPH * CLUSTER::__graph = &__graph; // set graph in cluster class
     for(int i = 0; i < layers.size() - 1; i++)
     {
         layers[i].add_output(layers[i+1].input());
