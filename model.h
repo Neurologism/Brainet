@@ -13,7 +13,7 @@ class MODEL
 public:
     MODEL(){CLUSTER::set_graph(&__graph);};
     void load();
-    void sequential(std::vector<CLUSTER> layers);
+    void sequential(std::vector<std::shared_ptr<CLUSTER>> layers);
     void train(int epochs, double learning_rate);
 };
 
@@ -22,12 +22,12 @@ void MODEL::load()
     CLUSTER::set_graph(&__graph);
 }
 
-void MODEL::sequential(std::vector<CLUSTER> layers)
+void MODEL::sequential(std::vector<std::shared_ptr<CLUSTER>> layers)
 {
     for(int i = 0; i < layers.size() - 1; i++)
     {
-        layers[i].add_output(layers[i+1].input());
-        layers[i+1].add_input(layers[i].output());
+        layers[i]->add_output(layers[i+1]->input());
+        layers[i+1]->add_input(layers[i]->output());
     }
 }
 
