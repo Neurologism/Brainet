@@ -35,7 +35,7 @@ void INPUT::add_input(VARIABLE * input)
 
 void INPUT::add_output(VARIABLE * output)
 {
-    _input_variable->get_consumers().push_back(output);
+    _input_variable->get_consumers()->push_back(output);
 }
 
 VARIABLE * INPUT::input(int index)
