@@ -22,9 +22,9 @@ public:
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++;};
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data) : __op(op), __parents(parents), __children(children), __data(data){__id = __counter++;};
     OPERATION * get_operation();
-    std::vector<VARIABLE *> & get_consumers();
-    std::vector<VARIABLE *> & get_inputs();
-    TENSOR<double> & get_data();
+    std::vector<VARIABLE *> * get_consumers();
+    std::vector<VARIABLE *> * get_inputs();
+    TENSOR<double> * get_data();
     int get_id();
 };
 
@@ -43,25 +43,25 @@ OPERATION * VARIABLE::get_operation()
 /**
  * @brief returns the children of the variable
 */
-std::vector<VARIABLE *> & VARIABLE::get_consumers()
+std::vector<VARIABLE *> * VARIABLE::get_consumers()
 {
-    return __children;
+    return &__children;
 }
 
 /**
  * @brief returns the parents of the variable
 */
-std::vector<VARIABLE *> & VARIABLE::get_inputs()
+std::vector<VARIABLE *> * VARIABLE::get_inputs()
 {
-    return __parents;
+    return &__parents;
 }
 
 /**
  * @brief returns the data of the operation
 */
-TENSOR<double> & VARIABLE::get_data()
+TENSOR<double> * VARIABLE::get_data()
 {
-    return __data;
+    return &__data;
 }
 
 /**
