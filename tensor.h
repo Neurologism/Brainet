@@ -33,6 +33,8 @@ public:
 template <class T>
 T TENSOR<T>::at(std::vector<int> index)
 {
+    if(index.size() != __shape.size())
+        throw std::invalid_argument("TENSOR::at: Index size does not match the dimensionality of the tensor")
     int _block_size = std::accumulate(__shape.begin(), __shape.end(), 1, std::multiplies<int>());
     int _index = 0;
     for (int i = 0; i < index.size(); i++)
@@ -71,6 +73,8 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
 template <class T>
 void TENSOR<T>::set(std::vector<int> index, T value)
 {
+    if(index.size() != __shape.size())
+        throw std::invalid_argument("TENSOR::set: Index size does not match the dimensionality of the tensor");
     int _block_size = std::accumulate(__shape.begin(), __shape.end(), 1, std::multiplies<int>());
     int _index = 0;
     for (int i = 0; i < index.size(); i++)
