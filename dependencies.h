@@ -10,5 +10,6 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
+#include <memory>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
