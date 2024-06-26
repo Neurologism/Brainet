@@ -11,5 +11,6 @@
 #include <functional>
 #include <numeric>
 #include <memory>
+#include <variant>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
