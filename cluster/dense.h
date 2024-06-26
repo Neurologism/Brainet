@@ -19,12 +19,12 @@ public:
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
     void add_input(VARIABLE * input) override
     {
-        _matmul_variable->get_inputs().push_back(input);
-        _weight_matrix_variable->get_data() = TENSOR<double>({__units, input->get_data().shape(0)}, 1);
+        _matmul_variable->get_inputs()->push_back(input);
+        *(_weight_matrix_variable->get_data()) = TENSOR<double>({__units, input->get_data()->shape(0)}, 1);
     }
     void add_output(VARIABLE * output) override
     {
-        _activation_variable->get_consumers().push_back(output);
+        _activation_variable->get_consumers()->push_back(output);
     }
     VARIABLE * input(int index) override
     {
@@ -45,7 +45,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<
     __units = units;
     __graph->add_variable(VARIABLE(nullptr, {}, {})); // nullptr because there is no operation
     _weight_matrix_variable = &__graph->get_variables().back();
-    __graph->add_variable(VARIABLE(new MATMUL(), {_weight_matrix_variable}, {}));
+    __graph->add_variable(VARIABLE(new MATMUL(), {}, {}));
     _matmul_variable = &__graph->get_variables().back();
     // Use std::visit to handle the variant
     auto operation_ptr = std::visit([](auto&& arg) -> OPERATION* {
@@ -55,8 +55,9 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<
 
     __graph->add_variable(VARIABLE(operation_ptr, {_matmul_variable}, {}));
     _activation_variable = &__graph->get_variables().back();
-    _matmul_variable->get_consumers().push_back(_activation_variable);
-    _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
+    _weight_matrix_variable->get_consumers()->push_back(_matmul_variable);
+    _matmul_variable->get_consumers()->push_back(_activation_variable);
+    
 }
 
 #endif // DENSE_INCLUDE_GUARD
