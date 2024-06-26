@@ -22,4 +22,9 @@ public:
 
 GRAPH * CLUSTER::__graph = nullptr;
 
+#include "input.h"
+#include "dense.h"
+
+using CLUSTER_VARIANT = std::variant<INPUT, DENSE>;
+
 #endif // CLUSTER_INCLUDE_GUARD

@@ -3,6 +3,7 @@
 
 #include ".\cluster.h"
 #include "..\operation\linear_algebra\matmul.h"
+#include "..\operation\activation_function\activation_function.h"
 
 /**
  * @brief DENSE class creates a dense layer for the graph
@@ -15,7 +16,7 @@ class DENSE : public CLUSTER
     VARIABLE * _activation_variable;
 
 public:
-    DENSE(OPERATION & activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
+    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
     void add_input(VARIABLE * input) override
     {
         _matmul_variable->get_inputs().push_back(input);
@@ -35,7 +36,7 @@ public:
     }
 };
 
-DENSE::DENSE(OPERATION & activation_function, int units, TENSOR<double> weight_matrix)
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<double> weight_matrix)
 {
     if(__graph == nullptr)
     {
@@ -46,7 +47,13 @@ DENSE::DENSE(OPERATION & activation_function, int units, TENSOR<double> weight_m
     _weight_matrix_variable = &__graph->get_variables().back();
     __graph->add_variable(VARIABLE(new MATMUL(), {_weight_matrix_variable}, {}));
     _matmul_variable = &__graph->get_variables().back();
-    __graph->add_variable(VARIABLE(&activation_function, {_matmul_variable}, {}));
+    // Use std::visit to handle the variant
+    auto operation_ptr = std::visit([](auto&& arg) -> OPERATION* {
+        // Assuming all types in the variant can be dynamically casted to OPERATION*
+        return dynamic_cast<OPERATION*>(&arg);
+    }, activation_function);
+
+    __graph->add_variable(VARIABLE(operation_ptr, {_matmul_variable}, {}));
     _activation_variable = &__graph->get_variables().back();
     _matmul_variable->get_consumers().push_back(_activation_variable);
     _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
