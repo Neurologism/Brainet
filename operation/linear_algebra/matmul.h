@@ -53,7 +53,7 @@ TENSOR<double> MATMUL::matmul(TENSOR<double> * left_matrix, TENSOR<double> * rig
     std::vector<std::thread> workers(right_matrix->shape(1));
     for (int i = 0; i < right_matrix->shape(1); ++i)
     {
-        workers[i] = std::thread (&MATMUL::blockmul, this, left_matrix, right_matrix, std::ref(result), i);
+        workers[i] = std::thread (&MATMUL::blockmul, this, std::ref(*left_matrix), std::ref(*right_matrix), std::ref(result), i);
     }
     for (std::thread &worker:workers)
     {
