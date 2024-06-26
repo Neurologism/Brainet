@@ -31,15 +31,19 @@ public:
 
 VARIABLE::~VARIABLE()
 {
-    for (VARIABLE * parent : __parents)
+    for (auto parent : __parents)
     {
-        free(parent);
+        delete parent;
     }
-    for (VARIABLE * child : __children)
+    __parents.clear();
+
+    for (auto child : __children)
     {
-        free(child);
+        delete child;
     }
+    __children.clear();
 }
+
 
 /**
  * @brief returns the operation object
