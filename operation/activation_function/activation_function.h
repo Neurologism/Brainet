@@ -48,5 +48,9 @@ TENSOR<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIA
     return _data;
 }
 
+#include "rectified_linear_unit.h"
+
+using ACTIVATION_FUNCTION_VARIANT = std::variant<ReLU>;
+
 
 #endif // ACTIVATION_FUNCTION_INCLUDE_GUARD
