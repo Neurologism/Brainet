@@ -12,5 +12,6 @@
 #include <numeric>
 #include <memory>
 #include <variant>
+#include <iostream>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
