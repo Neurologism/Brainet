@@ -21,29 +21,12 @@ public:
     VARIABLE(OPERATION * op) : __op(op){__op=op,__id = __counter++;};
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++;};
     VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data) : __op(op), __parents(parents), __children(children), __data(data){__id = __counter++;};
-    ~VARIABLE();
     OPERATION * get_operation();
     std::vector<VARIABLE *> & get_consumers();
     std::vector<VARIABLE *> & get_inputs();
     TENSOR<double> & get_data();
     int get_id();
 };
-
-VARIABLE::~VARIABLE()
-{
-    for (auto parent : __parents)
-    {
-        delete parent;
-    }
-    __parents.clear();
-
-    for (auto child : __children)
-    {
-        delete child;
-    }
-    __children.clear();
-}
-
 
 /**
  * @brief returns the operation object
