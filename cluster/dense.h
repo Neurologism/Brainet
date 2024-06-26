@@ -15,7 +15,7 @@ class DENSE : public CLUSTER
     VARIABLE * _activation_variable;
 
 public:
-    DENSE(OPERATION & activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
+    DENSE(OPERATION activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
     void add_input(VARIABLE * input) override
     {
         _matmul_variable->get_inputs().push_back(input);
@@ -35,7 +35,7 @@ public:
     }
 };
 
-DENSE::DENSE(OPERATION & activation_function, int units, TENSOR<double> weight_matrix)
+DENSE::DENSE(OPERATION activation_function, int units, TENSOR<double> weight_matrix)
 {
     if(__graph == nullptr)
     {
