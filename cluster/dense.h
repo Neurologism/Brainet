@@ -10,7 +10,6 @@
  */
 class DENSE : public CLUSTER
 {
-    int __units;
     // storing index of the variables in the graph
     int _weight_matrix_variable;
     int _matmul_variable;
@@ -18,9 +17,10 @@ class DENSE : public CLUSTER
 
 public:
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
-    void add_input(VARIABLE * input) override
+    void add_input(VARIABLE * input, int units) override
     {
         __graph->at(_matmul_variable)->get_inputs()->push_back(input);
+        *(__graph->at(_weight_matrix_variable)->get_data()) = TENSOR<double>({__units, units}, 1);
     }
     void add_output(VARIABLE * output) override
     {
