@@ -21,7 +21,6 @@ public:
     void add_input(VARIABLE * input) override
     {
         __graph->at(_matmul_variable)->get_inputs()->push_back(input);
-        *(__graph->at(_weight_matrix_variable)->get_data()) = TENSOR<double>({__units, input->get_data()->shape(0)}, 1);
     }
     void add_output(VARIABLE * output) override
     {
