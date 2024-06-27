@@ -6,21 +6,6 @@
 #include "cluster/cluster.h"
 #include "operation/activation_function/activation_function.h"
 
-CLUSTER* convertToClusterPointer(CLUSTER_VARIANT& variant) {
-    return std::visit([](auto&& arg) -> CLUSTER* {
-        // Attempt dynamic_cast for polymorphic types
-        auto ptr = dynamic_cast<CLUSTER*>(&arg);
-        if (ptr) {
-            return ptr; // Successful cast
-        } else {
-            // Handle the case where arg is not a CLUSTER* (e.g., INPUT)
-            // This might involve calling a specific method like arg.toClusterPointer()
-            // if such a method exists.
-            return nullptr; // or some other appropriate handling
-        }
-    }, variant);
-}
-
 class MODEL
 {
     GRAPH __graph;
@@ -40,7 +25,10 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers)
 {
     std::vector<CLUSTER*> clusters;
     for (CLUSTER_VARIANT& layer : layers) {
-        clusters.push_back(convertToClusterPointer(layer));
+        clusters.push_back(std::visit([](auto&& arg) -> CLUSTER* {
+        // Assuming all types in the variant can be dynamically casted to OPERATION*
+        return dynamic_cast<CLUSTER*>(&arg);
+    }, layer));
     }
     
     for(int i = 0; i < layers.size() - 1; i++)
