@@ -12,12 +12,14 @@ class CLUSTER
 {
 protected:
     static GRAPH * __graph;
+    int __units;
 public:
-    virtual void add_input(VARIABLE * input){}
+    virtual void add_input(VARIABLE * input, int units){}
     virtual void add_output(VARIABLE * output){}
     virtual VARIABLE * input(int index = 0){return nullptr;}
     virtual VARIABLE * output(int index = 0){return nullptr;}
     static void set_graph(GRAPH * graph){__graph = graph;}
+    int size(){return __units;}
 };
 
 GRAPH * CLUSTER::__graph = nullptr;

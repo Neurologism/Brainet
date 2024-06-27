@@ -12,7 +12,7 @@ class INPUT : public CLUSTER
     int _input_variable;
 public:
     INPUT(TENSOR<double> & data, int units);
-    void add_input(VARIABLE * input) override;
+    void add_input(VARIABLE * input, int units) override;
     void add_output(VARIABLE * output) override;
     VARIABLE * input(int index) override;
     VARIABLE * output(int index) override;
@@ -28,7 +28,7 @@ INPUT::INPUT(TENSOR<double> & data, int units)
     __graph->add_variable(VARIABLE(nullptr, {}, {}, data));
 }
 
-void INPUT::add_input(VARIABLE * input)
+void INPUT::add_input(VARIABLE * input, int units)
 {
     throw std::runtime_error("Input variable cannot have an input");
 }
