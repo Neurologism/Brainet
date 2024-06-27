@@ -17,6 +17,7 @@ public:
     void forward();
     std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
+    VARIABLE * at(int index){return &__variables[index];};
     void add_variable(VARIABLE var){__variables.push_back(var);};
 }; 
 
@@ -44,11 +45,11 @@ std::vector<VARIABLE *> GRAPH::__topo_sort()
     std::function<void(int)> dfs = [&](int node)
     {
         visited[node] = true;
-        for (int i = 0; i < __variables[node].get_consumers().size(); i++)
+        for (int i = 0; i < __variables[node].get_consumers()->size(); i++)
         {
-            if (!visited[__variables[node].get_consumers()[i]->get_id()])
+            if (!visited[__variables[node].get_consumers()->at(i)->get_id()])
             {
-                dfs(__variables[node].get_consumers()[i]->get_id());
+                dfs(__variables[node].get_consumers()->at(i)->get_id());
             }
         }
         sorted.push_back(&__variables[node]);
@@ -74,7 +75,7 @@ void GRAPH::forward()
     std::vector<VARIABLE *> sorted = __topo_sort();
     for (int i = 0; i < sorted.size(); i++)
     {
-        sorted[i]->get_operation()->f(sorted[i]->get_inputs());
+        sorted[i]->get_operation()->f(*(sorted[i]->get_inputs()));
     }
 }
 
@@ -114,16 +115,16 @@ void GRAPH::build_grad(int focus, std::vector<TENSOR<double>> & grad_table)
         return;
     }
 
-    grad_table[focus] = TENSOR<double>(__variables[focus].get_data().shape()); // make space for the gradient
+    grad_table[focus] = TENSOR<double>(__variables[focus].get_data()->shape()); // make space for the gradient
 
-    for (int i = 0; i < __variables[focus].get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
+    for (int i = 0; i < __variables[focus].get_consumers()->size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
         // load stuff
-        VARIABLE * consumer = __variables[focus].get_consumers()[i];
+        VARIABLE * consumer = __variables[focus].get_consumers()->at(i);
         OPERATION * op = consumer->get_operation();
-        std::vector<VARIABLE *> inputs = consumer->get_inputs();
+        std::vector<VARIABLE *> inputs = *(consumer->get_inputs());
         build_grad(consumer->get_id(), grad_table); // build the gradient table for the consumer (dp, dfs)
-        TENSOR<double> gradient = op->bprop(consumer->get_inputs(), __variables[focus], grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
+        TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), __variables[focus], grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
         for (int j = 0; j < gradient.size(); j++) // add the gradient to the gradient table
         {
             grad_table[focus].data()[j] += gradient.data()[j];
