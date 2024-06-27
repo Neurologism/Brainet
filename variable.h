@@ -3,6 +3,7 @@
 
 #include "dependencies.h"
 #include "tensor.h"
+#include "operation/operation.h"
 
 class OPERATION;
 
