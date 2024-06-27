@@ -17,6 +17,7 @@ public:
     void forward();
     std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
     std::vector<VARIABLE> & get_variables();
+    VARIABLE * at(int index){return &__variables[index];};
     void add_variable(VARIABLE var){__variables.push_back(var);};
 }; 
 
