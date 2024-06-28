@@ -19,9 +19,9 @@ class VARIABLE
     int __id;
 
 public:
-    VARIABLE(OPERATION * op) : __op(op){__op=op,__id = __counter++;};
-    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++;};
-    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data) : __op(op), __parents(parents), __children(children), __data(data){__id = __counter++;};
+    VARIABLE(OPERATION * op) : __op(op){__id = __counter++; op->set_variable(this);};
+    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++; op->set_variable(this);};
+    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data) : __op(op), __parents(parents), __children(children), __data(data){__id = __counter++; op->set_variable(this);};
     OPERATION * get_operation();
     std::vector<VARIABLE *> * get_consumers();
     std::vector<VARIABLE *> * get_inputs();
@@ -34,10 +34,6 @@ public:
 */
 OPERATION * VARIABLE::get_operation()
 {
-    if (__op == nullptr)
-    {
-        throw std::invalid_argument("This operation is a pseudo-variable and has no operation.");
-    }
     return __op;
 }
 
