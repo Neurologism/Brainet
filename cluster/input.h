@@ -25,6 +25,7 @@ INPUT::INPUT(TENSOR<double> & data, int units)
         throw std::runtime_error("graph is not set");
     }
     _input_variable = __graph->add_variable(VARIABLE(nullptr, {}, {}, data));
+    __units = units;
 }
 
 void INPUT::add_input(VARIABLE * input, int units)
