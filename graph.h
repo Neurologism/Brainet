@@ -7,18 +7,21 @@
 
 class GRAPH // dag of variables and operations
 {
-    std::vector<VARIABLE> __variables;
-    void build_grad(int focus, std::vector<TENSOR<double>> & grad_table);
-    std::vector<VARIABLE *> __topo_sort();
+    std::list<VARIABLE> __variables;
+    void build_grad(VARIABLE * focus, std::vector<TENSOR<double>> & grad_table);
+    std::list<VARIABLE *> __topo_sort();
 public:
     GRAPH();
     ~GRAPH();
-    VARIABLE * operator[](int index);
     void forward();
     std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
-    std::vector<VARIABLE> & get_variables();
-    VARIABLE * at(int index){return &__variables[index];};
-    void add_variable(VARIABLE var){__variables.push_back(var);};
+    std::list<VARIABLE> & get_variables();
+    VARIABLE * add_variable(VARIABLE var)
+    {
+        __variables.push_back(var); 
+        if(var.get_operation()!=nullptr)var.get_operation()->set_variable(&__variables.back()); // address of variable has changed -> invalidation of pointers
+        return &__variables.back();
+    };
 }; 
 
 GRAPH::GRAPH() 
@@ -29,37 +32,33 @@ GRAPH::~GRAPH()
 {
 }   
 
-VARIABLE * GRAPH::operator[](int index)
-{
-    return &__variables[index];
-}
-
 /**
  * @brief topological sort of the graph
  * @return Returns a list of pointers to the variables in topological order
 */
-std::vector<VARIABLE *> GRAPH::__topo_sort()
+std::list<VARIABLE *> GRAPH::__topo_sort()
 {
-    std::vector<VARIABLE *> sorted;
+    std::list<VARIABLE *> sorted;
     std::vector<bool> visited(__variables.size(), false);
-    std::function<void(int)> dfs = [&](int node)
+    std::function<void(VARIABLE *)> dfs = [&](VARIABLE * var)
     {
-        visited[node] = true;
-        for (int i = 0; i < __variables[node].get_consumers()->size(); i++)
+        if(visited[var->get_id()]) return;
+        visited[var->get_id()] = true;
+        for (VARIABLE * child : *(var->get_consumers()))
         {
-            if (!visited[__variables[node].get_consumers()->at(i)->get_id()])
+            if (!visited[child->get_id()])
             {
-                dfs(__variables[node].get_consumers()->at(i)->get_id());
+                dfs(child);
             }
         }
-        sorted.push_back(&__variables[node]);
+        sorted.push_back(var);
     };
 
-    for (int i = 0; i < __variables.size(); i++)
+    for (VARIABLE & var : __variables)
     {
-        if (!visited[i])
+        if (!visited[var.get_id()])
         {
-            dfs(i);
+            dfs(&var);
         }
     }
     std::reverse(sorted.begin(), sorted.end());
@@ -72,13 +71,13 @@ std::vector<VARIABLE *> GRAPH::__topo_sort()
 */
 void GRAPH::forward()
 {
-    std::vector<VARIABLE *> sorted = __topo_sort();
-    for (int i = 0; i < sorted.size(); i++)
+    std::list<VARIABLE *> sorted = __topo_sort();
+    for (VARIABLE * var : sorted)
     {
-        OPERATION * op = sorted[i]->get_operation();
+        OPERATION * op = var->get_operation();
         if(op != nullptr)
         {
-            op->f(*(sorted[i]->get_inputs()));
+            op->f(*(var->get_inputs()));
         }
         
     }
@@ -98,11 +97,12 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, int z)
     grad.set({0},1);
     grad_table[z] = grad; // change to make possible to differentiate with respect to multiple variables ?
 
-    for (int i = 0; i < __variables.size(); i++)
+
+    for (VARIABLE & var : __variables)
     {
-        if (targets[i]) // call build grad for each target variable
+        if (targets[var.get_id()]) // call build grad for each target variable
         {
-            build_grad(i, grad_table);
+            build_grad(&var, grad_table);
         }
     }
     return grad_table;
@@ -113,31 +113,31 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, int z)
  * @param focus the variable to be differentiated
  * @param grad_table the gradient table to be built
 */
-void GRAPH::build_grad(int focus, std::vector<TENSOR<double>> & grad_table)
+void GRAPH::build_grad(VARIABLE * focus, std::vector<TENSOR<double>> & grad_table)
 {
-    if (grad_table[focus].dimensionality() != 0) // gradient of this variable already computed
+    if (grad_table[focus->get_id()].dimensionality() != 0) // gradient of this variable already computed
     {
         return;
     }
 
-    grad_table[focus] = TENSOR<double>(__variables[focus].get_data()->shape()); // make space for the gradient
+    grad_table[focus->get_id()] = TENSOR<double>(focus->get_data()->shape()); // make space for the gradient
 
-    for (int i = 0; i < __variables[focus].get_consumers()->size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
+    for (int i = 0; i < focus->get_consumers()->size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
         // load stuff
-        VARIABLE * consumer = __variables[focus].get_consumers()->at(i);
+        VARIABLE * consumer = focus->get_consumers()->at(i);
         OPERATION * op = consumer->get_operation();
         std::vector<VARIABLE *> inputs = *(consumer->get_inputs());
-        build_grad(consumer->get_id(), grad_table); // build the gradient table for the consumer (dp, dfs)
-        TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), __variables[focus], grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
+        build_grad(consumer, grad_table); // build the gradient table for the consumer (dp, dfs)
+        TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), *focus, grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
         for (int j = 0; j < gradient.size(); j++) // add the gradient to the gradient table
         {
-            grad_table[focus].data()[j] += gradient.data()[j];
+            grad_table[focus->get_id()].data()[j] += gradient.data()[j];
         }
     }
 }
 
-std::vector<VARIABLE> & GRAPH::get_variables()
+std::list<VARIABLE> & GRAPH::get_variables()
 {
     return __variables;
 }

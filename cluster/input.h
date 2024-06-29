@@ -9,7 +9,7 @@
  */
 class INPUT : public CLUSTER
 {
-    int _input_variable;
+    VARIABLE * _input_variable;
 public:
     INPUT(TENSOR<double> & data, int units);
     void add_input(VARIABLE * input, int units) override;
@@ -24,8 +24,8 @@ INPUT::INPUT(TENSOR<double> & data, int units)
     {
         throw std::runtime_error("graph is not set");
     }
-    _input_variable = __graph->get_variables().size();
-    __graph->add_variable(VARIABLE(nullptr, {}, {}, data));
+    _input_variable = __graph->add_variable(VARIABLE(nullptr, {}, {}, data));
+    __units = units;
 }
 
 void INPUT::add_input(VARIABLE * input, int units)
@@ -35,7 +35,7 @@ void INPUT::add_input(VARIABLE * input, int units)
 
 void INPUT::add_output(VARIABLE * output)
 {
-    __graph->at(_input_variable)->get_consumers()->push_back(output);
+    _input_variable->get_consumers()->push_back(output);
 }
 
 VARIABLE * INPUT::input(int index)
@@ -46,6 +46,6 @@ VARIABLE * INPUT::input(int index)
 
 VARIABLE * INPUT::output(int index)
 {
-    return __graph->at(_input_variable);
+    return _input_variable;
 }
 #endif // INPUT_INCLUDE_GUARD
