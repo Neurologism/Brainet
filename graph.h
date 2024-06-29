@@ -7,18 +7,17 @@
 
 class GRAPH // dag of variables and operations
 {
-    std::vector<VARIABLE> __variables;
+    std::list<VARIABLE> __variables;
     void build_grad(int focus, std::vector<TENSOR<double>> & grad_table);
-    std::vector<VARIABLE *> __topo_sort();
+    std::list<VARIABLE *> __topo_sort();
 public:
     GRAPH();
     ~GRAPH();
     VARIABLE * operator[](int index);
     void forward();
     std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
-    std::vector<VARIABLE> & get_variables();
-    VARIABLE * at(int index){return &__variables[index];};
-    void add_variable(VARIABLE var){__variables.push_back(var);};
+    std::list<VARIABLE> & get_variables();
+    void add_variable(const VARIABLE &var){__variables.push_back(var);};
 }; 
 
 GRAPH::GRAPH() 
@@ -44,12 +43,13 @@ std::vector<VARIABLE *> GRAPH::__topo_sort()
     std::vector<bool> visited(__variables.size(), false);
     std::function<void(int)> dfs = [&](int node)
     {
+        if(visited[node]) return;
         visited[node] = true;
-        for (int i = 0; i < __variables[node].get_consumers()->size(); i++)
+        for (auto children : *__variables[node].get_consumers())
         {
-            if (!visited[__variables[node].get_consumers()->at(i)->get_id()])
+            if (!visited[children->get_id()])
             {
-                dfs(__variables[node].get_consumers()->at(i)->get_id());
+                dfs(children->get_id());
             }
         }
         sorted.push_back(&__variables[node]);
