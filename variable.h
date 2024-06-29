@@ -19,9 +19,29 @@ class VARIABLE
     int __id;
 
 public:
-    VARIABLE(OPERATION * op) : __op(op){__id = __counter++; op->set_variable(this);};
-    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children) : __op(op), __parents(parents), __children(children){__id = __counter++; op->set_variable(this);};
-    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data) : __op(op), __parents(parents), __children(children), __data(data){__id = __counter++; op->set_variable(this);};
+    VARIABLE(OPERATION * op)
+    {
+        __id = __counter++;
+        __op = op;
+        if(op!=nullptr)op->set_variable(this);
+    };
+    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children)
+    {
+        __id = __counter++;
+        __op = op;
+        __parents = parents;
+        __children = children;
+        if(op!=nullptr)op->set_variable(this);
+    };
+    VARIABLE(OPERATION * op, std::vector<VARIABLE *> parents, std::vector<VARIABLE *> children, TENSOR<double> & data)
+    {
+        __id = __counter++;
+        __op = op;
+        __parents = parents;
+        __children = children;
+        __data = data;
+        if(op!=nullptr)op->set_variable(this);
+    };
     OPERATION * get_operation();
     std::vector<VARIABLE *> * get_consumers();
     std::vector<VARIABLE *> * get_inputs();
