@@ -16,7 +16,12 @@ public:
     void forward();
     std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
     std::list<VARIABLE> & get_variables();
-    VARIABLE * add_variable(const VARIABLE &var){__variables.push_back(var); return &__variables.back();};
+    VARIABLE * add_variable(VARIABLE var)
+    {
+        __variables.push_back(var); 
+        if(var.get_operation()!=nullptr)var.get_operation()->set_variable(&__variables.back()); // address of variable has changed -> invalidation of pointers
+        return &__variables.back();
+    };
 }; 
 
 GRAPH::GRAPH() 
