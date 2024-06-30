@@ -23,7 +23,7 @@ public:
     int dimensionality(){return __shape.size();};
     int size(){return __data.size();};
     std::vector<T> & data(){return __data;};
-    void transpose();
+    TENSOR<T> transpose();
 };
 
 /**
@@ -93,7 +93,7 @@ void TENSOR<T>::set(std::vector<int> index, T value)
  * @brief transposes the tensor
 */
 template <class T>
-void TENSOR<T>::transpose()
+TENSOR<T> TENSOR<T>::transpose()
 {
     if(__shape.size() != 2)
         throw std::invalid_argument("TENSOR::transpose: Tensor must be 2D");
@@ -105,8 +105,9 @@ void TENSOR<T>::transpose()
             _data[j*__shape[0] + i] = __data[i*__shape[1] + j];
         }
     }
-    __data = _data;
-    std::swap(__shape[0],__shape[1]);
+    TENSOR<T> _tensor({__shape[1],__shape[0]});
+    _tensor.data() = _data;
+    return _tensor;
 }
 
 #endif // TENSOR_INCLUDE_GUARD
