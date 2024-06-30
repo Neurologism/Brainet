@@ -88,15 +88,17 @@ void GRAPH::forward()
  * @brief backpropagation algorithm
  * @attention assumes that the graph is a dag and forward has been called before
  * @param targets boolen list indicating for each variable in __variables if its gradient should be computed 
- * @param z the variable to be differentiated (gradient is 1)
+ * @param differentiate the variables to be differentiated (gradient is 1)
 */
-std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, int z)
+std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, std::vector<VARIABLE *> differentiate)
 {
     std::vector<TENSOR<double>> grad_table(__variables.size()); // data 
-    TENSOR<double> grad({1});
-    grad.set({0},1);
-    grad_table[z] = grad; // change to make possible to differentiate with respect to multiple variables ?
-
+    for(VARIABLE * var : differentiate)
+    {
+        if(var->get_data()->shape()!={1})throw std::runtime_error("Differentiation only possible for scalar variables");
+        grad_table[var->get_id()] = TENSOR<double>({1}); // set gradient to 1 for the variables to be differentiated
+        grad_table[var->get_id()].set({0},1);
+    }
 
     for (VARIABLE & var : __variables)
     {
