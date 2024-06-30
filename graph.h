@@ -14,7 +14,7 @@ public:
     GRAPH();
     ~GRAPH();
     void forward();
-    std::vector<TENSOR<double>> backprop(std::vector<bool> & target, int z);
+    std::vector<TENSOR<double>> backprop(std::vector<bool> & target, std::vector<VARIABLE *> differentiate);
     std::list<VARIABLE> & get_variables();
     VARIABLE * add_variable(VARIABLE var)
     {
@@ -95,9 +95,11 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, std::ve
     std::vector<TENSOR<double>> grad_table(__variables.size()); // data 
     for(VARIABLE * var : differentiate)
     {
-        if(var->get_data()->shape()!={1})throw std::runtime_error("Differentiation only possible for scalar variables");
-        grad_table[var->get_id()] = TENSOR<double>({1}); // set gradient to 1 for the variables to be differentiated
-        grad_table[var->get_id()].set({0},1);
+        grad_table[var->get_id()] = TENSOR<double>(var->get_data()->shape());
+        for(int i = 0; i < var->get_data()->size(); i++)
+        {
+            grad_table[var->get_id()].data()[i] = 1;
+        }
     }
 
     for (VARIABLE & var : __variables)
@@ -132,6 +134,10 @@ void GRAPH::build_grad(VARIABLE * focus, std::vector<TENSOR<double>> & grad_tabl
         std::vector<VARIABLE *> inputs = *(consumer->get_inputs());
         build_grad(consumer, grad_table); // build the gradient table for the consumer (dp, dfs)
         TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), *focus, grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
+        if (gradient.shape() != focus->get_data()->shape())
+        {
+            throw std::runtime_error("Gradient shape does not match variable shape");
+        }
         for (int j = 0; j < gradient.size(); j++) // add the gradient to the gradient table
         {
             grad_table[focus->get_id()].data()[j] += gradient.data()[j];
