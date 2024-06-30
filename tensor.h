@@ -23,6 +23,7 @@ public:
     int dimensionality(){return __shape.size();};
     int size(){return __data.size();};
     std::vector<T> & data(){return __data;};
+    void transpose();
 };
 
 /**
@@ -60,7 +61,8 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
         std::uniform_real_distribution<> dis(-0.1, 0.1);
         for(int i = 0; i < __data.size(); i++)
         {
-            __data[i] = dis(gen);
+            // __data[i] = dis(gen);
+            __data[i] = 1;
         }
     }
 }
@@ -85,6 +87,26 @@ void TENSOR<T>::set(std::vector<int> index, T value)
     if(_index >= __data.size())
         throw std::out_of_range("Index out of range");
     __data[_index] = value;
+}
+
+/**
+ * @brief transposes the tensor
+*/
+template <class T>
+void TENSOR<T>::transpose()
+{
+    if(__shape.size() != 2)
+        throw std::invalid_argument("TENSOR::transpose: Tensor must be 2D");
+    std::vector<T> _data(__data.size());
+    for(int i = 0; i < __shape[0]; i++)
+    {
+        for(int j = 0; j < __shape[1]; j++)
+        {
+            _data[j*__shape[0] + i] = __data[i*__shape[1] + j];
+        }
+    }
+    __data = _data;
+    std::swap(__shape[0],__shape[1]);
 }
 
 #endif // TENSOR_INCLUDE_GUARD
