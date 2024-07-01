@@ -9,7 +9,7 @@
 class MODEL
 {
     std::shared_ptr<GRAPH> __graph;
-    std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> __to_be_differentiated;
+    std::vector<std::shared_ptr<VARIABLE>> __to_be_differentiated;
 public:
     MODEL(){CLUSTER::set_graph(__graph);};
     void load();
