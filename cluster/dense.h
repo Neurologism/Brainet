@@ -11,25 +11,25 @@
 class DENSE : public CLUSTER
 {
     // storing index of the variables in the graph
-    VARIABLE * _weight_matrix_variable;
-    VARIABLE * _matmul_variable;
-    VARIABLE * _activation_variable;
+    std::shared_ptr<VARIABLE> _weight_matrix_variable;
+    std::shared_ptr<VARIABLE> _matmul_variable;
+    std::shared_ptr<VARIABLE> _activation_variable;
 
 public:
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units);
-    void add_input(VARIABLE * input, int units) override
+    void add_input(std::shared_ptr<VARIABLE> input, int units) override
     {
         _activation_variable->get_inputs()->push_back(input);
     }
-    void add_output(VARIABLE * output) override
+    void add_output(std::shared_ptr<VARIABLE> output) override
     {
         _activation_variable->get_consumers()->push_back(output);
     }
-    VARIABLE * input(int index) override
+    std::shared_ptr<VARIABLE> input(int index) override
     {
         return _activation_variable;
     }
-    VARIABLE * output(int index) override
+    std::shared_ptr<VARIABLE> output(int index) override
     {
         return _activation_variable;
     }
@@ -50,9 +50,9 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
     // _matmul_variable = __graph->add_variable(VARIABLE(new MATMUL(), {_weight_matrix_variable}, {}));
 
     // Use std::visit to handle the variant
-    OPERATION * operation_ptr = std::visit([](auto&& arg) -> OPERATION* {
+    std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) -> std::shared_ptr<OPERATION> {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return dynamic_cast<OPERATION*>(&arg);
+        return std::make_shared<OPERATION>(dynamic_cast<OPERATION*>(&arg));
     }, activation_function);
 
     _activation_variable = __graph->add_variable(VARIABLE(operation_ptr, {}, {}));
