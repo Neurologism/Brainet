@@ -35,7 +35,7 @@ void INPUT::add_input(std::shared_ptr<VARIABLE> input, int units)
 
 void INPUT::add_output(std::shared_ptr<VARIABLE> output)
 {
-    _input_variable->get_consumers()->push_back(output);
+    _input_variable->get_consumers().push_back(output);
 }
 
 std::shared_ptr<VARIABLE> INPUT::input(int index)
