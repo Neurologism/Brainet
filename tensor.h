@@ -22,6 +22,7 @@ public:
     int shape(int index){return __shape[index];};
     int dimensionality(){return __shape.size();};
     int size(){return __data.size();};
+    void resize(std::vector<int> dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
     std::vector<T> & data(){return __data;};
     TENSOR<T> transpose();
 };
@@ -52,7 +53,6 @@ T TENSOR<T>::at(std::vector<int> index)
 template <class T>
 TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
 {
-    __shape = dimensionality;
     __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()), 0);
     if(random)
     {
@@ -65,6 +65,7 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
             __data[i] = 1;
         }
     }
+    __shape.swap(dimensionality);
 }
 
 /**

@@ -6,14 +6,14 @@
 class ACTIVATION_FUNCTION : public OPERATION
 {
 public:
-    void f(std::vector<VARIABLE *>& inputs) override;
-    TENSOR<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient) override;
+    void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
+    TENSOR<double> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient) override;
 
     virtual double activation_function(double x) = 0;
     virtual double activation_function_derivative(double x) = 0;
 };
 
-void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
+void ACTIVATION_FUNCTION::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
 {
     if (inputs.size() != 1)
     {
@@ -30,7 +30,7 @@ void ACTIVATION_FUNCTION::f(std::vector<VARIABLE *>& inputs)
     *(this->get_variable()->get_data()) = _data;
 }
 
-TENSOR<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient)
+TENSOR<double> ACTIVATION_FUNCTION::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient)
 {
     if (inputs.size() != 1)
     {
@@ -38,11 +38,11 @@ TENSOR<double> ACTIVATION_FUNCTION::bprop(std::vector<VARIABLE *>& inputs, VARIA
     }
 
     // load derivative of activation into data 
-    TENSOR<double> _data(focus.get_data()->shape());
+    TENSOR<double> _data(focus->get_data()->shape());
 
     for (int i=0; i<gradient.size(); i++) // apply activation function derivative to all elements
     {
-        _data.data().push_back(activation_function_derivative(focus.get_data()->data()[i])*gradient.data()[i]);
+        _data.data().push_back(activation_function_derivative(focus->get_data()->data()[i])*gradient.data()[i]);
     }
 
     return _data;

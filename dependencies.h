@@ -14,5 +14,6 @@
 #include <variant>
 #include <iostream>
 #include <list>
+#include <set>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
