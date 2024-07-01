@@ -105,13 +105,15 @@ TENSOR<double> MATMUL::bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, 
     }
 
 
-    if (inputs[0]->get_id() != focus.get_id())
+    if (inputs[0]->get_id() == focus.get_id())
     {
-        return matmul(&gradient, right_matrix);
+        TENSOR<double> right_matrix_transposed = right_matrix->transpose();
+        return matmul(&gradient, &right_matrix_transposed);
     }
     else 
     {
-        return matmul(left_matrix, &gradient);
+        TENSOR<double> left_matrix_transposed = left_matrix->transpose();
+        return matmul(&left_matrix_transposed, &gradient);
     }
 }
 
