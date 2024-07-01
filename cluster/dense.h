@@ -19,11 +19,11 @@ public:
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units);
     void add_input(std::shared_ptr<VARIABLE> input, int units) override
     {
-        _activation_variable->get_inputs()->push_back(input);
+        _activation_variable->get_inputs().push_back(input);
     }
     void add_output(std::shared_ptr<VARIABLE> output) override
     {
-        _activation_variable->get_consumers()->push_back(output);
+        _activation_variable->get_consumers().push_back(output);
     }
     std::shared_ptr<VARIABLE> input(int index) override
     {
