@@ -37,21 +37,21 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
         clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->size());
     }
 
-    if(add_backprop)(*__to_be_differentiated).push_back(clusters.back()->output());
+    if(add_backprop)__to_be_differentiated.push_back(clusters.back()->output());
 }
 
 void MODEL::train(int epochs, double learning_rate)
 {
     (*__graph).forward();
     std::set<std::shared_ptr<VARIABLE>> s;
-    for(VARIABLE & var : (*__graph).get_variables())
+    for(std::shared_ptr<VARIABLE> var : __graph->get_variables())
     {
-        if(var.get_operation() == nullptr)
+        if(var->get_operation() == nullptr)
         {
-            s.insert(std::make_shared<VARIABLE>(var));
+            s.insert(var);
         }
     }
-    (*__graph).backprop(s, *__to_be_differentiated);
+    (*__graph).backprop(s, __to_be_differentiated);
 }
 
 #endif // MODEL_INCLUDE_GUARD
