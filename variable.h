@@ -12,7 +12,7 @@ class OPERATION;
 */
 class VARIABLE
 {
-    std::vector<std::shared_ptr<VARIABLE>>> __children, __parents;
+    std::vector<std::shared_ptr<VARIABLE>> __children, __parents;
     std::shared_ptr<OPERATION> __op;
     std::shared_ptr<TENSOR<double>> __data; // each variable can store a tensor of the data 
     static int __counter; // keep track of the number of variables created
@@ -40,8 +40,8 @@ public:
         *__data = data;
     };
     std::shared_ptr<OPERATION> get_operation();
-    std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> get_consumers();
-    std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> get_inputs();
+    std::vector<std::shared_ptr<VARIABLE>> get_consumers();
+    std::vector<std::shared_ptr<VARIABLE>> get_inputs();
     std::shared_ptr<TENSOR<double>> get_data();
     int get_id();
 };
@@ -57,7 +57,7 @@ std::shared_ptr<OPERATION> VARIABLE::get_operation()
 /**
  * @brief returns the children of the variable
 */
-std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> VARIABLE::get_consumers()
+std::vector<std::shared_ptr<VARIABLE>> VARIABLE::get_consumers()
 {
     return __children;
 }
@@ -65,7 +65,7 @@ std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> VARIABLE::get_consumers(
 /**
  * @brief returns the parents of the variable
 */
-std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> VARIABLE::get_inputs()
+std::vector<std::shared_ptr<VARIABLE>> VARIABLE::get_inputs()
 {
     return __parents;
 }
