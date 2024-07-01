@@ -9,13 +9,13 @@
  */
 class INPUT : public CLUSTER
 {
-    VARIABLE * _input_variable;
+    std::shared_ptr<VARIABLE> _input_variable;
 public:
     INPUT(TENSOR<double> & data, int units);
-    void add_input(VARIABLE * input, int units) override;
-    void add_output(VARIABLE * output) override;
-    VARIABLE * input(int index) override;
-    VARIABLE * output(int index) override;
+    void add_input(std::shared_ptr<VARIABLE> input, int units) override;
+    void add_output(std::shared_ptr<VARIABLE> output) override;
+    std::shared_ptr<VARIABLE> input(int index) override;
+    std::shared_ptr<VARIABLE> output(int index) override;
 };
 
 INPUT::INPUT(TENSOR<double> & data, int units)
@@ -28,23 +28,23 @@ INPUT::INPUT(TENSOR<double> & data, int units)
     __units = units;
 }
 
-void INPUT::add_input(VARIABLE * input, int units)
+void INPUT::add_input(std::shared_ptr<VARIABLE> input, int units)
 {
     throw std::runtime_error("Input variable cannot have an input");
 }
 
-void INPUT::add_output(VARIABLE * output)
+void INPUT::add_output(std::shared_ptr<VARIABLE> output)
 {
     _input_variable->get_consumers()->push_back(output);
 }
 
-VARIABLE * INPUT::input(int index)
+std::shared_ptr<VARIABLE> INPUT::input(int index)
 {
     throw std::runtime_error("Input variable cannot have an input");
     return nullptr;
 }
 
-VARIABLE * INPUT::output(int index)
+std::shared_ptr<VARIABLE> INPUT::output(int index)
 {
     return _input_variable;
 }
