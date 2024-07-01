@@ -53,7 +53,6 @@ T TENSOR<T>::at(std::vector<int> index)
 template <class T>
 TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
 {
-    __shape = dimensionality;
     __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()), 0);
     if(random)
     {
@@ -66,6 +65,7 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
             __data[i] = 1;
         }
     }
+    __shape.swap(dimensionality);
 }
 
 /**
