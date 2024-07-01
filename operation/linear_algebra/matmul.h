@@ -17,7 +17,7 @@ class MATMUL : public OPERATION
 public:
     MATMUL(){};
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
-    TENSOR<double> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, VARIABLE & focus, TENSOR<double> & gradient) override;
+    TENSOR<double> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient) override;
 };
 
 /**
@@ -90,7 +90,7 @@ void MATMUL::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-TENSOR<double> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, VARIABLE & focus, TENSOR<double> & gradient)
+TENSOR<double> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient)
 {
     if (inputs.size() != 2)
     {
@@ -106,7 +106,7 @@ TENSOR<double> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, VAR
     }
 
 
-    if (inputs[0]->get_id() == focus.get_id())
+    if (inputs[0]->get_id() == focus->get_id())
     {
         TENSOR<double> right_matrix_transposed = right_matrix->transpose();
         return matmul(std::make_shared<TENSOR<double>>(gradient), std::make_shared<TENSOR<double>>(right_matrix_transposed));
