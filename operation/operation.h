@@ -13,13 +13,13 @@ class VARIABLE;
 class OPERATION
 {
 private:
-    VARIABLE * __variable = nullptr;
+    std::shared_ptr<VARIABLE> __variable = nullptr;
 public:
     OPERATION() = default;
     /**
      * @brief mathematical function the operation implements
     */
-    virtual void f(std::vector<VARIABLE *>& inputs) =0; 
+    virtual void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) =0; 
     /**
      * @brief derivative of the function
      * assumes that the gradient is already calculated for the output variables 
@@ -27,23 +27,23 @@ public:
      * @param focus the variable that the gradient is calculated for
      * @param gradient the sum of the gradients of the output variables
     */
-    virtual TENSOR<double> bprop(std::vector<VARIABLE *>& inputs, VARIABLE & focus, TENSOR<double> & gradient) =0;
+    virtual TENSOR<double> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, VARIABLE & focus, TENSOR<double> & gradient) =0;
     /**
      * @brief sets the variable of the operation
     */
-    void set_variable(VARIABLE * variable);
+    void set_variable(std::shared_ptr<VARIABLE> variable);
     /**
      * @brief returns the variable of the operation
     */
-    VARIABLE * get_variable();
+    std::shared_ptr<VARIABLE> get_variable();
 };
 
-void OPERATION::set_variable(VARIABLE * variable)
+void OPERATION::set_variable(std::shared_ptr<VARIABLE> variable)
 {
     __variable = variable;
 }
 
-VARIABLE * OPERATION::get_variable()
+std::shared_ptr<VARIABLE> OPERATION::get_variable()
 {
     if(__variable == nullptr)
     {
