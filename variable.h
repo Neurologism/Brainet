@@ -12,7 +12,7 @@ class OPERATION;
 */
 class VARIABLE
 {
-    std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> __children, __parents;
+    std::vector<std::shared_ptr<VARIABLE>>> __children, __parents;
     std::shared_ptr<OPERATION> __op;
     std::shared_ptr<TENSOR<double>> __data; // each variable can store a tensor of the data 
     static int __counter; // keep track of the number of variables created
@@ -28,15 +28,15 @@ public:
     {
         __id = __counter++;
         __op = op;
-        *__parents = parents;
-        *__children = children;
+        __parents = parents;
+        __children = children;
     };
     VARIABLE(std::shared_ptr<OPERATION> op, std::vector<std::shared_ptr<VARIABLE>> parents, std::vector<std::shared_ptr<VARIABLE>> children, TENSOR<double> & data)
     {
         __id = __counter++;
         __op = op;
-        *__parents = parents;
-        *__children = children;
+        __parents = parents;
+        __children = children;
         *__data = data;
     };
     std::shared_ptr<OPERATION> get_operation();
