@@ -8,13 +8,13 @@
 class GRAPH // dag of variables and operations
 {
     std::list<VARIABLE> __variables;
-    void build_grad(VARIABLE * focus, std::vector<TENSOR<double>> & grad_table);
+    void build_grad(VARIABLE * focus, std::map<VARIABLE*,TENSOR<double>> & grad_table);
     std::list<VARIABLE *> __topo_sort();
 public:
     GRAPH();
     ~GRAPH();
     void forward();
-    std::vector<TENSOR<double>> backprop(std::vector<bool> & target, std::vector<VARIABLE *> differentiate);
+    std::map<VARIABLE*,TENSOR<double>> backprop(std::set<VARIABLE*> & target, std::vector<VARIABLE *> differentiate);
     std::list<VARIABLE> & get_variables();
     VARIABLE * add_variable(VARIABLE var)
     {
@@ -30,6 +30,7 @@ GRAPH::GRAPH()
 
 GRAPH::~GRAPH()
 {
+    std::cout << "GRAPH DESTRUCTOR" << std::endl;
 }   
 
 /**
@@ -90,21 +91,21 @@ void GRAPH::forward()
  * @param targets boolen list indicating for each variable in __variables if its gradient should be computed 
  * @param differentiate the variables to be differentiated (gradient is 1)
 */
-std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, std::vector<VARIABLE *> differentiate)
+std::map<VARIABLE*,TENSOR<double>> GRAPH::backprop(std::set<VARIABLE*> & targets, std::vector<VARIABLE *> differentiate)
 {
-    std::vector<TENSOR<double>> grad_table(__variables.size()); // data 
+    std::map<VARIABLE*,TENSOR<double>> grad_table; // data 
     for(VARIABLE * var : differentiate)
     {
-        grad_table[var->get_id()] = TENSOR<double>(var->get_data()->shape());
+        grad_table[var] = TENSOR<double>(var->get_data()->shape());
         for(int i = 0; i < var->get_data()->size(); i++)
         {
-            grad_table[var->get_id()].data()[i] = 1;
+            grad_table[var].data()[i] = 1;
         }
     }
 
     for (VARIABLE & var : __variables)
     {
-        if (targets[var.get_id()]) // call build grad for each target variable
+        if (targets.find(&var)!=targets.end()) // call build grad for each target variable
         {
             build_grad(&var, grad_table);
         }
@@ -117,14 +118,14 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::vector<bool> & targets, std::ve
  * @param focus the variable to be differentiated
  * @param grad_table the gradient table to be built
 */
-void GRAPH::build_grad(VARIABLE * focus, std::vector<TENSOR<double>> & grad_table)
+void GRAPH::build_grad(VARIABLE * focus, std::map<VARIABLE*,TENSOR<double>> & grad_table)
 {
-    if (grad_table[focus->get_id()].dimensionality() != 0) // gradient of this variable already computed
+    if (grad_table.find(focus)!=grad_table.end()) // gradient of this variable already computed
     {
         return;
     }
 
-    grad_table[focus->get_id()] = TENSOR<double>(focus->get_data()->shape()); // make space for the gradient
+    grad_table[focus] = TENSOR<double>(focus->get_data()->shape()); // make space for the gradient
 
     for (int i = 0; i < focus->get_consumers()->size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
@@ -133,14 +134,14 @@ void GRAPH::build_grad(VARIABLE * focus, std::vector<TENSOR<double>> & grad_tabl
         OPERATION * op = consumer->get_operation();
         std::vector<VARIABLE *> inputs = *(consumer->get_inputs());
         build_grad(consumer, grad_table); // build the gradient table for the consumer (dp, dfs)
-        TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), *focus, grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
+        TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), *focus, grad_table[consumer]); // calculate the gradient of the consumer with respect to the focus variable
         if (gradient.shape() != focus->get_data()->shape())
         {
             throw std::runtime_error("Gradient shape does not match variable shape");
         }
         for (int j = 0; j < gradient.size(); j++) // add the gradient to the gradient table
         {
-            grad_table[focus->get_id()].data()[j] += gradient.data()[j];
+            grad_table[focus].data()[j] += gradient.data()[j];
         }
     }
 }
