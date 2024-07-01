@@ -120,6 +120,22 @@ std::map<VARIABLE*,TENSOR<double>> GRAPH::backprop(std::set<VARIABLE*> & targets
 */
 void GRAPH::build_grad(VARIABLE * focus, std::map<VARIABLE*,TENSOR<double>> & grad_table)
 {
+    if (focus == nullptr)
+    {
+        throw std::runtime_error("Variable is nullptr");
+    }
+    if (focus->get_operation() == nullptr)
+    {
+        throw std::runtime_error("Variable has no operation");
+    }
+    if (focus->get_consumers() == nullptr)
+    {
+        throw std::runtime_error("Variable has no consumers");
+    }
+    if (focus->get_data() == nullptr)
+    {
+        throw std::runtime_error("Variable has no data");
+    }
     if (grad_table.find(focus)!=grad_table.end()) // gradient of this variable already computed
     {
         return;
