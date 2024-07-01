@@ -22,6 +22,7 @@ public:
     int shape(int index){return __shape[index];};
     int dimensionality(){return __shape.size();};
     int size(){return __data.size();};
+    void resize(std::vector<int> dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
     std::vector<T> & data(){return __data;};
     TENSOR<T> transpose();
 };
