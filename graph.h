@@ -8,18 +8,18 @@
 class GRAPH // dag of variables and operations
 {
     std::vector<std::shared_ptr<VARIABLE>> __variables;
-    void build_grad(VARIABLE & focus, std::vector<TENSOR<double>> & grad_table);
+    void build_grad(std::shared_ptr<VARIABLE> focus, std::vector<TENSOR<double>> & grad_table);
     std::vector<std::shared_ptr<VARIABLE>> __topo_sort();
 public:
     GRAPH();
     ~GRAPH();
     void forward();
     std::vector<TENSOR<double>> backprop(std::set<std::shared_ptr<VARIABLE>> & target, std::vector<std::shared_ptr<VARIABLE>> differentiate);
-    std::list<VARIABLE> & get_variables();
+    std::vector<std::shared_ptr<VARIABLE>> get_variables();
     std::shared_ptr<VARIABLE> add_variable(VARIABLE var)
     {
-        __variables.push_back(var); 
-        if(var.get_operation()!=nullptr)var.get_operation()->set_variable(std::make_shared<VARIABLE>(__variables.back())); // address of variable has changed -> invalidation of pointers
+        __variables.push_back(std::make_shared<VARIABLE>(var)); 
+        if(var.get_operation()!=nullptr)var.get_operation()->set_variable(__variables.back()); // address of variable has changed -> invalidation of pointers
         return std::make_shared<VARIABLE>(__variables.back());
     };
 }; 
@@ -37,15 +37,15 @@ GRAPH::~GRAPH()
  * @brief topological sort of the graph
  * @return Returns a list of pointers to the variables in topological order
 */
-std::list<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
+std::vector<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
 {
-    std::list<std::shared_ptr<VARIABLE>> sorted;
+    std::vector<std::shared_ptr<VARIABLE>> sorted;
     std::vector<bool> visited(__variables.size(), false);
     std::function<void(std::shared_ptr<VARIABLE>)> dfs = [&](std::shared_ptr<VARIABLE> var)
     {
         if(visited[var->get_id()]) return;
         visited[var->get_id()] = true;
-        for (std::shared_ptr<VARIABLE> child : var->get_consumers().operator*())
+        for (std::shared_ptr<VARIABLE> child : var->get_consumers())
         {
             if (!visited[child->get_id()])
             {
@@ -55,9 +55,9 @@ std::list<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
         sorted.push_back(var);
     };
 
-    for (VARIABLE & var : __variables)
+    for (std::shared_ptr<VARIABLE> var : __variables)
     {
-        if (!visited[var.get_id()])
+        if (!visited[var->get_id()])
         {
             dfs(std::make_shared<VARIABLE>(var));
         }
@@ -72,13 +72,13 @@ std::list<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
 */
 void GRAPH::forward()
 {
-    std::list<std::shared_ptr<VARIABLE>> sorted = __topo_sort();
+    std::vector<std::shared_ptr<VARIABLE>> sorted = __topo_sort();
     for (std::shared_ptr<VARIABLE> var : sorted)
     {
         std::shared_ptr<OPERATION> op = var->get_operation();
         if(op != nullptr)
         {
-            op->f(*(var->get_inputs()));
+            op->f(var->get_inputs());
         }
         
     }
@@ -103,7 +103,7 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> 
         }
     }
     TENSOR<double> _gradient({0,0});
-    for (VARIABLE & var : __variables)
+    for (std::shared_ptr<VARIABLE> var : __variables)
     {
         if (targets.find(std::make_shared<VARIABLE>(var))!=targets.end()) // call build grad for each target variable
         {
@@ -118,30 +118,30 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> 
  * @param focus the variable to be differentiated
  * @param grad_table the gradient table to be built
 */
-void GRAPH::build_grad(VARIABLE & focus, std::vector<TENSOR<double>> & grad_table)
+void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<TENSOR<double>> & grad_table)
 {
-    if (focus.get_consumers() == nullptr)
+    if (focus->get_consumers().empty())
     {
         throw std::runtime_error("Variable has no consumers");
     }
-    if (focus.get_data() == nullptr)
+    if (focus->get_data() == nullptr)
     {
         throw std::runtime_error("Variable has no data");
     }
-    if (!grad_table[focus.get_id()].dimensionality()) // gradient of this variable already computed
+    if (!grad_table[focus->get_id()].dimensionality()) // gradient of this variable already computed
     {
         return;
     }
     TENSOR<double> _gradient({0,0});
-    for (int i = 0; i < focus.get_consumers()->size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
+    for (int i = 0; i < focus->get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
         // load stuff
-        std::shared_ptr<VARIABLE> consumer = focus.get_consumers()->at(i);
+        std::shared_ptr<VARIABLE> consumer = focus->get_consumers().at(i);
         std::shared_ptr<OPERATION> op = consumer->get_operation();
-        std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> inputs = consumer->get_inputs();
-        build_grad(*consumer, grad_table); // build the gradient table for the consumer (dp, dfs)
-        TENSOR<double> gradient = op->bprop(*(consumer->get_inputs()), focus, grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
-        if (gradient.shape() != focus.get_data()->shape())
+        std::vector<std::shared_ptr<VARIABLE>> inputs = consumer->get_inputs();
+        build_grad(consumer, grad_table); // build the gradient table for the consumer (dp, dfs)
+        TENSOR<double> gradient = op->bprop(consumer->get_inputs(), focus, grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
+        if (gradient.shape() != focus->get_data()->shape())
         {
             throw std::runtime_error("Gradient shape does not match variable shape");
         }
@@ -150,10 +150,10 @@ void GRAPH::build_grad(VARIABLE & focus, std::vector<TENSOR<double>> & grad_tabl
             _gradient.data()[j] += gradient.data()[j];
         }
     }
-    grad_table[focus.get_id()] = _gradient;
+    grad_table[focus->get_id()] = _gradient;
 }
 
-std::list<VARIABLE> & GRAPH::get_variables()
+std::vector<std::shared_ptr<VARIABLE>> GRAPH::get_variables()
 {
     return __variables;
 }
