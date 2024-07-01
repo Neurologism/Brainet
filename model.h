@@ -8,10 +8,10 @@
 
 class MODEL
 {
-    GRAPH __graph;
-    std::vector<VARIABLE *> __to_be_differentiated;
+    std::shared_ptr<GRAPH> __graph;
+    std::shared_ptr<std::vector<std::shared_ptr<VARIABLE>>> __to_be_differentiated;
 public:
-    MODEL(){CLUSTER::set_graph(&__graph);};
+    MODEL(){CLUSTER::set_graph(__graph);};
     void load();
     void sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop = true);
     void train(int epochs, double learning_rate);
@@ -19,17 +19,16 @@ public:
 
 void MODEL::load()
 {
-    CLUSTER::set_graph(&__graph);
+    CLUSTER::set_graph(__graph);
 }
 
 void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
 {
-    std::vector<CLUSTER*> clusters;
+    std::vector<std::shared_ptr<CLUSTER>> clusters;
     for (CLUSTER_VARIANT& layer : layers) {
-        clusters.push_back(std::visit([](auto&& arg) -> CLUSTER* {
-        // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return dynamic_cast<CLUSTER*>(&arg);
-    }, layer));
+        clusters.push_back(std::visit([](auto&& arg) -> std::shared_ptr<CLUSTER> {
+            return std::make_shared<CLUSTER>(arg);
+        }, layer));
     }
     
     for(int i = 0; i < layers.size() - 1; i++)
@@ -38,21 +37,21 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
         clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->size());
     }
 
-    if(add_backprop)__to_be_differentiated.push_back(clusters.back()->output());
+    if(add_backprop)(*__to_be_differentiated).push_back(clusters.back()->output());
 }
 
 void MODEL::train(int epochs, double learning_rate)
 {
-    __graph.forward();
-    std::set<VARIABLE*> s;
-    for(VARIABLE & var : __graph.get_variables())
+    (*__graph).forward();
+    std::set<std::shared_ptr<VARIABLE>> s;
+    for(VARIABLE & var : (*__graph).get_variables())
     {
         if(var.get_operation() == nullptr)
         {
-            s.insert(&var);
+            s.insert(std::make_shared<VARIABLE>(var));
         }
     }
-    std::map<VARIABLE*,TENSOR<double>> grad_table = __graph.backprop(s, __to_be_differentiated);
+    (*__graph).backprop(s, *__to_be_differentiated);
 }
 
 #endif // MODEL_INCLUDE_GUARD
