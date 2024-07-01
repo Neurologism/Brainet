@@ -16,11 +16,10 @@ class DENSE : public CLUSTER
     VARIABLE * _activation_variable;
 
 public:
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<double> weight_matrix = TENSOR<double>({0, 0}));
+    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units);
     void add_input(VARIABLE * input, int units) override
     {
-        _matmul_variable->get_inputs()->push_back(input);
-        *(_weight_matrix_variable->get_data()) = TENSOR<double>({__units, units}, 1);
+        _activation_variable->get_inputs()->push_back(input);
     }
     void add_output(VARIABLE * output) override
     {
@@ -28,7 +27,7 @@ public:
     }
     VARIABLE * input(int index) override
     {
-        return _matmul_variable;
+        return _activation_variable;
     }
     VARIABLE * output(int index) override
     {
@@ -36,7 +35,7 @@ public:
     }
 };
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<double> weight_matrix)
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
 {
     if(__graph == nullptr)
     {
@@ -44,24 +43,23 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units, TENSOR<
     }
     __units = units;
 
-    // create the variables
+    // // create the variables
     
-    _weight_matrix_variable = __graph->add_variable(VARIABLE(nullptr, {}, {})); // nullptr because there is no operation
+    // _weight_matrix_variable = __graph->add_variable(VARIABLE(nullptr, {}, {})); // nullptr because there is no operation
 
-    _matmul_variable = __graph->add_variable(VARIABLE(new MATMUL(), {_weight_matrix_variable}, {}));
+    // _matmul_variable = __graph->add_variable(VARIABLE(new MATMUL(), {_weight_matrix_variable}, {}));
 
     // Use std::visit to handle the variant
-    auto operation_ptr = std::visit([](auto&& arg) -> OPERATION* {
+    OPERATION * operation_ptr = std::visit([](auto&& arg) -> OPERATION* {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
         return dynamic_cast<OPERATION*>(&arg);
     }, activation_function);
 
-    _activation_variable = __graph->add_variable(VARIABLE(operation_ptr, {_matmul_variable}, {}));
+    _activation_variable = __graph->add_variable(VARIABLE(operation_ptr, {}, {}));
 
     // conections within the cluster
-    _weight_matrix_variable->get_consumers()->push_back(_matmul_variable);
-    _matmul_variable->get_consumers()->push_back(_activation_variable);
-    
+    // _weight_matrix_variable->get_consumers()->push_back(_matmul_variable);
+    // _matmul_variable->get_consumers()->push_back(_activation_variable);    
 }
 
 #endif // DENSE_INCLUDE_GUARD
