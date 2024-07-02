@@ -14,6 +14,7 @@ protected:
     static std::shared_ptr<GRAPH> __graph;
     int __units;
 public:
+    virtual ~CLUSTER() = default;
     virtual void add_input(std::shared_ptr<VARIABLE> input, int units){}
     virtual void add_output(std::shared_ptr<VARIABLE> output){}
     virtual std::shared_ptr<VARIABLE> input(int index = 0){return nullptr;}

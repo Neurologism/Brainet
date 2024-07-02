@@ -50,12 +50,12 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
     // _matmul_variable = __graph->add_variable(VARIABLE(new MATMUL(), {_weight_matrix_variable}, {}));
 
     // Use std::visit to handle the variant
-    std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) -> std::shared_ptr<OPERATION> {
+    OPERATION * operation_ptr = std::visit([](auto&& arg) -> OPERATION* {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return std::make_shared<OPERATION>(dynamic_cast<OPERATION*>(&arg));
+        return dynamic_cast<OPERATION*>(&arg);
     }, activation_function);
 
-    _activation_variable = __graph->add_variable(VARIABLE(operation_ptr, {}, {}));
+    _activation_variable = __graph->add_variable(VARIABLE(std::shared_ptr<OPERATION>(operation_ptr), {}, {}));
 
     // conections within the cluster
     // _weight_matrix_variable->get_consumers()->push_back(_matmul_variable);
