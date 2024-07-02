@@ -39,6 +39,10 @@ public:
         __children = children;
         *__data = data;
     };
+    VARIABLE(std::shared_ptr<VARIABLE> & var)
+    {
+        throw std::runtime_error("Not implemented");
+    }
     std::shared_ptr<OPERATION> get_operation();
     std::vector<std::shared_ptr<VARIABLE>> & get_consumers();
     std::vector<std::shared_ptr<VARIABLE>> & get_inputs();
