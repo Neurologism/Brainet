@@ -18,9 +18,9 @@ public:
     std::vector<std::shared_ptr<VARIABLE>> get_variables();
     std::shared_ptr<VARIABLE> add_variable(VARIABLE var)
     {
-        __variables.push_back(std::make_shared<VARIABLE>(var)); 
+        __variables.push_back(var); 
         if(var.get_operation()!=nullptr)var.get_operation()->set_variable(__variables.back()); // address of variable has changed -> invalidation of pointers
-        return std::make_shared<VARIABLE>(__variables.back());
+        return __variables.back();
     };
 }; 
 
@@ -59,7 +59,7 @@ std::vector<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
     {
         if (!visited[var->get_id()])
         {
-            dfs(std::make_shared<VARIABLE>(var));
+            dfs(var);
         }
     }
     std::reverse(sorted.begin(), sorted.end());
@@ -76,9 +76,10 @@ void GRAPH::forward()
     for (std::shared_ptr<VARIABLE> var : sorted)
     {
         std::shared_ptr<OPERATION> op = var->get_operation();
-        if(op != nullptr)
+        if (op != nullptr)
         {
-            op->f(var->get_inputs());
+            std::vector<std::shared_ptr<VARIABLE>> inputs = var->get_inputs();
+            var->get_operation()->f(inputs);
         }
         
     }
@@ -105,7 +106,7 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> 
     TENSOR<double> _gradient({0,0});
     for (std::shared_ptr<VARIABLE> var : __variables)
     {
-        if (targets.find(std::make_shared<VARIABLE>(var))!=targets.end()) // call build grad for each target variable
+        if (targets.find(var)!=targets.end()) // call build grad for each target variable
         {
             build_grad(var, grad_table);
         }
