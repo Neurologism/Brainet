@@ -15,6 +15,7 @@ class TENSOR
 public:
     TENSOR(){};
     TENSOR(std::vector<int> dimensionality, bool random = false);
+    ~TENSOR(){};
     
     T at(std::vector<int> index);
     void set(std::vector<int> index, T value);
