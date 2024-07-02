@@ -8,10 +8,11 @@
 
 class MODEL
 {
-    std::shared_ptr<GRAPH> __graph;
+    std::shared_ptr<GRAPH> __graph = std::make_shared<GRAPH>();
     std::vector<std::shared_ptr<VARIABLE>> __to_be_differentiated;
 public:
     MODEL(){CLUSTER::set_graph(__graph);};
+    ~MODEL(){};
     void load();
     void sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop = true);
     void train(int epochs, double learning_rate);
@@ -24,11 +25,11 @@ void MODEL::load()
 
 void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
 {
-    std::vector<std::shared_ptr<CLUSTER>> clusters;
+    std::vector<CLUSTER *> clusters;
     for (CLUSTER_VARIANT& layer : layers) {
-        clusters.push_back(std::visit([](auto&& arg) -> std::shared_ptr<CLUSTER> {
-            return std::make_shared<CLUSTER>(arg);
-        }, layer));
+        clusters.push_back(std::visit([](auto&& arg) -> CLUSTER* {
+        // Assuming all types in the variant can be dynamically casted to OPERATION*
+        return dynamic_cast<CLUSTER*>(&arg);}, layer));
     }
     
     for(int i = 0; i < layers.size() - 1; i++)
