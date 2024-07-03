@@ -16,6 +16,7 @@ private:
     std::shared_ptr<VARIABLE> __variable = nullptr;
 public:
     OPERATION() = default;
+    virtual ~OPERATION() = default;
     /**
      * @brief mathematical function the operation implements
     */
