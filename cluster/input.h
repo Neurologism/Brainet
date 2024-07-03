@@ -12,6 +12,7 @@ class INPUT : public CLUSTER
     std::shared_ptr<VARIABLE> _input_variable;
 public:
     INPUT(TENSOR<double> & data, int units);
+    ~INPUT() = default;
     void add_input(std::shared_ptr<VARIABLE> input, int units) override;
     void add_output(std::shared_ptr<VARIABLE> output) override;
     std::shared_ptr<VARIABLE> input(int index) override;

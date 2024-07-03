@@ -20,14 +20,14 @@ void ACTIVATION_FUNCTION::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
         throw std::invalid_argument("ACTIVATION_FUNCTION::f: Invalid number of input variables.");
     }
     
-    TENSOR<double> _data(inputs.front()->get_data()->shape());
+    TENSOR<double> _data(inputs.front()->get_data().shape());
 
-    for (double data : inputs.front()->get_data()->data()) // apply activation function to all elements
+    for (double data : inputs.front()->get_data().data()) // apply activation function to all elements
     {
         _data.data().push_back(activation_function(data));
     }
 
-    *(this->get_variable()->get_data()) = _data;
+    this->get_variable()->get_data() = _data;
 }
 
 TENSOR<double> ACTIVATION_FUNCTION::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient)
@@ -38,11 +38,11 @@ TENSOR<double> ACTIVATION_FUNCTION::bprop(std::vector<std::shared_ptr<VARIABLE>>
     }
 
     // load derivative of activation into data 
-    TENSOR<double> _data(focus->get_data()->shape());
+    TENSOR<double> _data(focus->get_data().shape());
 
     for (int i=0; i<gradient.size(); i++) // apply activation function derivative to all elements
     {
-        _data.data().push_back(activation_function_derivative(focus->get_data()->data()[i])*gradient.data()[i]);
+        _data.data().push_back(activation_function_derivative(focus->get_data().data()[i])*gradient.data()[i]);
     }
 
     return _data;
