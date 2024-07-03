@@ -12,14 +12,14 @@ class OPERATION;
 */
 class VARIABLE
 {
-    std::vector<const VARIABLE &> __children, __parents;
+    std::vector<std::shared_ptr<VARIABLE>> __children, __parents;
     std::shared_ptr<OPERATION> __op;
     TENSOR<double> __data;
     static int __counter; // keep track of the number of variables created
     int __id;
 
 public:
-    VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<const VARIABLE &> & parents = {}, const std::vector<const VARIABLE &> & children = {}, const TENSOR<double> & data = TENSOR<double>());
+    VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents = {}, const std::vector<std::shared_ptr<VARIABLE>> & children = {}, const TENSOR<double> & data = TENSOR<double>());
     VARIABLE(std::shared_ptr<VARIABLE> & var)
     {
         throw std::runtime_error("A variable should no be copied. Use a shared pointer instead.");
@@ -29,14 +29,14 @@ public:
     
     }
     std::shared_ptr<OPERATION> get_operation();
-    std::vector<const VARIABLE &> & get_consumers();
-    std::vector<const VARIABLE &> & get_inputs();
+    std::vector<std::shared_ptr<VARIABLE>> & get_consumers();
+    std::vector<std::shared_ptr<VARIABLE>> & get_inputs();
     TENSOR<double> & get_data();
     int get_id();
 };
 
 
-VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<const VARIABLE &> & parents, const std::vector<const VARIABLE &> & children, const TENSOR<double> & data)
+VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents, const std::vector<std::shared_ptr<VARIABLE>> & children, const TENSOR<double> & data)
 {
     __id = __counter++;
     __op = op;
@@ -57,7 +57,7 @@ std::shared_ptr<OPERATION> VARIABLE::get_operation()
 /**
  * @brief returns the children of the variable
 */
-std::vector<const VARIABLE &> & VARIABLE::get_consumers()
+std::vector<std::shared_ptr<VARIABLE>> & VARIABLE::get_consumers()
 {
     return __children;
 }
@@ -65,7 +65,7 @@ std::vector<const VARIABLE &> & VARIABLE::get_consumers()
 /**
  * @brief returns the parents of the variable
 */
-std::vector<const VARIABLE &> & VARIABLE::get_inputs()
+std::vector<std::shared_ptr<VARIABLE>> & VARIABLE::get_inputs()
 {
     return __parents;
 }
