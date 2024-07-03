@@ -18,7 +18,7 @@ public:
     std::vector<std::shared_ptr<VARIABLE>> get_variables();
     std::shared_ptr<VARIABLE> add_variable(VARIABLE var)
     {
-        __variables.push_back(var); 
+        __variables.push_back(std::make_shared<VARIABLE>(var)); 
         if(var.get_operation()!=nullptr)var.get_operation()->set_variable(__variables.back()); // address of variable has changed -> invalidation of pointers
         return __variables.back();
     };
@@ -97,8 +97,8 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> 
     std::vector<TENSOR<double>> grad_table(__variables.size(),TENSOR<double>({0,0})); // data 
     for(std::shared_ptr<VARIABLE> var : differentiate)
     {
-        grad_table[var->get_id()] = TENSOR<double>(var->get_data()->shape());
-        for(int i = 0; i < var->get_data()->size(); i++)
+        grad_table[var->get_id()] = TENSOR<double>(var->get_data().shape());
+        for(int i = 0; i < var->get_data().size(); i++)
         {
             grad_table[var->get_id()].data()[i] = 1;
         }
@@ -125,7 +125,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<TENSOR<doubl
     {
         throw std::runtime_error("Variable has no consumers");
     }
-    if (focus->get_data() == nullptr)
+    if (focus->get_data().dimensionality() == 0)
     {
         throw std::runtime_error("Variable has no data");
     }
@@ -142,7 +142,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<TENSOR<doubl
         std::vector<std::shared_ptr<VARIABLE>> inputs = consumer->get_inputs();
         build_grad(consumer, grad_table); // build the gradient table for the consumer (dp, dfs)
         TENSOR<double> gradient = op->bprop(consumer->get_inputs(), focus, grad_table[consumer->get_id()]); // calculate the gradient of the consumer with respect to the focus variable
-        if (gradient.shape() != focus->get_data()->shape())
+        if (gradient.shape() != focus->get_data().shape())
         {
             throw std::runtime_error("Gradient shape does not match variable shape");
         }
