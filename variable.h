@@ -14,7 +14,7 @@ class VARIABLE
 {
     std::vector<std::shared_ptr<VARIABLE>> __children, __parents;
     std::shared_ptr<OPERATION> __op;
-    std::shared_ptr<TENSOR<double>> __data; // each variable can store a tensor of the data 
+    TENSOR<double> __data;
     static int __counter; // keep track of the number of variables created
     int __id;
 
@@ -37,16 +37,20 @@ public:
         __op = op;
         __parents = parents;
         __children = children;
-        *__data = data;
+        __data = data;
     };
     VARIABLE(std::shared_ptr<VARIABLE> & var)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("A variable should no be copied. Use a shared pointer instead.");
+    }
+    ~VARIABLE()
+    {
+    
     }
     std::shared_ptr<OPERATION> get_operation();
     std::vector<std::shared_ptr<VARIABLE>> & get_consumers();
     std::vector<std::shared_ptr<VARIABLE>> & get_inputs();
-    std::shared_ptr<TENSOR<double>> get_data();
+    TENSOR<double> & get_data();
     int get_id();
 };
 
@@ -77,7 +81,7 @@ std::vector<std::shared_ptr<VARIABLE>> & VARIABLE::get_inputs()
 /**
  * @brief returns the data of the operation
 */
-std::shared_ptr<TENSOR<double>> VARIABLE::get_data()
+TENSOR<double> & VARIABLE::get_data()
 {
     return __data;
 }
