@@ -53,7 +53,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
     // Use std::visit to handle the variant
     std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return std::make_shared<std::decay_t<decltype(arg)>>(arg);}, ACTIVATION_FUNCTION_VARIANT{activation_function});
+        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, ACTIVATION_FUNCTION_VARIANT{activation_function});
 
     _activation_variable = __graph->add_variable(VARIABLE(operation_ptr, {}, {}));
 
