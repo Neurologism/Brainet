@@ -25,11 +25,12 @@ void MODEL::load()
 
 void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
 {
-    std::vector<CLUSTER *> clusters;
+    std::vector<std::shared_ptr<CLUSTER>> clusters;
     for (CLUSTER_VARIANT& layer : layers) {
-        clusters.push_back(std::visit([](auto&& arg) -> CLUSTER* {
+        std::shared_ptr<CLUSTER> cluster_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return dynamic_cast<CLUSTER*>(&arg);}, layer));
+        return std::shared_ptr<CLUSTER>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CLUSTER_VARIANT{layer});
+        clusters.push_back(cluster_ptr);
     }
     
     for(int i = 0; i < layers.size() - 1; i++)
