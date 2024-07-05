@@ -103,7 +103,7 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> 
             grad_table[var->get_id()].data()[i] = 1;
         }
     }
-    TENSOR<double> _gradient({0,0});
+
     for (std::shared_ptr<VARIABLE> var : __variables)
     {
         if (targets.find(var)!=targets.end()) // call build grad for each target variable
@@ -121,6 +121,10 @@ std::vector<TENSOR<double>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> 
 */
 void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<TENSOR<double>> & grad_table)
 {
+    if (!grad_table[focus->get_id()].dimensionality()) // gradient of this variable already computed
+    {
+        return;
+    }
     if (focus->get_consumers().empty())
     {
         throw std::runtime_error("Variable has no consumers");
@@ -129,10 +133,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<TENSOR<doubl
     {
         throw std::runtime_error("Variable has no data");
     }
-    if (!grad_table[focus->get_id()].dimensionality()) // gradient of this variable already computed
-    {
-        return;
-    }
+    
     TENSOR<double> _gradient({0,0});
     for (int i = 0; i < focus->get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {

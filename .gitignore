@@ -1,3 +1,9 @@
 .vscode/
 *.exe
 main.cpp
+.Brainet.sln
+.Brainet.vcxproj
+.Brainet.vcxproj.filters
+.Brainet.vcxproj.user
+.Brainet
+.vs

@@ -12,7 +12,7 @@ class CLUSTER
 {
 protected:
     static std::shared_ptr<GRAPH> __graph;
-    int __units;
+    int __units = -1;
 public:
     virtual ~CLUSTER() = default;
     virtual void add_input(std::shared_ptr<VARIABLE> input, int units){}
@@ -20,7 +20,11 @@ public:
     virtual std::shared_ptr<VARIABLE> input(int index = 0){return nullptr;}
     virtual std::shared_ptr<VARIABLE> output(int index = 0){return nullptr;}
     static void set_graph(std::shared_ptr<GRAPH> graph){__graph = graph;}
-    int size(){return __units;}
+    int size()
+    {
+        if(__units == -1)throw std::runtime_error("units not set");
+        return __units;
+    }
 };
 
 std::shared_ptr<GRAPH> CLUSTER::__graph = nullptr;
