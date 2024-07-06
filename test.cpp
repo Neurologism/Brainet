@@ -9,6 +9,7 @@ int main()
     for(int i=0;i<100;i++)
     {
         TENSOR<double> a({2,2});
+        std::shared_ptr<TENSOR<double>> b = std::make_shared<TENSOR<double>>(a);
         v.push_back(a);
     }
     for(int i=0;i<100;i++)
