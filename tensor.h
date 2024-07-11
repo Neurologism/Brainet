@@ -15,6 +15,22 @@ class TENSOR
 public:
     TENSOR(){};
     TENSOR(std::vector<int> dimensionality, bool random = false);
+    TENSOR(const TENSOR<T> & tensor)
+    {
+        throw std::invalid_argument("TENSOR::TENSOR: Copy constructor not allowed");
+    }
+    TENSOR & operator=(const TENSOR<T> & tensor)
+    {
+        throw std::invalid_argument("TENSOR::operator=: Copy assignment not allowed");
+    }
+    TENSOR(TENSOR<T> && tensor)
+    {
+        throw std::invalid_argument("TENSOR::TENSOR: Move constructor not allowed");
+    }
+    TENSOR & operator=(TENSOR<T> && tensor)
+    {
+        throw std::invalid_argument("TENSOR::operator=: Move assignment not allowed");
+    }
     ~TENSOR(){};
     
     T at(std::vector<int> index);
