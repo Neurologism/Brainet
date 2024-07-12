@@ -14,15 +14,27 @@ class VARIABLE
 {
     std::vector<std::shared_ptr<VARIABLE>> __children, __parents;
     std::shared_ptr<OPERATION> __op;
-    TENSOR<double> __data;
+    std::shared_ptr<TENSOR<double>> __data;
     static int __counter; // keep track of the number of variables created
     int __id;
 
 public:
-    VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents = {}, const std::vector<std::shared_ptr<VARIABLE>> & children = {}, const TENSOR<double> & data = TENSOR<double>());
+    VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents = {}, const std::vector<std::shared_ptr<VARIABLE>> & children = {}, const std::shared_ptr<TENSOR<double>> & data = nullptr);
     VARIABLE(std::shared_ptr<VARIABLE> & var)
     {
-        throw std::runtime_error("A variable should no be copied. Use a shared pointer instead.");
+        throw std::runtime_error("A variable should not be copied. Use a shared pointer instead.");
+    }
+    VARIABLE & operator=(std::shared_ptr<VARIABLE> & var)
+    {
+        throw std::runtime_error("A variable should not be copied. Use a shared pointer instead.");
+    }
+    VARIABLE(VARIABLE && var)
+    {
+        std::cout << "VARIABLE MOVE CONSTRUCTOR" << std::endl;
+    }
+    VARIABLE & operator=(VARIABLE && var)
+    {
+        throw std::runtime_error("A variable should not be moved. Use a shared pointer instead.");
     }
     ~VARIABLE()
     {
@@ -31,12 +43,12 @@ public:
     std::shared_ptr<OPERATION> get_operation();
     std::vector<std::shared_ptr<VARIABLE>> & get_consumers();
     std::vector<std::shared_ptr<VARIABLE>> & get_inputs();
-    TENSOR<double> & get_data();
+    std::shared_ptr<TENSOR<double>> & get_data();
     int get_id();
 };
 
 
-VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents, const std::vector<std::shared_ptr<VARIABLE>> & children, const TENSOR<double> & data)
+VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents, const std::vector<std::shared_ptr<VARIABLE>> & children, const std::shared_ptr<TENSOR<double>> & data)
 {
     __id = __counter++;
     __op = op;
@@ -73,7 +85,7 @@ std::vector<std::shared_ptr<VARIABLE>> & VARIABLE::get_inputs()
 /**
  * @brief returns the data of the operation
 */
-TENSOR<double> & VARIABLE::get_data()
+std::shared_ptr<TENSOR<double>> & VARIABLE::get_data()
 {
     return __data;
 }

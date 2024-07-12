@@ -25,6 +25,7 @@ public:
         if(__units == -1)throw std::runtime_error("units not set");
         return __units;
     }
+    int getUnits(){return __units;}
 };
 
 std::shared_ptr<GRAPH> CLUSTER::__graph = nullptr;

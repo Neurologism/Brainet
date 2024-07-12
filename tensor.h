@@ -15,22 +15,22 @@ class TENSOR
 public:
     TENSOR(){};
     TENSOR(std::vector<int> dimensionality, bool random = false);
-    TENSOR(const TENSOR<T> & tensor)
-    {
-        throw std::invalid_argument("TENSOR::TENSOR: Copy constructor not allowed");
-    }
-    TENSOR & operator=(const TENSOR<T> & tensor)
-    {
-        throw std::invalid_argument("TENSOR::operator=: Copy assignment not allowed");
-    }
-    TENSOR(TENSOR<T> && tensor)
-    {
-        throw std::invalid_argument("TENSOR::TENSOR: Move constructor not allowed");
-    }
-    TENSOR & operator=(TENSOR<T> && tensor)
-    {
-        throw std::invalid_argument("TENSOR::operator=: Move assignment not allowed");
-    }
+    // TENSOR(const TENSOR<T> & tensor)
+    // {
+    //     throw std::invalid_argument("TENSOR::TENSOR: Copy constructor not allowed");
+    // }
+    // TENSOR & operator=(const TENSOR<T> & tensor)
+    // {
+    //     throw std::invalid_argument("TENSOR::operator=: Copy assignment not allowed");
+    // }
+    // TENSOR(TENSOR<T> && tensor)
+    // {
+    //     throw std::invalid_argument("TENSOR::TENSOR: Move constructor not allowed");
+    // }
+    // TENSOR & operator=(TENSOR<T> && tensor)
+    // {
+    //     throw std::invalid_argument("TENSOR::operator=: Move assignment not allowed");
+    // }
     ~TENSOR(){};
     
     T at(std::vector<int> index);
@@ -41,7 +41,7 @@ public:
     int size(){return __data.size();};
     void resize(std::vector<int> dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
     std::vector<T> & data(){return __data;};
-    TENSOR<T> transpose();
+    std::shared_ptr<TENSOR<T>> transpose();
 };
 
 /**
@@ -70,7 +70,7 @@ T TENSOR<T>::at(std::vector<int> index)
 template <class T>
 TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
 {
-    __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()), 0);
+    __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<int>()), 0);
     if(random)
     {
         std::random_device rd;
@@ -111,10 +111,11 @@ void TENSOR<T>::set(std::vector<int> index, T value)
  * @brief transposes the tensor
 */
 template <class T>
-TENSOR<T> TENSOR<T>::transpose()
+std::shared_ptr<TENSOR<T>> TENSOR<T>::transpose()
 {
     if(__shape.size() != 2)
         throw std::invalid_argument("TENSOR::transpose: Tensor must be 2D");
+    std::shared_ptr<TENSOR<T>> _tensor = std::make_shared<TENSOR<T>>(TENSOR<T>({__shape[1],__shape[0]}));
     std::vector<T> _data(__data.size());
     for(int i = 0; i < __shape[0]; i++)
     {
@@ -123,8 +124,7 @@ TENSOR<T> TENSOR<T>::transpose()
             _data[j*__shape[0] + i] = __data[i*__shape[1] + j];
         }
     }
-    TENSOR<T> _tensor({__shape[1],__shape[0]});
-    _tensor.data() = _data;
+    _tensor->data() = _data;
     return _tensor;
 }
 

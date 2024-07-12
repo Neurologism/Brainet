@@ -28,7 +28,7 @@ public:
      * @param focus the variable that the gradient is calculated for
      * @param gradient the sum of the gradients of the output variables
     */
-    virtual TENSOR<double> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient) =0;
+    virtual std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) =0;
     /**
      * @brief sets the variable of the operation
     */

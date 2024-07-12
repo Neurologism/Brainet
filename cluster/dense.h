@@ -55,7 +55,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
         // Assuming all types in the variant can be dynamically casted to OPERATION*
         return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, ACTIVATION_FUNCTION_VARIANT{activation_function});
 
-    _activation_variable = __graph->add_variable(VARIABLE(operation_ptr, {}, {}));
+    _activation_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(operation_ptr, {}, {})));
 
     // conections within the cluster
     // _weight_matrix_variable->get_consumers()->push_back(_matmul_variable);

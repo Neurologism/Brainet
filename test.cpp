@@ -1,22 +1,15 @@
-#include "tensor.h"
+#include "brainet.h"
 
 using namespace std;
 
 // implementin general tests
 int main()
 {
-    vector<TENSOR<double>> v;
-    for(int i=0;i<100;i++)
-    {
-        TENSOR<double> a({2,2});
-        std::shared_ptr<TENSOR<double>> b = std::make_shared<TENSOR<double>>(a);
-        v.push_back(a);
-    }
-    for(int i=0;i<100;i++)
-    {
-        v[i].~TENSOR();
-        
-    } 
-    v.clear();   
-    return 0;
+    MODEL model;
+    TENSOR<double> input = TENSOR<double>({2,2});
+
+    model.sequential({INPUT(input,2), DENSE(ReLU(),2), DENSE(ReLU(),1)});   
+
+    model.train(0,0);
+    return 0; 
 }

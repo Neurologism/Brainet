@@ -12,13 +12,13 @@ class MATMUL : public OPERATION
 {   
     const int block_size = 8; 
     const int threads = 200;
-    TENSOR<double> matmul(TENSOR<double> & left_matrix, TENSOR<double> & right_matrix);
-    void blockmul(TENSOR<double> & left_matrix, TENSOR<double> & right_matrix, TENSOR<double> & result, int k);
+    std::shared_ptr<TENSOR<double>> matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix);
+    void blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, int k);
 public:
     MATMUL(){};
     ~MATMUL(){};
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
-    TENSOR<double> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient) override;
+    std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 };
 
 /**
@@ -28,16 +28,16 @@ public:
  * @param result the matrix that should be returned
  * @param j the current coloum in the result matrix
 */
-void MATMUL::blockmul(TENSOR<double> & left_matrix, TENSOR<double> & right_matrix, TENSOR<double> & result, int k)
+void MATMUL::blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, int k)
 {
-    for (int i = 0; i < left_matrix.shape(0); ++i)
+    for (int i = 0; i < left_matrix->shape(0); ++i)
     {
         double sum = 0;
-        for (int j = 0; j < left_matrix.shape(1); ++j)
+        for (int j = 0; j < left_matrix->shape(1); ++j)
         {
-            sum += left_matrix.at({i, j}) * right_matrix.at({j, k});
+            sum += left_matrix->at({i, j}) * right_matrix->at({j, k});
         }
-        result.set({i, k}, sum);
+        result->set({i, k}, sum);
     }
 }
 
@@ -47,13 +47,13 @@ void MATMUL::blockmul(TENSOR<double> & left_matrix, TENSOR<double> & right_matri
  * @param data1 first matrix
  * @param data2 second matrix
 */
-TENSOR<double> MATMUL::matmul(TENSOR<double> & left_matrix, TENSOR<double> & right_matrix)
+std::shared_ptr<TENSOR<double>> MATMUL::matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix)
 {
-    TENSOR<double> result({left_matrix.shape(0), right_matrix.shape(1)});
+    std::shared_ptr<TENSOR<double>> result = std::make_shared<TENSOR<double>>(TENSOR<double>({left_matrix->shape(0),right_matrix->shape(1)}));
 
     //devide into threads
-    std::vector<std::thread> workers(right_matrix.shape(1));
-    for (int i = 0; i < right_matrix.shape(1); ++i)
+    std::vector<std::thread> workers(right_matrix->shape(1));
+    for (int i = 0; i < right_matrix->shape(1); ++i)
     {
         workers[i] = std::thread (&MATMUL::blockmul, this, std::ref(left_matrix), std::ref(right_matrix), std::ref(result), i);
     }
@@ -78,7 +78,7 @@ void MATMUL::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
         throw std::invalid_argument("MATRIX_MULTIPLY::f: Invalid number of input variables.");
     }
     ;
-    if (inputs[0]->get_data().shape(1)!= inputs[1]->get_data().shape(0))
+    if (inputs[0]->get_data()->shape(1)!= inputs[1]->get_data()->shape(0))
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::f: Invalid shapes of input matrices.");
     }
@@ -90,13 +90,13 @@ void MATMUL::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
  * @brief backpropagation for matrix multiplication
  * handels input and output for the operation and does error checking
 */
-TENSOR<double> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, TENSOR<double> & gradient)
+std::shared_ptr<TENSOR<double>> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)
 {
     if (inputs.size() != 2)
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid number of input variables.");
     }
-    if(inputs[0]->get_data().shape(1) != inputs[1]->get_data().shape(0))
+    if(inputs[0]->get_data()->shape(1) != inputs[1]->get_data()->shape(0))
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid shapes of input matrices.");
     }
@@ -104,12 +104,12 @@ TENSOR<double> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std
 
     if (inputs[0]->get_id() == focus->get_id())
     {
-        TENSOR<double> right_matrix_transposed = inputs[1]->get_data().transpose();
+        std::shared_ptr<TENSOR<double>> right_matrix_transposed = inputs[1]->get_data()->transpose();
         return matmul(gradient, right_matrix_transposed);
     }
     else 
     {
-        TENSOR<double> left_matrix_transposed = inputs[0]->get_data().transpose();
+        std::shared_ptr<TENSOR<double>> left_matrix_transposed = inputs[0]->get_data()->transpose();
         return matmul(left_matrix_transposed, gradient);
     }
 }
