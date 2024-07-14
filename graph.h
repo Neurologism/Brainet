@@ -104,13 +104,13 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::set<std::share
         }
     }
 
-    // for (std::shared_ptr<VARIABLE> var : __variables)
-    // {
-    //     if (targets.find(var)!=targets.end()) // call build grad for each target variable
-    //     {
-    //         build_grad(var, grad_table);
-    //     }
-    // }
+    for (std::shared_ptr<VARIABLE> var : __variables)
+    {
+        if (targets.find(var)!=targets.end()) // call build grad for each target variable
+        {
+            build_grad(var, grad_table);
+        }
+    }
     return grad_table;
 }
 
@@ -121,7 +121,7 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::set<std::share
 */
 void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_ptr<TENSOR<double>>> & grad_table)
 {
-    if (!grad_table[focus->get_id()]->dimensionality()) // gradient of this variable already computed
+    if (grad_table[focus->get_id()] != nullptr) // if the gradient has already been calculated, return
     {
         return;
     }
@@ -134,7 +134,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
         throw std::runtime_error("Variable has no data");
     }
     
-    std::shared_ptr<TENSOR<double>> _gradient = std::make_shared<TENSOR<double>>(TENSOR<double>({0,0}));
+    std::shared_ptr<TENSOR<double>> _gradient;
     for (int i = 0; i < focus->get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
         // load stuff
@@ -147,10 +147,22 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
         {
             throw std::runtime_error("Gradient shape does not match variable shape");
         }
-        for (int j = 0; j < gradient->size(); j++) // add the gradient to the gradient table
+        if(_gradient == nullptr)
         {
-            _gradient->data()[j] += gradient->data()[j];
+            _gradient = gradient;
         }
+        else if(_gradient->shape() != gradient->shape())
+        {
+            throw std::runtime_error("Gradient shapes do not match");
+        }
+        else
+        {
+            for (int j = 0; j < gradient->size(); j++) // add the gradient to the gradient table
+            {
+                _gradient->data()[j] += gradient->data()[j];
+            }
+        }
+        
     }
     grad_table[focus->get_id()] = _gradient;
 }
