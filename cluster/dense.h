@@ -21,6 +21,7 @@ public:
     void add_input(std::shared_ptr<VARIABLE> input, int units) override
     {
         _matmul_variable->get_inputs().push_back(input);
+        _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({__units, units}, 1, 1));
     }
     void add_output(std::shared_ptr<VARIABLE> output) override
     {
