@@ -79,8 +79,7 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, int value, bool random)
         std::uniform_real_distribution<> dis(-0.1, 0.1);
         for(int i = 0; i < __data.size(); i++)
         {
-            // __data[i] = dis(gen);
-            __data[i] = 1;
+            __data[i] = dis(gen);
         }
     }
     __shape = dimensionality;
