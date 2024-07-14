@@ -11,8 +11,8 @@ class GRAPH // dag of variables and operations
     void build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_ptr<TENSOR<double>>> & grad_table);
     std::vector<std::shared_ptr<VARIABLE>> __topo_sort();
 public:
-    GRAPH();
-    ~GRAPH();
+    GRAPH() = default;
+    ~GRAPH() = default;
     void forward();
     std::vector<std::shared_ptr<TENSOR<double>>> backprop(std::set<std::shared_ptr<VARIABLE>> & target, std::vector<std::shared_ptr<VARIABLE>> differentiate);
     std::vector<std::shared_ptr<VARIABLE>> get_variables();
@@ -24,14 +24,6 @@ public:
     };
 }; 
 
-GRAPH::GRAPH() 
-{
-}
-
-GRAPH::~GRAPH()
-{
-    std::cout << "GRAPH DESTRUCTOR" << std::endl;
-}   
 
 /**
  * @brief topological sort of the graph
