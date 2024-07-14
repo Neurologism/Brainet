@@ -12,6 +12,13 @@ class TENSOR
 {
     std::vector<T> __data;
     std::vector<int> __shape;
+
+    void error_check()
+    {
+        if (__data.size() != std::accumulate(__shape.begin(),__shape.end(),1, std::multiplies<int>()))
+            throw std::invalid_argument("TENSOR::data: Data size does not match the dimensionality of the tensor");
+          
+    }
 public:
     TENSOR(){};
     TENSOR(std::vector<int> dimensionality, int value = 0, bool random = false);
@@ -34,7 +41,7 @@ public:
     int dimensionality(){return __shape.size();};
     int size(){return __data.size();};
     void resize(std::vector<int> dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
-    std::vector<T> & data(){return __data;};
+    std::vector<T> & data(){error_check();return __data;};
     std::shared_ptr<TENSOR<T>> transpose();
 };
 
