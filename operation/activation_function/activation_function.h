@@ -22,9 +22,9 @@ void ACTIVATION_FUNCTION::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
 
     std::shared_ptr<TENSOR<double>> _data = std::make_shared<TENSOR<double>>(inputs.front()->get_data()->shape());
 
-    for (double data : inputs.front()->get_data()->data()) // apply activation function to all elements
+    for (int i=0; i < _data->size(); i++) // apply activation function to all elements
     {
-        _data->data().push_back(activation_function(data));
+        _data->data()[i] = activation_function(_data->data()[i]);
     }
 
     this->get_variable()->get_data() = _data;
