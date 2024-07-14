@@ -44,7 +44,7 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
 
 void MODEL::train(int epochs, double learning_rate)
 {
-    (*__graph).forward();
+    __graph->forward();
     std::set<std::shared_ptr<VARIABLE>> s;
     for(std::shared_ptr<VARIABLE> var : __graph->get_variables())
     {
@@ -53,7 +53,11 @@ void MODEL::train(int epochs, double learning_rate)
             s.insert(var);
         }
     }
-    (*__graph).backprop(s, __to_be_differentiated);
+    std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(s, __to_be_differentiated);
+    while(v.size() > 0)
+    {
+        v.pop_back();
+    }
 }
 
 #endif // MODEL_INCLUDE_GUARD

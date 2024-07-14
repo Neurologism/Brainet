@@ -11,7 +11,7 @@ class INPUT : public CLUSTER
 {
     std::shared_ptr<VARIABLE> _input_variable;
 public:
-    INPUT(TENSOR<double> & data, int units);
+    INPUT(std::shared_ptr<TENSOR<double>> & data, int units);
     ~INPUT() = default;
     void add_input(std::shared_ptr<VARIABLE> input, int units) override;
     void add_output(std::shared_ptr<VARIABLE> output) override;
@@ -19,14 +19,14 @@ public:
     std::shared_ptr<VARIABLE> output(int index) override;
 };
 
-INPUT::INPUT(TENSOR<double> & data, int units)
+INPUT::INPUT(std::shared_ptr<TENSOR<double>> & data, int units)
 {
     if(__graph == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
     
-    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}, std::make_shared<TENSOR<double>>(data))));
+    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}, data)));
     __units = units;
 }
 

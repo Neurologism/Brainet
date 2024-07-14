@@ -94,23 +94,23 @@ void GRAPH::forward()
 */
 std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> & targets, std::vector<std::shared_ptr<VARIABLE>> differentiate)
 {
-    std::vector<std::shared_ptr<TENSOR<double>>> grad_table(__variables.size(),std::make_shared<TENSOR<double>>(TENSOR<double>({0,0}))); // data 
+    std::vector<std::shared_ptr<TENSOR<double>>> grad_table(__variables.size(),nullptr); // data 
     for(std::shared_ptr<VARIABLE> var : differentiate)
     {
-        grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(var->get_data()->shape());
+        grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(TENSOR<double>(var->get_data()->shape()));
         for(int i = 0; i < var->get_data()->size(); i++)
         {
             grad_table[var->get_id()]->data()[i] = 1;
         }
     }
 
-    for (std::shared_ptr<VARIABLE> var : __variables)
-    {
-        if (targets.find(var)!=targets.end()) // call build grad for each target variable
-        {
-            build_grad(var, grad_table);
-        }
-    }
+    // for (std::shared_ptr<VARIABLE> var : __variables)
+    // {
+    //     if (targets.find(var)!=targets.end()) // call build grad for each target variable
+    //     {
+    //         build_grad(var, grad_table);
+    //     }
+    // }
     return grad_table;
 }
 

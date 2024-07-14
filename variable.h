@@ -28,14 +28,8 @@ public:
     {
         throw std::runtime_error("A variable should not be copied. Use a shared pointer instead.");
     }
-    VARIABLE(VARIABLE && var)
-    {
-        std::cout << "VARIABLE MOVE CONSTRUCTOR" << std::endl;
-    }
-    VARIABLE & operator=(VARIABLE && var)
-    {
-        throw std::runtime_error("A variable should not be moved. Use a shared pointer instead.");
-    }
+    VARIABLE(VARIABLE && var) = default;
+    VARIABLE & operator=(VARIABLE && var) = default;
     ~VARIABLE()
     {
     

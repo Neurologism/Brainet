@@ -14,24 +14,18 @@ class TENSOR
     std::vector<int> __shape;
 public:
     TENSOR(){};
-    TENSOR(std::vector<int> dimensionality, bool random = false);
-    // TENSOR(const TENSOR<T> & tensor)
-    // {
-    //     throw std::invalid_argument("TENSOR::TENSOR: Copy constructor not allowed");
-    // }
-    // TENSOR & operator=(const TENSOR<T> & tensor)
-    // {
-    //     throw std::invalid_argument("TENSOR::operator=: Copy assignment not allowed");
-    // }
-    // TENSOR(TENSOR<T> && tensor)
-    // {
-    //     throw std::invalid_argument("TENSOR::TENSOR: Move constructor not allowed");
-    // }
-    // TENSOR & operator=(TENSOR<T> && tensor)
-    // {
-    //     throw std::invalid_argument("TENSOR::operator=: Move assignment not allowed");
-    // }
-    ~TENSOR(){};
+    TENSOR(std::vector<int> dimensionality, int value = 0, bool random = false);
+    TENSOR(const TENSOR<T> & tensor)
+    {
+        throw std::invalid_argument("TENSOR::TENSOR: Copy constructor not allowed");
+    }
+    TENSOR & operator=(const TENSOR<T> & tensor)
+    {
+        throw std::invalid_argument("TENSOR::operator=: Copy assignment not allowed");
+    }
+    TENSOR(TENSOR<T> && tensor) = default;
+    TENSOR & operator=(TENSOR<T> && tensor) = default;
+    ~TENSOR() = default;
     
     T at(std::vector<int> index);
     void set(std::vector<int> index, T value);
@@ -68,9 +62,9 @@ T TENSOR<T>::at(std::vector<int> index)
 
 
 template <class T>
-TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
+TENSOR<T>::TENSOR(std::vector<int> dimensionality, int value, bool random)
 {
-    __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<int>()), 0);
+    __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<int>()), value);
     if(random)
     {
         std::random_device rd;
@@ -82,7 +76,7 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, bool random)
             __data[i] = 1;
         }
     }
-    __shape.swap(dimensionality);
+    __shape = dimensionality;
 }
 
 /**

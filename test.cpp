@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
     MODEL model;
-    TENSOR<double> input = TENSOR<double>({2,2});
+    shared_ptr<TENSOR<double>> input = make_shared<TENSOR<double>>(TENSOR<double>({2,2}));
 
     model.sequential({INPUT(input,2), DENSE(ReLU(),2), DENSE(ReLU(),1)});   
 
