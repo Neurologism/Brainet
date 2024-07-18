@@ -24,7 +24,7 @@ void ACTIVATION_FUNCTION::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
 
     for (int i=0; i < _data->size(); i++) // apply activation function to all elements
     {
-        _data->data()[i] = activation_function(_data->data()[i]);
+        _data->data()[i] = activation_function(inputs.front()->get_data()->data()[i]);
     }
 
     this->get_variable()->get_data() = _data;
@@ -42,7 +42,7 @@ std::shared_ptr<TENSOR<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shar
 
     for (int i=0; i < _data->size(); i++) // apply derivative of activation function to all elements
     {
-        _data->data()[i] = activation_function_derivative(_data->data()[i]);
+        _data->data()[i] = activation_function_derivative(inputs.front()->get_data()->data()[i]);
     }
 
     return _data;
