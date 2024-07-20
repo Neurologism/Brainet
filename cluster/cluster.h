@@ -32,7 +32,8 @@ std::shared_ptr<GRAPH> CLUSTER::__graph = nullptr;
 
 #include "input.h"
 #include "dense.h"
+#include "cost.h"
 
-using CLUSTER_VARIANT = std::variant<INPUT, DENSE>;
+using CLUSTER_VARIANT = std::variant<INPUT, DENSE, COST>;
 
 #endif // CLUSTER_INCLUDE_GUARD
