@@ -7,10 +7,11 @@
 
 class COST : public CLUSTER
 {
+    std::shared_ptr<VARIABLE> _target_variable;
     std::shared_ptr<VARIABLE> _output_variable;
 
 public:
-    COST(COST_FUNCTION_VARIANT cost_function);
+    COST(COST_FUNCTION_VARIANT cost_function, std::shared_ptr<TENSOR<double>> & data);
     ~COST() = default;
     void add_input(std::shared_ptr<VARIABLE> input, int units) override
     {
@@ -30,16 +31,19 @@ public:
     }
 };
 
-COST::COST(COST_FUNCTION_VARIANT cost_function)
+COST::COST(COST_FUNCTION_VARIANT cost_function, std::shared_ptr<TENSOR<double>> & data)
 {
     if(__graph == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
 
-    // create the variables
+    _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}, data)));
+
     _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
-        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {}, {})));
+        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));
+    
+    _target_variable->get_consumers().push_back(_output_variable);
 }
 
 
