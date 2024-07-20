@@ -42,7 +42,7 @@ std::shared_ptr<TENSOR<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shar
 
     for (int i=0; i < _data->size(); i++) // apply derivative of activation function to all elements
     {
-        _data->data()[i] = activation_function_derivative(inputs.front()->get_data()->data()[i]);
+        _data->data()[i] = activation_function_derivative(focus->get_data()->data()[i]) * gradient->data()[i];
     }
 
     return _data;
