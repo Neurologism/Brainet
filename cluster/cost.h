@@ -1,7 +1,7 @@
 #ifndef COST_INCLUDE_GUARD
 #define COST_INCLUDE_GUARD
 
-#include "dependencies.h"
+#include "../dependencies.h"
 #include "cluster.h"
 #include "../operation/cost_function/cost_function.h"
 
