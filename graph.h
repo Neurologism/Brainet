@@ -67,13 +67,18 @@ void GRAPH::forward()
     std::vector<std::shared_ptr<VARIABLE>> sorted = __topo_sort();
     for (std::shared_ptr<VARIABLE> var : sorted)
     {
+        std::cout<<"VARIABLE "<<var->get_id()<<": ";
         std::shared_ptr<OPERATION> op = var->get_operation();
         if (op != nullptr)
         {
             std::vector<std::shared_ptr<VARIABLE>> inputs = var->get_inputs();
             var->get_operation()->f(inputs);
         }
-        
+        for(double d : var->get_data()->data())
+        {
+            std::cout << d << " ";
+        }
+        std::cout << std::endl;
     }
 }
 
