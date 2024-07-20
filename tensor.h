@@ -21,7 +21,7 @@ class TENSOR
     }
 public:
     TENSOR(){};
-    TENSOR(std::vector<int> dimensionality, int value = 0, bool random = false);
+    TENSOR(std::vector<int> dimensionality, double value = 0, bool random = false);
     TENSOR(const TENSOR<T> & tensor)
     {
         throw std::invalid_argument("TENSOR::TENSOR: Copy constructor not allowed");
@@ -69,7 +69,7 @@ T TENSOR<T>::at(std::vector<int> index)
 
 
 template <class T>
-TENSOR<T>::TENSOR(std::vector<int> dimensionality, int value, bool random)
+TENSOR<T>::TENSOR(std::vector<int> dimensionality, double value, bool random)
 {
     __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<int>()), value);
     if(random)
