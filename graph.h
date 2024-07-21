@@ -157,6 +157,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
         }
         
     }
+    grad_table[focus->get_id()] = _gradient;
 }
 
 std::vector<std::shared_ptr<VARIABLE>> GRAPH::get_variables()
