@@ -48,6 +48,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
     // create the variables
     
     _weight_matrix_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}))); // nullptr because there is no operation
+    __learnable_parameters.push_back(_weight_matrix_variable);
 
     _matmul_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<MATMUL>(MATMUL()), {_weight_matrix_variable}, {})));
 
