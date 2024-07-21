@@ -67,18 +67,12 @@ void GRAPH::forward()
     std::vector<std::shared_ptr<VARIABLE>> sorted = __topo_sort();
     for (std::shared_ptr<VARIABLE> var : sorted)
     {
-        std::cout<<"VARIABLE "<<var->get_id()<<": ";
         std::shared_ptr<OPERATION> op = var->get_operation();
         if (op != nullptr)
         {
             std::vector<std::shared_ptr<VARIABLE>> inputs = var->get_inputs();
             var->get_operation()->f(inputs);
         }
-        for(double d : var->get_data()->data())
-        {
-            std::cout << d << " ";
-        }
-        std::cout << std::endl;
     }
 }
 
@@ -105,7 +99,12 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::sh
     {
         build_grad(var, grad_table);
     }
-    return grad_table;
+    std::vector<std::shared_ptr<TENSOR<double>>> target_grads;
+    for (std::shared_ptr<VARIABLE> var : targets)
+    {
+        target_grads.push_back(grad_table[var->get_id()]);
+    }
+    return target_grads;
 }
 
 /**
@@ -158,13 +157,6 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
         }
         
     }
-    grad_table[focus->get_id()] = _gradient;
-    std::cout<<"GRADIENT "<<focus->get_id()<<": ";
-    for(double d : _gradient->data())
-    {
-        std::cout << d << " ";
-    }
-    std::cout << std::endl;
 }
 
 std::vector<std::shared_ptr<VARIABLE>> GRAPH::get_variables()
