@@ -49,7 +49,7 @@ std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>
     std::shared_ptr<TENSOR<double>> _gradient = std::make_shared<TENSOR<double>>(TENSOR<double>(inputs[0]->get_data()->shape()));
     for(int i = 0; i < inputs[0]->get_data()->size(); i++)
     {
-        _gradient->data()[i] = (inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i]) / inputs[0]->get_data()->size() * 2 * gradient->data()[0];
+        _gradient->data()[i] = (inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i]) * 2 * gradient->data()[0];
     }
 
     return _gradient;
