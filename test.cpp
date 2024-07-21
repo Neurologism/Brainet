@@ -26,6 +26,6 @@ int main()
     
     model.sequential({INPUT(input,2), DENSE(ReLU(),2), DENSE(ReLU(),1), COST(MSE(),target)});   
 
-    model.train(0,0);
+    model.train(10,1);
     return 0; 
 }

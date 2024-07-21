@@ -18,10 +18,10 @@ class DENSE : public CLUSTER
 public:
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units);
     ~DENSE() = default;
-    void add_input(std::shared_ptr<VARIABLE> input, int units) override
+    void add_input(std::shared_ptr<VARIABLE> input, int input_units) override
     {
         _matmul_variable->get_inputs().push_back(input);
-        _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({__units, units}, 1, 1));
+        _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({__units, input_units}, 1, 1));
     }
     void add_output(std::shared_ptr<VARIABLE> output) override
     {
