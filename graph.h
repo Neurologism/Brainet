@@ -10,6 +10,7 @@ class GRAPH // dag of variables and operations
     std::vector<std::shared_ptr<VARIABLE>> __variables;
     void build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_ptr<TENSOR<double>>> & grad_table);
     std::vector<std::shared_ptr<VARIABLE>> __topo_sort();
+    std::vector<std::shared_ptr<VARIABLE>> __learnable_parameters;
 public:
     GRAPH() = default;
     ~GRAPH() = default;
@@ -162,6 +163,12 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
         
     }
     grad_table[focus->get_id()] = _gradient;
+    std::cout<<"GRADIENT "<<focus->get_id()<<": ";
+    for(double d : _gradient->data())
+    {
+        std::cout << d << " ";
+    }
+    std::cout << std::endl;
 }
 
 std::vector<std::shared_ptr<VARIABLE>> GRAPH::get_variables()
