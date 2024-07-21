@@ -27,6 +27,7 @@ public:
         return __units;
     }
     int getUnits(){return __units;}
+    static std::vector<std::shared_ptr<VARIABLE>> get_learnable_parameters(){return __learnable_parameters;}
 };
 
 std::shared_ptr<GRAPH> CLUSTER::__graph = nullptr;
