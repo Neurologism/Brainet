@@ -44,19 +44,22 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
 
 void MODEL::train(int epochs, double learning_rate)
 {
-    __graph->forward();
-    std::set<std::shared_ptr<VARIABLE>> s;
-    for(std::shared_ptr<VARIABLE> var : __graph->get_variables())
+    for(int epoch = 0; epoch < epochs; epoch++)
     {
-        if(var->get_operation() == nullptr)
+        __graph->forward();
+        std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
+        std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl;
+        std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(CLUSTER::get_learnable_parameters(), __to_be_differentiated);
+        for(int i = 0; i < CLUSTER::get_learnable_parameters().size(); i++)
         {
-            s.insert(var);
+            std::cout << "Parameter " << i << " ";
+            for(int j = 0; j < CLUSTER::get_learnable_parameters()[i]->get_data()->size(); j++)
+            {
+                CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
+                std::cout << CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] << " ";
+            }
+            std::cout << std::endl;
         }
-    }
-    std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(s, __to_be_differentiated);
-    while(v.size() > 0)
-    {
-        v.pop_back();
     }
 }
 

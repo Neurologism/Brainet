@@ -14,7 +14,7 @@ public:
     GRAPH() = default;
     ~GRAPH() = default;
     void forward();
-    std::vector<std::shared_ptr<TENSOR<double>>> backprop(std::set<std::shared_ptr<VARIABLE>> & target, std::vector<std::shared_ptr<VARIABLE>> differentiate);
+    std::vector<std::shared_ptr<TENSOR<double>>> backprop(std::vector<std::shared_ptr<VARIABLE>> & target, std::vector<std::shared_ptr<VARIABLE>> differentiate);
     std::vector<std::shared_ptr<VARIABLE>> get_variables();
     std::shared_ptr<VARIABLE> add_variable(std::shared_ptr<VARIABLE> var)
     {
@@ -67,18 +67,12 @@ void GRAPH::forward()
     std::vector<std::shared_ptr<VARIABLE>> sorted = __topo_sort();
     for (std::shared_ptr<VARIABLE> var : sorted)
     {
-        std::cout<<"VARIABLE "<<var->get_id()<<": ";
         std::shared_ptr<OPERATION> op = var->get_operation();
         if (op != nullptr)
         {
             std::vector<std::shared_ptr<VARIABLE>> inputs = var->get_inputs();
             var->get_operation()->f(inputs);
         }
-        for(double d : var->get_data()->data())
-        {
-            std::cout << d << " ";
-        }
-        std::cout << std::endl;
     }
 }
 
@@ -89,7 +83,7 @@ void GRAPH::forward()
  * @param targets boolen list indicating for each variable in __variables if its gradient should be computed 
  * @param differentiate the variables to be differentiated (gradient is 1)
 */
-std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::set<std::shared_ptr<VARIABLE>> & targets, std::vector<std::shared_ptr<VARIABLE>> differentiate)
+std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::shared_ptr<VARIABLE>> & targets, std::vector<std::shared_ptr<VARIABLE>> differentiate)
 {
     std::vector<std::shared_ptr<TENSOR<double>>> grad_table(__variables.size(),nullptr); // data 
     for(std::shared_ptr<VARIABLE> var : differentiate)
@@ -101,14 +95,16 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::set<std::share
         }
     }
 
-    for (std::shared_ptr<VARIABLE> var : __variables)
+    for (std::shared_ptr<VARIABLE> var : targets)
     {
-        if (targets.find(var)!=targets.end()) // call build grad for each target variable
-        {
-            build_grad(var, grad_table);
-        }
+        build_grad(var, grad_table);
     }
-    return grad_table;
+    std::vector<std::shared_ptr<TENSOR<double>>> target_grads;
+    for (std::shared_ptr<VARIABLE> var : targets)
+    {
+        target_grads.push_back(grad_table[var->get_id()]);
+    }
+    return target_grads;
 }
 
 /**

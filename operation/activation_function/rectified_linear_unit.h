@@ -15,63 +15,29 @@ protected:
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 public:
-    ReLU();
+    ReLU(double gradient = 0);
     ~ReLU() = default;
 };
 
 /**
  * @brief Constructor for the ReLU class.
 */
-ReLU::ReLU()
+ReLU::ReLU(double gradient)
 {
     
-    __gradient = 0;
+    __gradient = gradient;
 }
 
 double ReLU::activation_function(double input)
 {
-    return input > 0 ? input : __gradient * input;
+    return input >= 0 ? input : __gradient * input;
 }
 
 double ReLU::activation_function_derivative(double input)
 {
-    return input > 0 ? 1 : __gradient;
+    return input >= 0 ? 1 : __gradient;
 }
 
-/**
- * @brief Leaky ReLU class, representing the activation function f(x) = max(x, 0) + left_gradient * min(x, 0).
-*/
-class LeakyReLU : public ReLU
-{
-public:
-    LeakyReLU(double left_gradient);
-};
-
-/**
- * @brief Constructor for the LeakyReLU class.
- * @param gradient The gradient of the function for x < 0.
-*/
-LeakyReLU::LeakyReLU(double gradient)
-{
-    __gradient = gradient;
-}
-
-/**
- * @brief Absolute ReLU class, representing the activation function f(x) = |x|.
-*/
-class AbsoluteReLU : public ReLU
-{
-public:
-    AbsoluteReLU();
-};
-
-/**
- * @brief Constructor for the AbsoluteReLU class.
-*/
-AbsoluteReLU::AbsoluteReLU()
-{
-    __gradient = -1;
-}
 
 // add parametric RELU
 // add Maxout
