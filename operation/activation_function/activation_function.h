@@ -49,8 +49,13 @@ std::shared_ptr<TENSOR<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shar
 }
 
 #include "rectified_linear_unit.h"
+#include "hyperbolic_tangent.h"
+#include "softmax.h"
+#include "linear.h"
+#include "heavyside_step.h"
+#include "sigmoid.h"
 
-using ACTIVATION_FUNCTION_VARIANT = std::variant<ReLU>;
+using ACTIVATION_FUNCTION_VARIANT = std::variant<ReLU, HyperbolicTangent, Softmax, Linear, HeavysideStep, Sigmoid>; 
 
 
 #endif // ACTIVATION_FUNCTION_INCLUDE_GUARD
