@@ -12,6 +12,7 @@ class CLUSTER
 {
 protected:
     static std::shared_ptr<GRAPH> __graph;
+    static std::vector<std::shared_ptr<VARIABLE>> __learnable_parameters;
     int __units = -1;
 public:
     virtual ~CLUSTER() = default;
@@ -29,6 +30,7 @@ public:
 };
 
 std::shared_ptr<GRAPH> CLUSTER::__graph = nullptr;
+std::vector<std::shared_ptr<VARIABLE>> CLUSTER::__learnable_parameters = {};
 
 #include "input.h"
 #include "dense.h"
