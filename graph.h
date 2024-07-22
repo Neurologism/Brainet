@@ -91,7 +91,7 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::sh
         grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(TENSOR<double>(var->get_data()->shape()));
         for(int i = 0; i < var->get_data()->size(); i++)
         {
-            grad_table[var->get_id()]->data()[i] = -1;
+            grad_table[var->get_id()]->data()[i] = 1;
         }
     }
 
