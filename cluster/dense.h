@@ -31,7 +31,7 @@ public:
     }
     std::shared_ptr<VARIABLE> input(int index) override
     {
-        return _matmul_variable;
+        return _padding_variable;
     }
     std::shared_ptr<VARIABLE> output(int index) override
     {
