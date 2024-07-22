@@ -51,10 +51,10 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
 
     _padding_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<Padding>(Padding(1,0,1)), {}, {}))); // pad for weights
     
-    _weight_matrix_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {_padding_variable}, {}))); // nullptr because there is no operation
+    _weight_matrix_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}))); // nullptr because there is no operation
     __learnable_parameters.push_back(_weight_matrix_variable);
 
-    _matmul_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<MATMUL>(MATMUL()), {_weight_matrix_variable}, {})));
+    _matmul_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<MATMUL>(MATMUL()), {_weight_matrix_variable,_padding_variable}, {})));
 
     // Use std::visit to handle the variant
     std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) {
