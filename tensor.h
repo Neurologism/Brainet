@@ -76,7 +76,7 @@ TENSOR<T>::TENSOR(std::vector<int> dimensionality, double value, bool random)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(0, 0.1);
+        std::uniform_real_distribution<> dis(-1, 1);
         for(int i = 0; i < __data.size(); i++)
         {
             __data[i] = dis(gen);
