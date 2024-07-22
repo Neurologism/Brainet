@@ -64,7 +64,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
     _activation_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(operation_ptr, {_matmul_variable}, {})));
 
     // conections within the cluster
-    _padding_variable->get_consumers().push_back(_weight_matrix_variable);
+    _padding_variable->get_consumers().push_back(_matmul_variable);
     _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
     _matmul_variable->get_consumers().push_back(_activation_variable);    
 }
