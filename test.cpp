@@ -24,8 +24,8 @@ int main()
     target->set({3,0},0);
     target = target->transpose();
     
-    model.sequential({INPUT(input,2), DENSE(ReLU(),2), DENSE(ReLU(),1), COST(MSE(),target)});   
+    model.sequential({INPUT(input,2), DENSE(HyperbolicTangent(),2), DENSE(Sigmoid(),1), COST(MSE(),target)});   
 
-    model.train(10,1);
+    model.train(20,1);
     return 0; 
 }
