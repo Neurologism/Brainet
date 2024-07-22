@@ -55,7 +55,7 @@ void MODEL::train(int epochs, double learning_rate)
             std::cout << "Parameter " << i << " ";
             for(int j = 0; j < CLUSTER::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
-                CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
+                CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] -= learning_rate * v[i]->data()[j];
                 std::cout << CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] << " ";
             }
             std::cout << std::endl;
