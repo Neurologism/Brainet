@@ -1,7 +1,7 @@
 #ifndef MSE_INCLUDE_GUARD
 #define MSE_INCLUDE_GUARD
 
-#include"..\operation.h"
+#include"../operation.h"
 
 class MSE : public OPERATION
 {
