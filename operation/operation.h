@@ -1,9 +1,9 @@
 #ifndef OPERATION_INCLUDE_GUARD
 #define OPERATION_INCLUDE_GUARD
 
-#include "..\dependencies.h"
-#include "..\variable.h"
-#include "..\tensor.h"
+#include "../dependencies.h"
+#include "../variable.h"
+#include "../tensor.h"
 
 class VARIABLE;
 

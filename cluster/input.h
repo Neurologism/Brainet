@@ -1,7 +1,7 @@
 #ifndef INPUT_INCLUDE_GUARD
 #define INPUT_INCLUDE_GUARD
 
-#include ".\cluster.h"
+#include "./cluster.h"
 
 /**
  * @brief INPUT class creates an input variable for the graph
