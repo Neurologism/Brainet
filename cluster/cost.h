@@ -17,7 +17,7 @@ class COST : public CLUSTER
 public:
     /**
      * @brief add a cost function to the graph
-     * @param cost_function the operation representing the cost function. All supported cost functions are to be added to the variant COST_FUNCTION_VARIANT.
+     * @param cost_function the operation representing the cost function.
      * @param data a pointer to the y truth of the model (the target variable) If the y truth should change please change the satelite data.
      */
     COST(COST_FUNCTION_VARIANT cost_function, std::shared_ptr<TENSOR<double>> & data);
