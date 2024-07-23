@@ -36,7 +36,7 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
     for(int i = 0; i < layers.size() - 1; i++)
     {
         clusters[i]->add_output(clusters[i+1]->input());
-        clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->size());
+        clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->getUnits());
     }
 
     if(add_backprop)__to_be_differentiated.push_back(clusters.back()->output());
