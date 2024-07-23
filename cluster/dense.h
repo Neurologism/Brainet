@@ -1,10 +1,10 @@
 #ifndef DENSE_INCLUDE_GUARD
 #define DENSE_INCLUDE_GUARD
 
-#include ".\cluster.h"
-#include "..\operation\linear_algebra\matmul.h"
-#include "..\operation\processing\padding.h"
-#include "..\operation\activation_function\activation_function.h"
+#include "./cluster.h"
+#include "../operation/linear_algebra/matmul.h"
+#include "../operation/processing/padding.h"
+#include "../operation/activation_function/activation_function.h"
 
 /**
  * @brief DENSE class creates a dense layer for the graph
