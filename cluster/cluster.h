@@ -7,6 +7,7 @@
 
 /**
  * @brief The CLUSTER class can be used to group multiple variables together. This is useful for adding substructures to the graph. It is mainly used to add something similar to layers to the graph.
+ * It is intended that all cost functions add their variables to the graph in the constructor. 
  */
 class CLUSTER
 {
