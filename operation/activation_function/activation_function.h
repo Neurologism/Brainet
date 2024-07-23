@@ -3,6 +3,7 @@
 
 #include"..\operation.h"
 
+
 class ACTIVATION_FUNCTION : public OPERATION
 {
 public:

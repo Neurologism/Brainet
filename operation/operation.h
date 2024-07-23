@@ -8,12 +8,12 @@
 class VARIABLE;
 
 /**
- * @brief OPERATION class is an abstract class that defines the interface for all operations.
+ * @brief OPERATION class is a wrapper class for the mathematical operations that are performed on the variables.
 */
 class OPERATION
 {
 private:
-    std::shared_ptr<VARIABLE> __variable = nullptr;
+    std::shared_ptr<VARIABLE> __variable = nullptr; // necessary for storing the result of the operation
 public:
     OPERATION() = default;
     virtual ~OPERATION() = default;
@@ -24,9 +24,9 @@ public:
     /**
      * @brief derivative of the function
      * assumes that the gradient is already calculated for the output variables 
-     * @param inputs the input variables of the operation
-     * @param focus the variable that the gradient is calculated for
-     * @param gradient the sum of the gradients of the output variables
+     * @param inputs the parents of the variable
+     * @param focus this is the only variable everything else is constant
+     * @param gradient the sum of the gradients of the consumers
     */
     virtual std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) =0;
     /**
@@ -48,7 +48,7 @@ std::shared_ptr<VARIABLE> OPERATION::get_variable()
 {
     if(__variable == nullptr)
     {
-        throw std::runtime_error("variable is not set");
+        throw std::runtime_error("variable is not set"); // this should never happen
     }
     return __variable;
 }
