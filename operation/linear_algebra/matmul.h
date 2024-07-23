@@ -4,32 +4,48 @@
 #include "../operation.h"
 
 
-
 /**
- * @brief Matrix multiplication operation class.
+ * @brief Matmul class used to perform the dot product of two matrices. This is usually a bottleneck in neural networks. 
+ * Expecting to replace this with a more efficient implementation in the future. Credits to @s1m-ba for the implementation.
 */
 class MATMUL : public OPERATION
 {   
-    const int block_size = 8; 
-    const int threads = 200;
+    static const int threads = 200;
+    /**
+     * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
+     * @param left_matrix the left matrix
+     * @param right_matrix the right matrix
+     * @return the result of the matrix multiplication
+     */
     std::shared_ptr<TENSOR<double>> matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix);
+    /**
+     * @brief  matrix vector multiplication function
+     * @param left_matrix the left matrix
+     * @param right_matrix the right matrix
+     * @param result the result of the matrix multiplication
+     * @param k the index of the coloum in the right matrix
+     */
     void blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, int k);
 public:
     MATMUL(){};
     ~MATMUL(){};
+    /**
+     * @brief wrapper function for matmul. Does error checking and handles inputs and outputs.
+     * @param inputs the input variables
+     */
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
+    /**
+     * @brief bprop for matmul. Outputs the gradient multiplied by the input != focus
+     * @param inputs the input variables
+     * @param focus the variable to calculate the gradient for
+     * @param gradient the sum of the gradients of the consumers
+     */
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 };
 
-/**
- * @brief Multithreaded matrix multiplication function by coloum
- * @param left_matrix first matrix
- * @param right_matrix second matrix
- * @param result the matrix that should be returned
- * @param j the current coloum in the result matrix
-*/
 void MATMUL::blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, int k)
 {
+    // straight forward matrix vector multiplication
     for (int i = 0; i < left_matrix->shape(0); ++i)
     {
         double sum = 0;
@@ -41,12 +57,6 @@ void MATMUL::blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared
     }
 }
 
-
-/**
- * @brief Matrix multiplication function.
- * @param data1 first matrix
- * @param data2 second matrix
-*/
 std::shared_ptr<TENSOR<double>> MATMUL::matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix)
 {
     std::shared_ptr<TENSOR<double>> result = std::make_shared<TENSOR<double>>(TENSOR<double>({left_matrix->shape(0),right_matrix->shape(1)}));
@@ -59,20 +69,15 @@ std::shared_ptr<TENSOR<double>> MATMUL::matmul(std::shared_ptr<TENSOR<double>> &
     }
     for (std::thread &worker:workers)
     {
-        worker.join();
+        worker.join(); // wait for all threads to finish
     }
     
     return result;
 }
 
-
-/**
- * @brief matrix multiplication as operation 
- * handels input and output for the operation and does error checking
- * wraper function for matrix_multiply
-*/
 void MATMUL::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
 {
+    // error checking
     if (inputs.size() != 2)
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::f: Invalid number of input variables.");
@@ -82,14 +87,10 @@ void MATMUL::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::f: Invalid shapes of input matrices.");
     }
+    // perform the matrix multiplication
     this->get_variable()->get_data() = matmul(inputs[0]->get_data(), inputs[1]->get_data());
 }
 
-
-/**
- * @brief backpropagation for matrix multiplication
- * handels input and output for the operation and does error checking
-*/
 std::shared_ptr<TENSOR<double>> MATMUL::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)
 {
     if (inputs.size() != 2)
@@ -101,15 +102,15 @@ std::shared_ptr<TENSOR<double>> MATMUL::bprop(std::vector<std::shared_ptr<VARIAB
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid shapes of input matrices.");
     }
 
-
+    // return the gradient multiplied by the input != focus
     if (inputs[0]->get_id() == focus->get_id())
     {
-        std::shared_ptr<TENSOR<double>> right_matrix_transposed = inputs[1]->get_data()->transpose();
+        std::shared_ptr<TENSOR<double>> right_matrix_transposed = inputs[1]->get_data()->transpose(); // transposed version needed to output the correct shape
         return matmul(gradient, right_matrix_transposed);
     }
     else 
     {
-        std::shared_ptr<TENSOR<double>> left_matrix_transposed = inputs[0]->get_data()->transpose();
+        std::shared_ptr<TENSOR<double>> left_matrix_transposed = inputs[0]->get_data()->transpose(); // transposed version needed to output the correct shape
         return matmul(left_matrix_transposed, gradient);
     }
 }
