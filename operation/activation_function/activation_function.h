@@ -1,7 +1,7 @@
 #ifndef ACTIVATION_FUNCTION_INCLUDE_GUARD
 #define ACTIVATION_FUNCTION_INCLUDE_GUARD
 
-#include"../operation.h"
+#include"..\operation.h"
 
 class ACTIVATION_FUNCTION : public OPERATION
 {
