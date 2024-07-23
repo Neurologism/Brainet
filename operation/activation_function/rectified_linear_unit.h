@@ -24,8 +24,7 @@ public:
 */
 ReLU::ReLU(double gradient)
 {
-    
-    __gradient = gradient;
+    __gradient = gradient; // gradient of (-inf, 0)
 }
 
 double ReLU::activation_function(double input)
