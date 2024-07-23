@@ -44,12 +44,20 @@ public:
         if(__units == -1)throw std::runtime_error("units not set");
         return __units;
     }
+    /**
+     * @brief used to get all learnable parameters declared by the cluster objects.
+     */
     static std::vector<std::shared_ptr<VARIABLE>> & get_learnable_parameters(){return __learnable_parameters;}
 };
+
+
+// this is mainly for interface purposes
 
 std::shared_ptr<GRAPH> CLUSTER::__graph = nullptr;
 std::vector<std::shared_ptr<VARIABLE>> CLUSTER::__learnable_parameters = {};
 
+
+// code of all child classes
 #include "input.h"
 #include "dense.h"
 #include "cost.h"
