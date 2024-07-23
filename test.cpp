@@ -26,6 +26,6 @@ int main()
     
     model.sequential({INPUT(input,2), DENSE(HyperbolicTangent(),2), DENSE(Sigmoid(),1), COST(MSE(),target)});   
 
-    model.train(20,1);
+    model.train(100,2);
     return 0; 
 }
