@@ -1,7 +1,7 @@
 #ifndef INPUT_INCLUDE_GUARD
 #define INPUT_INCLUDE_GUARD
 
-#include ".\module.h"
+#include "./module.h"
 
 /**
  * @brief this can store the input data of the model. Initalize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.

@@ -1,10 +1,10 @@
 #ifndef DENSE_INCLUDE_GUARD
 #define DENSE_INCLUDE_GUARD
 
-#include ".\module.h"
-#include "..\operation\linear_algebra\matmul.h"
-#include "..\operation\processing\padding.h"
-#include "..\operation\activation_function\activation_function.h"
+#include "./module.h"
+#include "../operation/linear_algebra/matmul.h"
+#include "../operation/processing/padding.h"
+#include "../operation/activation_function/activation_function.h"
 
 /**
  * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
