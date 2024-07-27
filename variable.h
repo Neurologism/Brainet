@@ -8,36 +8,66 @@
 class OPERATION;
 
 /**
- * @brief VARIABLE class is a wrapper class for OPERATION class. It is used to create a graph of operations.
+ * @brief The variable class is a implementation of a variable in a computational graph. It is used to store the data and owns a pointer to the operation that calculates the data.
 */
 class VARIABLE
 {
-    std::vector<std::shared_ptr<VARIABLE>> __children, __parents;
-    std::shared_ptr<OPERATION> __op;
-    std::shared_ptr<TENSOR<double>> __data;
+    std::vector<std::shared_ptr<VARIABLE>> __children, __parents; // the children and parents of the variable in the computational graph
+    std::shared_ptr<OPERATION> __op; // the operation that calculates the data
+    std::shared_ptr<TENSOR<double>> __data; // the data of the variable
     static int __counter; // keep track of the number of variables created
-    int __id;
+    int __id; // the unique id of the variable
 
 public:
+    /**
+     * @brief Construct a new VARIABLE object.
+     * @param op The operation that calculates the data.
+     * @param parents The parents of the variable.
+     * @param children The children of the variable.
+     * @param data The initial data of the variable.
+     */
     VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents = {}, const std::vector<std::shared_ptr<VARIABLE>> & children = {}, const std::shared_ptr<TENSOR<double>> & data = nullptr);
+    /**
+     * @brief Copy constructor not allowed.
+     */
     VARIABLE(std::shared_ptr<VARIABLE> & var)
     {
         throw std::runtime_error("A variable should not be copied. Use a shared pointer instead.");
     }
+    /**
+     * @brief Copy assignment not allowed.
+     */
     VARIABLE & operator=(std::shared_ptr<VARIABLE> & var)
     {
         throw std::runtime_error("A variable should not be copied. Use a shared pointer instead.");
     }
     VARIABLE(VARIABLE && var) = default;
     VARIABLE & operator=(VARIABLE && var) = default;
-    ~VARIABLE()
-    {
-    
-    }
+    ~VARIABLE() = default;
+    /**
+     * @brief This function returns the operation that calculates the data.
+     * @return std::shared_ptr<OPERATION> The operation that calculates the data.
+     */
     std::shared_ptr<OPERATION> get_operation();
+    /**
+     * @brief This function returns the children of the variable.
+     * @return std::vector<std::shared_ptr<VARIABLE>> The children of the variable.
+     */
     std::vector<std::shared_ptr<VARIABLE>> & get_consumers();
+    /**
+     * @brief This function returns the parents of the variable.
+     * @return std::vector<std::shared_ptr<VARIABLE>> The parents of the variable.
+     */
     std::vector<std::shared_ptr<VARIABLE>> & get_inputs();
+    /**
+     * @brief This function returns the data of the variable.
+     * @return std::shared_ptr<TENSOR<double>> The data of the variable.
+     */
     std::shared_ptr<TENSOR<double>> & get_data();
+    /**
+     * @brief This function returns the id of the variable.
+     * @return int The id of the variable.
+     */
     int get_id();
 };
 
@@ -51,47 +81,31 @@ VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std:
     __data = data;
 };
 
-
-/**
- * @brief returns the operation object
-*/
 std::shared_ptr<OPERATION> VARIABLE::get_operation()
 {
     return __op;
 }
 
-/**
- * @brief returns the children of the variable
-*/
 std::vector<std::shared_ptr<VARIABLE>> & VARIABLE::get_consumers()
 {
     return __children;
 }
 
-/**
- * @brief returns the parents of the variable
-*/
 std::vector<std::shared_ptr<VARIABLE>> & VARIABLE::get_inputs()
 {
     return __parents;
 }
 
-/**
- * @brief returns the data of the operation
-*/
 std::shared_ptr<TENSOR<double>> & VARIABLE::get_data()
 {
     return __data;
 }
 
-/**
- * @brief returns the id of the variable
-*/
 int VARIABLE::get_id()
 {
     return __id;
 }
 
-int VARIABLE::__counter = 0;
+int VARIABLE::__counter = 0; // initialize the static counter
 
-#endif
+#endif // VARIABLE_INCLUDE_GUARD

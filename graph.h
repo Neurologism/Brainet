@@ -5,17 +5,49 @@
 #include "variable.h"
 #include "operation/operation.h"
 
-class GRAPH // dag of variables and operations
+/**
+ * @brief The graph class is a implementation of a computational graph. It is used to store the variables and operations and to execute the forward and backward pass.
+ */
+class GRAPH 
 {
-    std::vector<std::shared_ptr<VARIABLE>> __variables;
+    std::vector<std::shared_ptr<VARIABLE>> __variables; // all variables in the graph
+    /**
+     * @brief This function builds the gradient table for the variable focus. It is a recursive function that calculates the gradient of the focus variable with respect to all other variables in the graph.
+     * To do this it uses dynamic programming.
+     * @param focus The variable for which the gradient is calculated.
+     * @param grad_table The gradient table that stores already calculated gradients.
+     */
     void build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_ptr<TENSOR<double>>> & grad_table);
+    /**
+     * @brief This function performs a topological sort on the graph and returns the sorted variables.
+     * @return std::vector<std::shared_ptr<VARIABLE>> The sorted variables.
+     */
     std::vector<std::shared_ptr<VARIABLE>> __topo_sort();
 public:
     GRAPH() = default;
     ~GRAPH() = default;
+    /**
+     * @brief This function simply executes the operations of the graph in topological order.
+     */
     void forward();
+    /**
+     * @brief This function calculates the gradients of the target variables with respect to the variables in the differentiate vector.
+     * It utilizes the well know general backpropagation algorithm and is implemented in a dynamic programming fashion.
+     * @param target The target variables for which the gradients are calculated.
+     * @param differentiate The variables with respect to which the gradients are calculated.
+     * @return std::vector<std::shared_ptr<TENSOR<double>> The gradients of the target variables with respect to the differentiate variables.
+     */
     std::vector<std::shared_ptr<TENSOR<double>>> backprop(std::vector<std::shared_ptr<VARIABLE>> & target, std::vector<std::shared_ptr<VARIABLE>> differentiate);
+    /**
+     * @brief This function returns all variables in the graph.
+     * @return std::vector<std::shared_ptr<VARIABLE>> The variables in the graph.
+     */
     std::vector<std::shared_ptr<VARIABLE>> get_variables();
+    /**
+     * @brief This function adds a variable to the graph.
+     * @param var The variable to be added.
+     * @return std::shared_ptr<VARIABLE> The added variable.
+     */
     std::shared_ptr<VARIABLE> add_variable(std::shared_ptr<VARIABLE> var)
     {
         __variables.push_back(var); 
@@ -25,15 +57,12 @@ public:
 }; 
 
 
-/**
- * @brief topological sort of the graph
- * @return Returns a list of pointers to the variables in topological order
-*/
 std::vector<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
 {
     std::vector<std::shared_ptr<VARIABLE>> sorted;
     std::vector<bool> visited(__variables.size(), false);
-    std::function<void(std::shared_ptr<VARIABLE>)> dfs = [&](std::shared_ptr<VARIABLE> var)
+    // depth first search
+    std::function<void(std::shared_ptr<VARIABLE>)> dfs = [&](std::shared_ptr<VARIABLE> var) 
     {
         if(visited[var->get_id()]) return;
         visited[var->get_id()] = true;
@@ -47,58 +76,48 @@ std::vector<std::shared_ptr<VARIABLE>> GRAPH::__topo_sort()
         sorted.push_back(var);
     };
 
-    for (std::shared_ptr<VARIABLE> var : __variables)
+    for (std::shared_ptr<VARIABLE> var : __variables) // call for all variables
     {
         if (!visited[var->get_id()])
         {
             dfs(var);
         }
     }
-    std::reverse(sorted.begin(), sorted.end());
+    std::reverse(sorted.begin(), sorted.end()); // reverse the order to get the topological order
     return sorted;
 }
 
-/**
- * @brief algorithm executing the forward pass
- * @return Returns the value of all variables 
-*/
 void GRAPH::forward()
 {
-    std::vector<std::shared_ptr<VARIABLE>> sorted = __topo_sort();
+    std::vector<std::shared_ptr<VARIABLE>> sorted = __topo_sort(); // get the topological order
     for (std::shared_ptr<VARIABLE> var : sorted)
     {
         std::shared_ptr<OPERATION> op = var->get_operation();
-        if (op != nullptr)
+        if (op != nullptr) // if the variable has an operation, execute it
         {
-            std::vector<std::shared_ptr<VARIABLE>> inputs = var->get_inputs();
-            var->get_operation()->f(inputs);
+            std::vector<std::shared_ptr<VARIABLE>> inputs = var->get_inputs(); // get the inputs of the operation
+            var->get_operation()->f(inputs); // execute the operation
         }
     }
 }
 
-
-/**
- * @brief backpropagation algorithm
- * @attention assumes that the graph is a dag and forward has been called before
- * @param targets boolen list indicating for each variable in __variables if its gradient should be computed 
- * @param differentiate the variables to be differentiated (gradient is 1)
-*/
 std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::shared_ptr<VARIABLE>> & targets, std::vector<std::shared_ptr<VARIABLE>> differentiate)
 {
-    std::vector<std::shared_ptr<TENSOR<double>>> grad_table(__variables.size(),nullptr); // data 
+    std::vector<std::shared_ptr<TENSOR<double>>> grad_table(__variables.size(),nullptr); // data table for the gradients 
     for(std::shared_ptr<VARIABLE> var : differentiate)
     {
-        grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(TENSOR<double>(var->get_data()->shape()));
+        grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(TENSOR<double>(var->get_data()->shape())); // initialize the gradient table with the differentiate variables
         for(int i = 0; i < var->get_data()->size(); i++)
         {
-            grad_table[var->get_id()]->data()[i] = 1;
+            grad_table[var->get_id()]->data()[i] = 1; // differentiate variables have a gradient of 1 and are considered as leaf nodes
         }
     }
 
     for (std::shared_ptr<VARIABLE> var : targets)
     {
-        build_grad(var, grad_table);
+        build_grad(var, grad_table); // build the gradient table for the target variables
     }
+    // only return the gradients of the target variables
     std::vector<std::shared_ptr<TENSOR<double>>> target_grads;
     for (std::shared_ptr<VARIABLE> var : targets)
     {
@@ -107,13 +126,9 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::sh
     return target_grads;
 }
 
-/**
- * @brief builds the gradient table for the variable with id focus using dp with dfs 
- * @param focus the variable to be differentiated
- * @param grad_table the gradient table to be built
-*/
 void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_ptr<TENSOR<double>>> & grad_table)
 {
+    // error handling
     if (grad_table[focus->get_id()] != nullptr) // if the gradient has already been calculated, return
     {
         return;
