@@ -1,15 +1,15 @@
 #ifndef DENSE_INCLUDE_GUARD
 #define DENSE_INCLUDE_GUARD
 
-#include ".\cluster.h"
+#include ".\module.h"
 #include "..\operation\linear_algebra\matmul.h"
 #include "..\operation\processing\padding.h"
 #include "..\operation\activation_function\activation_function.h"
 
 /**
- * @brief the dense cluster is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
+ * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
  */
-class DENSE : public CLUSTER
+class DENSE : public MODULE
 {
     // storing index of the variables in the graph
     std::shared_ptr<VARIABLE> _weight_matrix_variable; // learnable parameters of the layer (weights + bias)
@@ -26,7 +26,7 @@ public:
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units);
     ~DENSE() = default;
     /**
-     * @brief used to mark variables as input for the cluster.
+     * @brief used to mark variables as input for the module.
      */
     void add_input(std::shared_ptr<VARIABLE> input, int input_units) override
     {
@@ -34,21 +34,21 @@ public:
         _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({__units, input_units+1}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
     }
     /**
-     * @brief used to mark variables as output for the cluster.
+     * @brief used to mark variables as output for the module.
      */
     void add_output(std::shared_ptr<VARIABLE> output) override
     {
         _activation_variable->get_consumers().push_back(output);
     }
     /**
-     * @brief used to get the input variables of the cluster specified by the index.
+     * @brief used to get the input variables of the module specified by the index.
      */
     std::shared_ptr<VARIABLE> input(int index) override
     {
         return _padding_variable;
     }
     /**
-     * @brief used to get the output variables of the cluster specified by the index.
+     * @brief used to get the output variables of the module specified by the index.
      */
     std::shared_ptr<VARIABLE> output(int index) override
     {
@@ -82,7 +82,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
 
     _activation_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(operation_ptr, {_matmul_variable}, {})));
 
-    // conections within the cluster
+    // conections within the module
     _padding_variable->get_consumers().push_back(_matmul_variable);
     _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
     _matmul_variable->get_consumers().push_back(_activation_variable);    
