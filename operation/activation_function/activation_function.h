@@ -1,7 +1,7 @@
 #ifndef ACTIVATION_FUNCTION_INCLUDE_GUARD
 #define ACTIVATION_FUNCTION_INCLUDE_GUARD
 
-#include"..\operation.h"
+#include"../operation.h"
 
 /**
  * @brief Base class for operation functions. Derive from this class to create an activation function.

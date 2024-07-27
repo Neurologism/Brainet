@@ -1,7 +1,7 @@
 #ifndef MATMUL_INCLUDE_GUARD
 #define MATMUL_INCLUDE_GUARD
 
-#include "..\operation.h"
+#include "../operation.h"
 
 
 /**
