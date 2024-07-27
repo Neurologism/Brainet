@@ -1,13 +1,13 @@
 #ifndef INPUT_INCLUDE_GUARD
 #define INPUT_INCLUDE_GUARD
 
-#include "./cluster.h"
+#include "./module.h"
 
 /**
  * @brief this can store the input data of the model. Initalize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.
  * Preprocessing could be added at this point in the future.
  */
-class INPUT : public CLUSTER
+class INPUT : public MODULE
 {
     std::shared_ptr<VARIABLE> _input_variable;
 public:
@@ -23,7 +23,7 @@ public:
      */
     void add_input(std::shared_ptr<VARIABLE> input, int units) override;
     /**
-     * @brief used to mark variables as output for the cluster.
+     * @brief used to mark variables as output for the module.
      */
     void add_output(std::shared_ptr<VARIABLE> output) override;
     /**
@@ -31,7 +31,7 @@ public:
      */
     std::shared_ptr<VARIABLE> input(int index) override;
     /**
-     * @brief used to get the output variables of the cluster specified by the index.
+     * @brief used to get the output variables of the module specified by the index.
      */
     std::shared_ptr<VARIABLE> output(int index) override;
 };

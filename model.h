@@ -3,12 +3,12 @@
 
 #include "dependencies.h"
 #include "graph.h"
-#include "cluster/cluster.h"
+#include "module/module.h"
 #include "operation/activation_function/activation_function.h"
 
 /**
  * @brief The model class is the main interface for the user to create a neural network. It is used to build the network and to train it.
- * The model class combines the graph, the cluster and the operation classes to create a neural network.
+ * The model class combines the graph, the module and the operation classes to create a neural network.
  */
 class MODEL
 {
@@ -20,11 +20,11 @@ public:
      */
     MODEL()
     {
-        CLUSTER::set_graph(__graph); // set the static graph pointer in the cluster class
+        MODULE::set_graph(__graph); // set the static graph pointer in the module class
     };
     ~MODEL(){};
     /**
-     * @brief This function loads the graph of the model into the cluster class.
+     * @brief This function loads the graph of the model into the module class.
      */
     void load();
     /**
@@ -43,16 +43,16 @@ public:
 
 void MODEL::load()
 {
-    CLUSTER::set_graph(__graph);
+    MODULE::set_graph(__graph);
 }
 
 void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
 {
-    std::vector<std::shared_ptr<CLUSTER>> clusters;
+    std::vector<std::shared_ptr<MODULE>> clusters;
     for (CLUSTER_VARIANT& layer : layers) {
-        std::shared_ptr<CLUSTER> cluster_ptr = std::visit([](auto&& arg) {
+        std::shared_ptr<MODULE> cluster_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return std::shared_ptr<CLUSTER>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CLUSTER_VARIANT{layer});
+        return std::shared_ptr<MODULE>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CLUSTER_VARIANT{layer});
         clusters.push_back(cluster_ptr);
     }
     
@@ -73,14 +73,14 @@ void MODEL::train(int epochs, double learning_rate)
         __graph->forward();
         std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
         std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
-        std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(CLUSTER::get_learnable_parameters(), __to_be_differentiated); // backpropagation
-        for(int i = 0; i < CLUSTER::get_learnable_parameters().size(); i++)
+        std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters(), __to_be_differentiated); // backpropagation
+        for(int i = 0; i < MODULE::get_learnable_parameters().size(); i++)
         {
             std::cout << "Parameter " << i << " "; // debug
-            for(int j = 0; j < CLUSTER::get_learnable_parameters()[i]->get_data()->size(); j++)
+            for(int j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
-                CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
-                std::cout << CLUSTER::get_learnable_parameters()[i]->get_data()->data()[j] << " ";
+                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
+                std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " ";
             }
             std::cout << std::endl;
         }
