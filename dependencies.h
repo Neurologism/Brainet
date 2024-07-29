@@ -15,5 +15,8 @@
 #include <iostream>
 #include <list>
 #include <set>
+#include <filesystem>
+#include <fstream>
+#include <bitset>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD

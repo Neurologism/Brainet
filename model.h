@@ -76,13 +76,13 @@ void MODEL::train(int epochs, double learning_rate)
         std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters(), __to_be_differentiated); // backpropagation
         for(int i = 0; i < MODULE::get_learnable_parameters().size(); i++)
         {
-            std::cout << "Parameter " << i << " "; // debug
+            //std::cout << "Parameter " << i << " "; // debug
             for(int j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
                 MODULE::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
-                std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " ";
+                //std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " "; // debug
             }
-            std::cout << std::endl;
+            //std::cout << std::endl; // debug
         }
     }
 }
