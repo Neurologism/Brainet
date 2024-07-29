@@ -19,12 +19,13 @@ TENSOR<float> read_idx(std::string path)
     if (magic[2] == 0x08)
     {
         int dimensions = magic[3];
-        std::vector<int> shape(dimensions);
-        file.read((char *)shape.data(), dimensions * 4);
-
-        tensor = TENSOR<float>(shape);
-
-        file.read((char *)tensor.data().data(), tensor.data().size() * 4);
+        std::vector<unsigned int> shape(dimensions);
+        for (int i = 0; i < dimensions; i++)
+        {
+            unsigned char dimension[4];
+            file.read((char *)dimension, 4);
+            shape[i] = (unsigned int)dimension[0] << 24 | (unsigned int)dimension[1] << 16 | (unsigned int)dimension[2] << 8 | (unsigned int)dimension[3];
+        }
     }
     else
     {
