@@ -20,11 +20,19 @@ TENSOR<float> read_idx(std::string path)
     {
         int dimensions = magic[3];
         std::vector<int> shape(dimensions);
-        file.read((char *)shape.data(), dimensions * 4);
-
+        for (int i = 0; i < dimensions; i++)
+        {
+            unsigned char dimension[4];
+            file.read((char *)dimension, 4);
+            shape[i] = (unsigned int)dimension[0] << 24 | (unsigned int)dimension[1] << 16 | (unsigned int)dimension[2] << 8 | (unsigned int)dimension[3];
+        }
         tensor = TENSOR<float>(shape);
-
-        file.read((char *)tensor.data().data(), tensor.data().size() * 4);
+        for (int i = 0; i < tensor.size(); i++)
+        {
+            unsigned char pixel;
+            file.read((char *)&pixel, 1);
+            tensor.data()[i] = (float)pixel;
+        }
     }
     else
     {
