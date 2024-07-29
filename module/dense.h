@@ -31,7 +31,7 @@ public:
     void add_input(std::shared_ptr<VARIABLE> input, int input_units) override
     {
         _padding_variable->get_inputs().push_back(input);
-        _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({__units, input_units+1}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
+        _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({input_units+1,__units}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
     }
     /**
      * @brief used to mark variables as output for the module.
@@ -67,12 +67,12 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
 
     // create the variables
 
-    _padding_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<Padding>(Padding(1,0,1)), {}, {}))); // pad for weights
+    _padding_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<Padding>(Padding(0,1,1)), {}, {}))); // pad for weights
     
     _weight_matrix_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}))); // nullptr because there is no operation
     __learnable_parameters.push_back(_weight_matrix_variable);
 
-    _matmul_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<MATMUL>(MATMUL()), {_weight_matrix_variable,_padding_variable}, {})));
+    _matmul_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<MATMUL>(MATMUL()), {_padding_variable,_weight_matrix_variable}, {})));
 
     // turning the variant into a shared pointer to the operation class
     // Use std::visit to handle the variant
