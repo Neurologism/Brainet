@@ -99,6 +99,12 @@ public:
      * @return std::shared_ptr<TENSOR<T>> The transposed tensor.
      */
     std::shared_ptr<TENSOR<T>> transpose();
+
+    /**
+     * @brief This function reshapes the tensor.
+     * @param dimensionality The new dimensionality of the tensor.
+     */
+    void reshape(std::vector<int> dimensionality);
 };
 
 template <class T>
