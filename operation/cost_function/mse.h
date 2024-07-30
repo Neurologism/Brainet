@@ -46,7 +46,7 @@ std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>
     {
         throw std::runtime_error("MSE operation requires 2 inputs");
     }
-    if(inputs[0]->get_data()->shape() != inputs[1]->get_data()->shape())
+    if(inputs[0]->get_data()->size() != inputs[1]->get_data()->size())
     {
         throw std::runtime_error("MSE operation requires inputs to have the same shape");
     }
