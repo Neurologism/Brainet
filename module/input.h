@@ -16,7 +16,7 @@ public:
      * @param data a pointer to the input data
      * @param units the respective size of a single input
      */
-    INPUT(std::shared_ptr<TENSOR<double>> & data, int units);
+    INPUT(int units);
     ~INPUT() = default;
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
@@ -34,9 +34,11 @@ public:
      * @brief used to get the output variables of the module specified by the index.
      */
     std::shared_ptr<VARIABLE> output(int index) override;
+
+    void 
 };
 
-INPUT::INPUT(std::shared_ptr<TENSOR<double>> & data, int units)
+INPUT::INPUT(int units)
 {
     // error checks
     if(__graph == nullptr)
@@ -45,7 +47,7 @@ INPUT::INPUT(std::shared_ptr<TENSOR<double>> & data, int units)
     }
     
     // create the input variable
-    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}, data)));
+    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
     __units = units; // set the number of neurons in the layer
 }
 

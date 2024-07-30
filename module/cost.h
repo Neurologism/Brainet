@@ -20,7 +20,7 @@ public:
      * @param cost_function the operation representing the cost function.
      * @param data a pointer to the y truth of the model (the target variable) If the y truth should change please change the satelite data.
      */
-    COST(COST_FUNCTION_VARIANT cost_function, std::shared_ptr<TENSOR<double>> & data);
+    COST(COST_FUNCTION_VARIANT cost_function);
     ~COST() = default;
 
     /**
@@ -53,7 +53,7 @@ public:
     }
 };
 
-COST::COST(COST_FUNCTION_VARIANT cost_function, std::shared_ptr<TENSOR<double>> & data)
+COST::COST(COST_FUNCTION_VARIANT cost_function)
 {
     // error checks
     if(__graph == nullptr)
@@ -63,7 +63,7 @@ COST::COST(COST_FUNCTION_VARIANT cost_function, std::shared_ptr<TENSOR<double>> 
 
 
     // add variables to the graph
-    _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}, data)));
+    _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
 
     _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
         return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));

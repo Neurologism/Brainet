@@ -11,7 +11,7 @@ int main()
     input->reshape({input->shape()[0],input->shape()[1]*input->shape()[2]}); // flatten the input
 
     MODEL model;
-    model.sequential({INPUT(input,input->shape()[1]), DENSE(HyperbolicTangent(),2), DENSE(Sigmoid(),1), COST(MSE(),target)});   
+    model.sequential({INPUT(input->shape()[1]), DENSE(ReLU(),2), DENSE(Sigmoid(),1), COST(MSE())});   
 
     model.train(100,2);
     return 0; 
