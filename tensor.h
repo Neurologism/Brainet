@@ -180,4 +180,12 @@ std::shared_ptr<TENSOR<T>> TENSOR<T>::transpose()
     return _tensor; // return the new tensor
 }
 
+template <class T>
+void TENSOR<T>::reshape(std::vector<int> dimensionality)
+{
+    if(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<int>()) != __data.size())
+        throw std::invalid_argument("TENSOR::reshape: New dimensionality does not match the size of the tensor");
+    __shape = dimensionality; // set the new shape
+}
+
 #endif // TENSOR_INCLUDE_GUARD
