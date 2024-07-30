@@ -80,8 +80,8 @@ public:
      */
     int dimensionality(){return __shape.size();};
     /**
-     * @brief This function returns the size of the tensor (number of elements).
-     * @return int The size of the tensor.
+     * @brief This function returns the total capacity of the tensor.
+     * @return The size of the tensor.
      */
     int size(){return __data.size();};
     /**
