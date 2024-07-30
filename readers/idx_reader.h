@@ -4,7 +4,7 @@
 #include "../dependencies.h"
 #include "../tensor.h"
 
-TENSOR<float> read_idx(std::string path)
+TENSOR<double> read_idx(std::string path)
 {
    std::ifstream file(std::filesystem::path(path), std::ios::binary);
 
@@ -14,7 +14,7 @@ TENSOR<float> read_idx(std::string path)
     char magic[4];
     file.read(magic, 4);
 
-    TENSOR<float> tensor;
+    TENSOR<double> tensor;
 
     if (magic[2] == 0x08)
     {
@@ -26,12 +26,12 @@ TENSOR<float> read_idx(std::string path)
             file.read((char *)dimension, 4);
             shape[i] = (unsigned int)dimension[0] << 24 | (unsigned int)dimension[1] << 16 | (unsigned int)dimension[2] << 8 | (unsigned int)dimension[3];
         }
-        tensor = TENSOR<float>(shape);
+        tensor = TENSOR<double>(shape);
         for (int i = 0; i < tensor.size(); i++)
         {
             unsigned char pixel;
             file.read((char *)&pixel, 1);
-            tensor.data()[i] = (float)pixel;
+            tensor.data()[i] = (double)pixel;
         }
     }
     else

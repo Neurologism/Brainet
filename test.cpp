@@ -5,24 +5,13 @@ using namespace std;
 // implementin general tests
 int main()
 {
-    MODEL model;
-    shared_ptr<TENSOR<double>> input = make_shared<TENSOR<double>>(TENSOR<double>({4,2}));
-    input->set({0,0},0);
-    input->set({0,1},0);
-    input->set({1,0},0);
-    input->set({1,1},1);
-    input->set({2,0},1);
-    input->set({2,1},0);
-    input->set({3,0},1);
-    input->set({3,1},1);
+    std::shared_ptr<TENSOR<double>> input = std::make_shared<TENSOR<double>>(read_idx("datasets/train-images.idx3-ubyte"));
+    std::shared_ptr<TENSOR<double>> target = std::make_shared<TENSOR<double>>(read_idx("datasets/train-labels.idx1-ubyte"));
 
-    shared_ptr<TENSOR<double>> target = make_shared<TENSOR<double>>(TENSOR<double>({4,1}));
-    target->set({0,0},0);
-    target->set({1,0},1);
-    target->set({2,0},1);
-    target->set({3,0},0);
-    
-    model.sequential({INPUT(input,2), DENSE(HyperbolicTangent(),2), DENSE(Sigmoid(),1), COST(MSE(),target)});   
+    input->reshape({input->shape()[0],input->shape()[1]*input->shape()[2]}); // flatten the input
+
+    MODEL model;
+    model.sequential({INPUT(input,input->shape()[1]), DENSE(HyperbolicTangent(),2), DENSE(Sigmoid(),1), COST(MSE(),target)});   
 
     model.train(100,2);
     return 0; 

@@ -80,8 +80,8 @@ public:
      */
     int dimensionality(){return __shape.size();};
     /**
-     * @brief This function returns the size of the tensor (number of elements).
-     * @return int The size of the tensor.
+     * @brief This function returns the total capacity of the tensor.
+     * @return The size of the tensor.
      */
     int size(){return __data.size();};
     /**
@@ -99,6 +99,12 @@ public:
      * @return std::shared_ptr<TENSOR<T>> The transposed tensor.
      */
     std::shared_ptr<TENSOR<T>> transpose();
+
+    /**
+     * @brief This function reshapes the tensor.
+     * @param dimensionality The new dimensionality of the tensor.
+     */
+    void reshape(std::vector<int> dimensionality);
 };
 
 template <class T>
@@ -172,6 +178,14 @@ std::shared_ptr<TENSOR<T>> TENSOR<T>::transpose()
     }
     _tensor->data() = _data; // set the data of the new tensor
     return _tensor; // return the new tensor
+}
+
+template <class T>
+void TENSOR<T>::reshape(std::vector<int> dimensionality)
+{
+    if(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<int>()) != __data.size())
+        throw std::invalid_argument("TENSOR::reshape: New dimensionality does not match the size of the tensor");
+    __shape = dimensionality; // set the new shape
 }
 
 #endif // TENSOR_INCLUDE_GUARD
