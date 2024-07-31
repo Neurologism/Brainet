@@ -107,7 +107,7 @@ std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::sh
     for(std::shared_ptr<VARIABLE> var : differentiate)
     {
         grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(TENSOR<double>(var->get_data()->shape())); // initialize the gradient table with the differentiate variables
-        for(int i = 0; i < var->get_data()->size(); i++)
+        for(std::uint32_t i = 0; i < var->get_data()->size(); i++)
         {
             grad_table[var->get_id()]->data()[i] = 1; // differentiate variables have a gradient of 1 and are considered as leaf nodes
         }
@@ -143,7 +143,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
     }
     
     std::shared_ptr<TENSOR<double>> _gradient;
-    for (int i = 0; i < focus->get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
+    for (std::uint32_t i = 0; i < focus->get_consumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
     {
         // load stuff
         std::shared_ptr<VARIABLE> consumer = focus->get_consumers().at(i);
@@ -164,7 +164,7 @@ void GRAPH::build_grad(std::shared_ptr<VARIABLE> focus, std::vector<std::shared_
         }
         else
         {
-            for (int j = 0; j < gradient->size(); j++) // add the gradient to the gradient table
+            for (std::uint32_t j = 0; j < gradient->size(); j++) // add the gradient to the gradient table
             {
                 _gradient->data()[j] += gradient->data()[j];
             }

@@ -10,7 +10,7 @@
 */
 class MATMUL : public OPERATION
 {   
-    static const int threads = 200;
+    static const std::uint32_t threads = 200;
     /**
      * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
      * @param left_matrix the left matrix
@@ -25,7 +25,7 @@ class MATMUL : public OPERATION
      * @param result the result of the matrix multiplication
      * @param k the index of the coloum in the right matrix
      */
-    void blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, int k);
+    void blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, std::uint32_t k);
 public:
     MATMUL(){};
     ~MATMUL(){};
@@ -43,13 +43,13 @@ public:
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 };
 
-void MATMUL::blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, int k)
+void MATMUL::blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, std::uint32_t k)
 {
     // straight forward matrix vector multiplication
-    for (int i = 0; i < left_matrix->shape(0); ++i)
+    for (std::uint32_t i = 0; i < left_matrix->shape(0); ++i)
     {
         double sum = 0;
-        for (int j = 0; j < left_matrix->shape(1); ++j)
+        for (std::uint32_t j = 0; j < left_matrix->shape(1); ++j)
         {
             sum += left_matrix->at({i, j}) * right_matrix->at({j, k});
         }
@@ -63,7 +63,7 @@ std::shared_ptr<TENSOR<double>> MATMUL::matmul(std::shared_ptr<TENSOR<double>> &
 
     //devide into threads
     std::vector<std::thread> workers(right_matrix->shape(1));
-    for (int i = 0; i < right_matrix->shape(1); ++i)
+    for (std::uint32_t i = 0; i < right_matrix->shape(1); ++i)
     {
         workers[i] = std::thread (&MATMUL::blockmul, this, std::ref(left_matrix), std::ref(right_matrix), std::ref(result), i);
     }

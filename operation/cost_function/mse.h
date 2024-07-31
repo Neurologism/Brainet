@@ -29,7 +29,7 @@ void MSE::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     }
     // calculate the mean squared error
     double sum = 0;
-    for(int i = 0; i < inputs[0]->get_data()->size(); i++)
+    for(std::uint32_t i = 0; i < inputs[0]->get_data()->size(); i++)
     {
         sum += pow(inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i], 2);
     }
@@ -50,14 +50,14 @@ std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>
     {
         throw std::runtime_error("MSE operation requires inputs to have the same shape");
     }
-    if(gradient->shape() != std::vector<int>({1}))
+    if(gradient->shape() != std::vector<std::uint32_t>({1}))
     {
         throw std::runtime_error("MSE operation requires gradient to have shape {1}");
     }
 
     // calculate the gradient of the mean squared error function
     std::shared_ptr<TENSOR<double>> _gradient = std::make_shared<TENSOR<double>>(TENSOR<double>(inputs[0]->get_data()->shape()));
-    for(int i = 0; i < inputs[0]->get_data()->size(); i++)
+    for(std::uint32_t i = 0; i < inputs[0]->get_data()->size(); i++)
     {
         _gradient->data()[i] = (inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i]) * 2 * gradient->data()[0];
     }

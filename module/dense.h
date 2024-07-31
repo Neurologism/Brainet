@@ -23,12 +23,12 @@ public:
      * @param activation_function the operation representing the activation function.
      * @param units the number of neurons in the layer.
      */
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units);
+    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units);
     ~DENSE() = default;
     /**
      * @brief used to mark variables as input for the module.
      */
-    void add_input(std::shared_ptr<VARIABLE> input, int input_units) override
+    void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t input_units) override
     {
         _padding_variable->get_inputs().push_back(input);
         _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({input_units+1,__units}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
@@ -43,20 +43,20 @@ public:
     /**
      * @brief used to get the input variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> input(int index) override
+    std::shared_ptr<VARIABLE> input(std::uint32_t index) override
     {
         return _padding_variable;
     }
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> output(int index) override
+    std::shared_ptr<VARIABLE> output(std::uint32_t index) override
     {
         return _activation_variable;
     }
 };
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, int units)
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
 {
     // error checks
     if(__graph == nullptr)

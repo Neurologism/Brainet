@@ -33,14 +33,14 @@ public:
      * @param layers The layers of the neural network.
      * @param ID The ID of the data/label pair.
      */
-    void sequential(std::vector<MODULE_VARIANT> layers, int ID = 0);
+    void sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID = 0);
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
      * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
      * @param epochs The number of epochs.
      * @param learning_rate The learning rate.
      */
-    void train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, int epochs, double learning_rate);
+    void train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, std::uint32_t epochs, double learning_rate);
     /**
      * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
      * @param data The data.
@@ -48,7 +48,7 @@ public:
      * @param epochs The number of epochs.
      * @param learning_rate The learning rate.
      */
-    void train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, int epochs, double learning_rate);
+    void train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, std::uint32_t epochs, double learning_rate);
 };
 
 void MODEL::load()
@@ -56,7 +56,7 @@ void MODEL::load()
     MODULE::set_graph(__graph);
 }
 
-void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
+void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
 {
     std::vector<std::shared_ptr<MODULE>> clusters;
     for (MODULE_VARIANT& layer : layers) {
@@ -66,7 +66,7 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
         clusters.push_back(cluster_ptr);
     }
     
-    for(int i = 0; i < layers.size() - 1; i++)
+    for(std::uint32_t i = 0; i < layers.size() - 1; i++)
     {
         clusters[i]->add_output(clusters[i+1]->input());
         clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->getUnits());
@@ -83,23 +83,23 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
 
-void MODEL::train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, int epochs, double learning_rate)
+void MODEL::train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, std::uint32_t epochs, double learning_rate)
 {
 
 
 
 
     // this should be replaced by a more sophisticated training algorithm
-    for(int epoch = 0; epoch < epochs; epoch++)
+    for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
     {
         __graph->forward();
         std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
         std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
         std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters(), __to_be_differentiated); // backpropagation
-        for(int i = 0; i < MODULE::get_learnable_parameters().size(); i++)
+        for(std::uint32_t i = 0; i < MODULE::get_learnable_parameters().size(); i++)
         {
             //std::cout << "Parameter " << i << " "; // debug
-            for(int j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
+            for(std::uint32_t j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
                 MODULE::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
                 //std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " "; // debug
@@ -110,7 +110,7 @@ void MODEL::train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<doubl
 }
 
 
-void MODEL::train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, int epochs, double learning_rate)
+void MODEL::train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, std::uint32_t epochs, double learning_rate)
 {
     std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>> > data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
