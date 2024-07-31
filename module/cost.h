@@ -51,6 +51,13 @@ public:
     {
         return _output_variable;
     }
+    /**
+     * @brief used to get the target variable of the module.
+     */
+    std::shared_ptr<VARIABLE> target()
+    {
+        return _target_variable;
+    }
 };
 
 COST::COST(COST_FUNCTION_VARIANT cost_function)
