@@ -14,6 +14,7 @@ class MODEL
 {
     std::shared_ptr<GRAPH> __graph = std::make_shared<GRAPH>(); // the computational graph
     std::vector<std::shared_ptr<VARIABLE>> __to_be_differentiated; // the variables that are to be differentiated
+    std::map<std::uint32_t, std::pair<std::shared_ptr<VARIABLE>, std::shared_ptr<VARIABLE>>> __data_label_pairs; // the data/label pairs
 public:
     /**
      * @brief Construct a new MODEL object.
@@ -63,6 +64,7 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
     }
 
     __to_be_differentiated.push_back(clusters.back()->output());
+    
 }
 
 void MODEL::train(int epochs, double learning_rate)
