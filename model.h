@@ -36,10 +36,19 @@ public:
     void sequential(std::vector<MODULE_VARIANT> layers, int ID = 0);
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
+     * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
      * @param epochs The number of epochs.
      * @param learning_rate The learning rate.
      */
-    void train(int epochs, double learning_rate);
+    void train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, int epochs, double learning_rate);
+    /**
+     * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
+     * @param data The data.
+     * @param label The label.
+     * @param epochs The number of epochs.
+     * @param learning_rate The learning rate.
+     */
+    void train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, int epochs, double learning_rate);
 };
 
 void MODEL::load()
@@ -74,8 +83,12 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
 
-void MODEL::train(int epochs, double learning_rate)
+void MODEL::train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, int epochs, double learning_rate)
 {
+
+
+
+
     // this should be replaced by a more sophisticated training algorithm
     for(int epoch = 0; epoch < epochs; epoch++)
     {
@@ -94,6 +107,18 @@ void MODEL::train(int epochs, double learning_rate)
             //std::cout << std::endl; // debug
         }
     }
+}
+
+
+void MODEL::train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, int epochs, double learning_rate)
+{
+    std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>> > data_label_pairs;
+    if (__data_label_pairs.find(0) == __data_label_pairs.end())
+    {
+        throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
+    }
+    data_label_pairs[0] = std::make_pair(data, label);
+    train(data_label_pairs, epochs, learning_rate);
 }
 
 #endif // MODEL_INCLUDE_GUARD
