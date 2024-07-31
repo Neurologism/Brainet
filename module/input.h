@@ -27,13 +27,18 @@ public:
      */
     void add_output(std::shared_ptr<VARIABLE> output) override;
     /**
-     * @brief used to get the variable used to load the input data.
+     * @brief throw an error if this function is called because the input variable cannot have an input.
      */
     std::shared_ptr<VARIABLE> input(int index) override;
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
     std::shared_ptr<VARIABLE> output(int index) override;
+    /**
+     * @brief used to get the variable used to load the data.
+     */
+    std::shared_ptr<VARIABLE> data();
+    
 };
 
 INPUT::INPUT(int units)
@@ -61,11 +66,18 @@ void INPUT::add_output(std::shared_ptr<VARIABLE> output)
 
 std::shared_ptr<VARIABLE> INPUT::input(int index)
 {
-    return _input_variable;
+    throw std::runtime_error("Input variable cannot have an input");
+    return nullptr;
 }
 
 std::shared_ptr<VARIABLE> INPUT::output(int index)
 {
     return _input_variable;
 }
+
+std::shared_ptr<VARIABLE> INPUT::data()
+{
+    return _input_variable;
+}
+
 #endif // INPUT_INCLUDE_GUARD

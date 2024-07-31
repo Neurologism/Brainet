@@ -18,5 +18,6 @@
 #include <filesystem>
 #include <fstream>
 #include <bitset>
+#include <map>
 
 #endif // DEPENDENCIES_INCLUDE_GUARD
