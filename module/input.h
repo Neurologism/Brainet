@@ -16,12 +16,12 @@ public:
      * @param data a pointer to the input data
      * @param units the respective size of a single input
      */
-    INPUT(int units);
+    INPUT(std::uint32_t units);
     ~INPUT() = default;
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
      */
-    void add_input(std::shared_ptr<VARIABLE> input, int units) override;
+    void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units) override;
     /**
      * @brief used to mark variables as output for the module.
      */
@@ -29,11 +29,11 @@ public:
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
      */
-    std::shared_ptr<VARIABLE> input(int index) override;
+    std::shared_ptr<VARIABLE> input(std::uint32_t index) override;
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> output(int index) override;
+    std::shared_ptr<VARIABLE> output(std::uint32_t index) override;
     /**
      * @brief used to get the variable used to load the data.
      */
@@ -41,7 +41,7 @@ public:
     
 };
 
-INPUT::INPUT(int units)
+INPUT::INPUT(std::uint32_t units)
 {
     // error checks
     if(__graph == nullptr)
@@ -54,7 +54,7 @@ INPUT::INPUT(int units)
     __units = units; // set the number of neurons in the layer
 }
 
-void INPUT::add_input(std::shared_ptr<VARIABLE> input, int units)
+void INPUT::add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units)
 {
     throw std::runtime_error("Input variable cannot have an input");
 }
@@ -64,13 +64,13 @@ void INPUT::add_output(std::shared_ptr<VARIABLE> output)
     _input_variable->get_consumers().push_back(output);
 }
 
-std::shared_ptr<VARIABLE> INPUT::input(int index)
+std::shared_ptr<VARIABLE> INPUT::input(std::uint32_t index)
 {
     throw std::runtime_error("Input variable cannot have an input");
     return nullptr;
 }
 
-std::shared_ptr<VARIABLE> INPUT::output(int index)
+std::shared_ptr<VARIABLE> INPUT::output(std::uint32_t index)
 {
     return _input_variable;
 }

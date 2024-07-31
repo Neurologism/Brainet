@@ -15,8 +15,8 @@ class VARIABLE
     std::vector<std::shared_ptr<VARIABLE>> __children, __parents; // the children and parents of the variable in the computational graph
     std::shared_ptr<OPERATION> __op; // the operation that calculates the data
     std::shared_ptr<TENSOR<double>> __data; // the data of the variable
-    static int __counter; // keep track of the number of variables created
-    int __id; // the unique id of the variable
+    static std::uint32_t __counter; // keep track of the number of variables created
+    std::uint32_t __id; // the unique id of the variable
 
 public:
     /**
@@ -66,9 +66,9 @@ public:
     std::shared_ptr<TENSOR<double>> & get_data();
     /**
      * @brief This function returns the id of the variable.
-     * @return int The id of the variable.
+     * @return std::uint32_t The id of the variable.
      */
-    int get_id();
+    std::uint32_t get_id();
 };
 
 
@@ -101,11 +101,11 @@ std::shared_ptr<TENSOR<double>> & VARIABLE::get_data()
     return __data;
 }
 
-int VARIABLE::get_id()
+std::uint32_t VARIABLE::get_id()
 {
     return __id;
 }
 
-int VARIABLE::__counter = 0; // initialize the static counter
+std::uint32_t VARIABLE::__counter = 0; // initialize the static counter
 
 #endif // VARIABLE_INCLUDE_GUARD

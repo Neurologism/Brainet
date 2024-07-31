@@ -14,13 +14,13 @@ class MODULE
 protected:
     static std::shared_ptr<GRAPH> __graph; // shared by all clusters , points to the graph into which the module should add its variables
     static std::vector<std::shared_ptr<VARIABLE>> __learnable_parameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
-    int __units = -1; // stores the input size of the module (could be moved to respective derived classes)
+    std::uint32_t __units = -1; // stores the input size of the module (could be moved to respective derived classes)
 public:
     virtual ~MODULE() = default;
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as input for the module. 
      */
-    virtual void add_input(std::shared_ptr<VARIABLE> input, int units){};
+    virtual void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units){};
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as output for the module.
      */
@@ -28,11 +28,11 @@ public:
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to get the input variables of the module specified by the index.
      */
-    virtual std::shared_ptr<VARIABLE> input(int index = 0){return nullptr;}
+    virtual std::shared_ptr<VARIABLE> input(std::uint32_t index = 0){return nullptr;}
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to get the output variables of the module specified by the index.
      */
-    virtual std::shared_ptr<VARIABLE> output(int index = 0){return nullptr;}
+    virtual std::shared_ptr<VARIABLE> output(std::uint32_t index = 0){return nullptr;}
     /**
      * @brief wrapper class used to set the graph for all module objects manually. Manly intended for use with multiple graphs.
      */
@@ -40,7 +40,7 @@ public:
     /**
      * @brief used to get the private variable __units, could be moved to the respective derived classes.
      */
-    int getUnits()
+    std::uint32_t getUnits()
     {
         if(__units == -1)throw std::runtime_error("units not set");
         return __units;

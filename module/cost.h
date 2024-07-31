@@ -26,7 +26,7 @@ public:
     /**
      * @brief used to mark variables as input for the module.
      */
-    void add_input(std::shared_ptr<VARIABLE> input, int units) override
+    void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units) override
     {
         _output_variable->get_inputs().push_back(input);
     }
@@ -40,14 +40,14 @@ public:
     /**
      * @brief used to get the input variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> input(int index) override
+    std::shared_ptr<VARIABLE> input(std::uint32_t index) override
     {
         return _output_variable;
     }
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> output(int index) override
+    std::shared_ptr<VARIABLE> output(std::uint32_t index) override
     {
         return _output_variable;
     }
