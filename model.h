@@ -64,7 +64,14 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
     }
 
     __to_be_differentiated.push_back(clusters.back()->output());
-    
+    if (__data_label_pairs.find(ID) != __data_label_pairs.end())
+    {
+        throw std::runtime_error("ID already exists");
+    }
+    // add error checks in the future
+    std::shared_ptr<INPUT> input = std::dynamic_pointer_cast<INPUT>(clusters.front());
+    std::shared_ptr<COST> output = std::dynamic_pointer_cast<COST>(clusters.back());
+    __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
 
 void MODEL::train(int epochs, double learning_rate)
