@@ -25,7 +25,7 @@ public:
     /**
      * @brief Construct an empty new TENSOR object.
      */
-    TENSOR(){};
+    TENSOR() = default;
     /**
      * @brief Construct a new TENSOR object.
      * @param dimensionality The dimensionality of the tensor.
