@@ -63,6 +63,6 @@ std::vector<std::shared_ptr<VARIABLE>> MODULE::__learnable_parameters = {};
 #include "dense.h"
 #include "cost.h"
 
-using CLUSTER_VARIANT = std::variant<INPUT, DENSE, COST>;
+using MODULE_VARIANT = std::variant<INPUT, DENSE, COST>;
 
-#endif // CLUSTER_INCLUDE_GUARD
+#endif // MODULE_INCLUDE_GUARD

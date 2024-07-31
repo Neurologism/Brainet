@@ -30,9 +30,9 @@ public:
     /**
      * @brief This function creates a sequential neural network.
      * @param layers The layers of the neural network.
-     * @param add_backprop If true the output of the last layer is added to the differentiation vector.
+     * @param ID The ID of the data/label pair.
      */
-    void sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop = true);
+    void sequential(std::vector<MODULE_VARIANT> layers, int ID = 0);
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
      * @param epochs The number of epochs.
@@ -46,13 +46,13 @@ void MODEL::load()
     MODULE::set_graph(__graph);
 }
 
-void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
+void MODEL::sequential(std::vector<MODULE_VARIANT> layers, int ID)
 {
     std::vector<std::shared_ptr<MODULE>> clusters;
-    for (CLUSTER_VARIANT& layer : layers) {
+    for (MODULE_VARIANT& layer : layers) {
         std::shared_ptr<MODULE> cluster_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return std::shared_ptr<MODULE>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CLUSTER_VARIANT{layer});
+        return std::shared_ptr<MODULE>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, MODULE_VARIANT{layer});
         clusters.push_back(cluster_ptr);
     }
     
@@ -62,7 +62,7 @@ void MODEL::sequential(std::vector<CLUSTER_VARIANT> layers, bool add_backprop)
         clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->getUnits());
     }
 
-    if(add_backprop)__to_be_differentiated.push_back(clusters.back()->output());
+    __to_be_differentiated.push_back(clusters.back()->output());
 }
 
 void MODEL::train(int epochs, double learning_rate)

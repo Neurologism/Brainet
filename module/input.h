@@ -16,7 +16,7 @@ public:
      * @param data a pointer to the input data
      * @param units the respective size of a single input
      */
-    INPUT(std::shared_ptr<TENSOR<double>> & data, int units);
+    INPUT(int units);
     ~INPUT() = default;
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
@@ -27,7 +27,7 @@ public:
      */
     void add_output(std::shared_ptr<VARIABLE> output) override;
     /**
-     * @brief throw an error if this function is called because the input variable cannot have an input.
+     * @brief used to get the variable used to load the input data.
      */
     std::shared_ptr<VARIABLE> input(int index) override;
     /**
@@ -36,7 +36,7 @@ public:
     std::shared_ptr<VARIABLE> output(int index) override;
 };
 
-INPUT::INPUT(std::shared_ptr<TENSOR<double>> & data, int units)
+INPUT::INPUT(int units)
 {
     // error checks
     if(__graph == nullptr)
@@ -45,7 +45,7 @@ INPUT::INPUT(std::shared_ptr<TENSOR<double>> & data, int units)
     }
     
     // create the input variable
-    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {}, data)));
+    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
     __units = units; // set the number of neurons in the layer
 }
 
@@ -61,8 +61,7 @@ void INPUT::add_output(std::shared_ptr<VARIABLE> output)
 
 std::shared_ptr<VARIABLE> INPUT::input(int index)
 {
-    throw std::runtime_error("Input variable cannot have an input");
-    return nullptr;
+    return _input_variable;
 }
 
 std::shared_ptr<VARIABLE> INPUT::output(int index)
