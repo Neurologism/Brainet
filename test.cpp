@@ -5,14 +5,14 @@ using namespace std;
 // implementin general tests
 std::int32_t main()
 {
-    std::shared_ptr<TENSOR<double>> input = std::make_shared<TENSOR<double>>(read_idx("datasets/train-images.idx3-ubyte"));
-    std::shared_ptr<TENSOR<double>> target = std::make_shared<TENSOR<double>>(read_idx("datasets/train-labels.idx1-ubyte"));
+    typedef std::vector<std::vector<double>> data_type;
+    data_type input = read_idx("datasets/train-images.idx3-ubyte");
+    data_type target = read_idx("datasets/train-labels.idx1-ubyte");
 
-    input->reshape({input->shape()[0],input->shape()[1]*input->shape()[2]}); // flatten the input
 
     MODEL model;
-    model.sequential({INPUT(input->shape()[1]), DENSE(ReLU(),2), DENSE(Sigmoid(),1), COST(MSE())});   
+    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),2), DENSE(Sigmoid(),1), COST(MSE())});   
 
-    model.train(input,target,100,2);
+    model.train(input,target,10,100,2);
     return 0; 
 }

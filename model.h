@@ -98,11 +98,6 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
 
 
 
-
-
-
-
-
         __graph->forward();
         std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
         std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
