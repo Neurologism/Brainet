@@ -134,7 +134,7 @@ TENSOR<T>::TENSOR(std::vector<std::uint32_t> dimensionality, double value, bool 
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(-1, 1);
+        std::uniform_real_distribution<> dis(-0.001, 0.001);
         for(std::uint32_t i = 0; i < __data.size(); i++)
         {
             __data[i] = dis(gen);
