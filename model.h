@@ -94,7 +94,39 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
     {
-        
+        std::vector<std::vector<double>> batch_data;
+        std::vector<std::vector<double>> batch_label;
+
+        data_type data = data_label_pairs.at(0).first;
+        label_type label = data_label_pairs.at(0).second;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, data.size() - 1);
+        for (std::uint32_t i = 0; i < batch_size; i++)
+        {
+            std::uint32_t random_index = dis(gen);
+            batch_data.push_back(data[random_index]);
+            batch_label.push_back(label[random_index]);
+            // Use batch_data and batch_label for training
+        }
+        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) batch_data.size(), (std::uint32_t) batch_data[0].size()}, 0.0, false));
+        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) batch_label.size(),(std::uint32_t) batch_label[0].size()}, 0.0, false));
+
+        for (std::uint32_t i = 0; i < batch_data.size(); i++)
+        {
+            for (std::uint32_t j = 0; j < batch_data[i].size(); j++)
+            {
+                data_tensor->data()[i * batch_data[i].size() + j] = batch_data[i][j];
+            }
+            for (std::uint32_t j = 0; j < batch_label[i].size(); j++)
+            {
+                label_tensor->data()[i * batch_label[i].size() + j] = batch_label[i][j];
+            }
+        }
+
+        __data_label_pairs[0].first->get_data() = data_tensor;
+        __data_label_pairs[0].second->get_data() = label_tensor;
+
 
 
 
