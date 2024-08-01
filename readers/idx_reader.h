@@ -4,9 +4,10 @@
 #include "../dependencies.h"
 #include "../tensor.h"
 
-TENSOR<double> read_idx(std::string path)
+std::vector<std::vector<double>> read_idx(const std::string path)
 {
-   std::ifstream file(std::filesystem::path(path), std::ios::binary);
+    typedef std::vector<std::vector<double>> data_type;
+    std::ifstream file(std::filesystem::path(path), std::ios::binary);
 
     if (!file.is_open())
         throw std::invalid_argument("IDX_READER::read_idx: Could not open file");
@@ -14,7 +15,7 @@ TENSOR<double> read_idx(std::string path)
     char magic[4];
     file.read(magic, 4);
 
-    TENSOR<double> tensor;
+    data_type tensor;
 
     if (magic[2] == 0x08)
     {
@@ -26,12 +27,17 @@ TENSOR<double> read_idx(std::string path)
             file.read((char *)dimension, 4);
             shape[i] = (std::uint32_t)dimension[0] << 24 | (std::uint32_t)dimension[1] << 16 | (std::uint32_t)dimension[2] << 8 | (std::uint32_t)dimension[3];
         }
-        tensor = TENSOR<double>(shape);
+        tensor.resize(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<std::uint32_t>())));
         for (std::uint32_t i = 0; i < tensor.size(); i++)
         {
             unsigned char pixel;
             file.read((char *)&pixel, 1);
-            tensor.data()[i] = (double)pixel;
+            for (std::uint32_t j = 0; j < tensor[i].size(); j++)
+            {
+                unsigned char pixel;
+                file.read((char *)&pixel, 1);
+                tensor[i][j] = (double)pixel;
+            }
         }
     }
     else

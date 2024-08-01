@@ -12,9 +12,15 @@
  */
 class MODEL
 {
+    typedef std::vector<std::vector<double>> data_type;
+    typedef std::vector<std::vector<double>> label_type;
+
+
     std::shared_ptr<GRAPH> __graph = std::make_shared<GRAPH>(); // the computational graph
     std::vector<std::shared_ptr<VARIABLE>> __to_be_differentiated; // the variables that are to be differentiated
     std::map<std::uint32_t, std::pair<std::shared_ptr<VARIABLE>, std::shared_ptr<VARIABLE>>> __data_label_pairs; // the data/label pairs
+
+
 public:
     /**
      * @brief Construct a new MODEL object.
@@ -40,7 +46,7 @@ public:
      * @param epochs The number of epochs.
      * @param learning_rate The learning rate.
      */
-    void train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, std::uint32_t epochs, std::uint32_t batch_size, double learning_rate);
+    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
     /**
      * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
      * @param data The data.
@@ -48,7 +54,7 @@ public:
      * @param epochs The number of epochs.
      * @param learning_rate The learning rate.
      */
-    void train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, std::uint32_t epochs, std::uint32_t batch_size, double learning_rate);
+    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
 };
 
 void MODEL::load()
@@ -83,15 +89,47 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
 
-void MODEL::train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>>> & data_label_pairs, std::uint32_t epochs, std::uint32_t batch_size, double learning_rate)
+void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
 {
-
-
-
-
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
     {
+        std::vector<std::vector<double>> batch_data;
+        std::vector<std::vector<double>> batch_label;
+
+        data_type data = data_label_pairs.at(0).first;
+        label_type label = data_label_pairs.at(0).second;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, data.size() - 1);
+        for (std::uint32_t i = 0; i < batch_size; i++)
+        {
+            std::uint32_t random_index = dis(gen);
+            batch_data.push_back(data[random_index]);
+            batch_label.push_back(label[random_index]);
+            // Use batch_data and batch_label for training
+        }
+        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) batch_data.size(), (std::uint32_t) batch_data[0].size()}, 0.0, false));
+        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) batch_label.size(),(std::uint32_t) batch_label[0].size()}, 0.0, false));
+
+        for (std::uint32_t i = 0; i < batch_data.size(); i++)
+        {
+            for (std::uint32_t j = 0; j < batch_data[i].size(); j++)
+            {
+                data_tensor->data()[i * batch_data[i].size() + j] = batch_data[i][j];
+            }
+            for (std::uint32_t j = 0; j < batch_label[i].size(); j++)
+            {
+                label_tensor->data()[i * batch_label[i].size() + j] = batch_label[i][j];
+            }
+        }
+
+        __data_label_pairs[0].first->get_data() = data_tensor;
+        __data_label_pairs[0].second->get_data() = label_tensor;
+
+
+
+
         __graph->forward();
         std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
         std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
@@ -110,9 +148,9 @@ void MODEL::train(std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<doubl
 }
 
 
-void MODEL::train(std::shared_ptr<TENSOR<double>> data, std::shared_ptr<TENSOR<double>> label, std::uint32_t epochs, std::uint32_t batch_size, double learning_rate)
+void MODEL::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
 {
-    std::map<std::uint32_t, std::pair<std::shared_ptr<TENSOR<double>>, std::shared_ptr<TENSOR<double>>> > data_label_pairs;
+    std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
     {
         throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
