@@ -1,15 +1,18 @@
 #ifndef SOFTMAX_INCLUDE_GUARD
 #define SOFTMAX_INCLUDE_GUARD
 
-#include "activation_function.h"
+#include "../operation.h"
 
 /**
  * @brief Softmax function class, representing the softmax function f(x) = exp(x) / sum(exp(x)).
 */
-class Softmax : public ACTIVATION_FUNCTION
+class Softmax : public OPERATION
 {   
-    double activation_function(double input)override;
-    double activation_function_derivative(double input)override;
+    double activation_function(double input);
+    double activation_function_derivative(double input);
+
+    void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
+    std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 
 public:
     Softmax() = default;
@@ -21,10 +24,55 @@ double Softmax::activation_function(double input)
     return exp(input);
 }
 
-double Softmax::activation_function_derivative(double input)
+
+
+void Softmax::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
 {
-    return activation_function(input) * (1 - activation_function(input));
+    // always check for right number of inputs
+    if (inputs.size() != 1)
+    {
+        throw std::invalid_argument("Softmax::f: Invalid number of input variables.");
+    }
+
+    std::shared_ptr<TENSOR<double>> _data = std::make_shared<TENSOR<double>>(inputs.front()->get_data()->shape()); // create a new tensor to store the result
+
+    for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape()[0]; i++)
+    {
+        double _sum = 0;
+        double _max = inputs.front()->get_data()->at({i, 0}); // normalize the input to avoid overflow / underflow
+        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape()[1]; j++)
+        {
+            _sum += activation_function(inputs.front()->get_data()->at({i, j}));
+            if (inputs.front()->get_data()->at({i, j}) > _max)
+            {
+                _max = inputs.front()->get_data()->at({i, j});
+            }
+        }
+
+
+        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape()[1]; j++)
+        {
+
+            _data->set({i, j}, activation_function(inputs.front()->get_data()->at({i, j}) - _max) / _sum);
+        }
+    }
+    this->get_variable()->get_data() = _data; // store the result in the variable
 }
+
+std::shared_ptr<TENSOR<double>> Softmax::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)
+{
+    // always check for right number of inputs
+    if (inputs.size() != 1)
+    {
+        throw std::invalid_argument("Softmax::bprop: Invalid number of input variables.");
+    }
+
+    std::shared_ptr<TENSOR<double>> _data = std::make_shared<TENSOR<double>>(inputs.front()->get_data()->shape()); // create a new tensor to store the result
+
+    
+
+
+
 
 
 #endif // SOFTMAX_INCLUDE_GUARD
