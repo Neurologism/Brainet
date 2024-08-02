@@ -12,13 +12,6 @@ class MATMUL : public OPERATION
 {   
     static const std::uint32_t threads = 200;
     /**
-     * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
-     * @param left_matrix the left matrix
-     * @param right_matrix the right matrix
-     * @return the result of the matrix multiplication
-     */
-    std::shared_ptr<TENSOR<double>> matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix);
-    /**
      * @brief  matrix vector multiplication function
      * @param left_matrix the left matrix
      * @param right_matrix the right matrix
@@ -27,6 +20,13 @@ class MATMUL : public OPERATION
      */
     void blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, std::uint32_t k);
 public:
+    /**
+     * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
+     * @param left_matrix the left matrix
+     * @param right_matrix the right matrix
+     * @return the result of the matrix multiplication
+     */
+    std::shared_ptr<TENSOR<double>> matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix);
     MATMUL(){};
     ~MATMUL(){};
     /**
