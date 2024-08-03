@@ -13,8 +13,8 @@ std::int32_t main()
 
 
     MODEL model;
-    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),100), DENSE(ReLU(),100), DENSE(ReLU(),100), DENSE(Linear(),1), COST(MSE())});   
+    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),10), DENSE(ReLU(),10), DENSE(Linear(),1), COST(MSE())});   
 
-    model.train(input,target,100,100,0.001);
+    model.train(input,target,50,200,0.0001);
     return 0; 
 }
