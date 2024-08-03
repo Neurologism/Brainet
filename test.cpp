@@ -13,8 +13,10 @@ std::int32_t main()
 
 
     MODEL model;
-    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),100), DENSE(ReLU(),100), DENSE(Sigmoid(),10), COST(MSE(),10)});   
+    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),100), DENSE(ReLU(),100), DENSE(ReLU(),100), DENSE(Sigmoid(),10), COST(MSE(),10)});   
 
-    model.train(input,target,50,100,0.01);
+    model.train(input,target,25,100,0.01);
+
+    model.test(input,target);
     return 0; 
 }
