@@ -4,6 +4,7 @@
 #include "../dependencies.h"
 #include "module.h"
 #include "../operation/cost_function/cost_function.h"
+#include "../operation/processing/one_hot.h"
 
 /**
  * @brief the cost module is intended for calculating the cost of various models. Currently only cost functions dependy on the output of the network and the y truth are supported.
@@ -13,14 +14,17 @@ class COST : public MODULE
 {
     std::shared_ptr<VARIABLE> _target_variable; // storing y truth
     std::shared_ptr<VARIABLE> _output_variable; // actual cost funtion 
+    std::shared_ptr<VARIABLE> _one_hot_variable; // one hot encoding of the y truth
 
 public:
     /**
      * @brief add a cost function to the graph
      * @param cost_function the operation representing the cost function.
-     * @param data a pointer to the y truth of the model (the target variable) If the y truth should change please change the satelite data.
+     * @param one_hot_ecoding_size the size of the one hot encoding. Default is 0. One hot encoding assumes that the y truth is initially a single value giving the index of the on value.
+     * @param one_hot_ecoding_on_value the value to set the one hot encoding to. Default is 1.
+     * @param one_hot_ecoding_off_value the value to set the rest of the tensor to. Default is 0.
      */
-    COST(COST_FUNCTION_VARIANT cost_function);
+    COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_ecoding_size = 0, std::uint32_t one_hot_ecoding_on_value = 1, std::uint32_t one_hot_ecoding_off_value = 0);
     ~COST() = default;
 
     /**
@@ -60,7 +64,7 @@ public:
     }
 };
 
-COST::COST(COST_FUNCTION_VARIANT cost_function)
+COST::COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_ecoding_size, std::uint32_t one_hot_ecoding_on_value, std::uint32_t one_hot_ecoding_off_value)
 {
     // error checks
     if(__graph == nullptr)
@@ -72,15 +76,32 @@ COST::COST(COST_FUNCTION_VARIANT cost_function)
     // add variables to the graph
     _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
 
-    _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
-        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));
-    
-    // connections within the module
-    _target_variable->get_consumers().push_back(_output_variable);
+    if (one_hot_ecoding_size == 0) // check if 1 hot encoding requested
+    {
+        _one_hot_variable = nullptr;
+        
+        // add variables to the graph
+        _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+
+        _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
+            return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));
+        
+        // connections within the module
+        _target_variable->get_consumers().push_back(_output_variable);
+    }
+    else
+    {
+        // variable performing one hot encoding; no backward pass is supported
+        _one_hot_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<OneHot>(OneHot(10, 1, 0)), {_target_variable}, {}))); 
+
+        // conversion of the COST_FUNCTION_VARIANT to an operation pointer
+        _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
+            return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_one_hot_variable}, {})));
+        
+        // connections within the module
+        _target_variable->get_consumers().push_back(_one_hot_variable);
+        _one_hot_variable->get_consumers().push_back(_output_variable);
+    }
 }
-
-
-
-    
 
 #endif // COST_INCLUDE_GUARD
