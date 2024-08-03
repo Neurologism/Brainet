@@ -4,7 +4,7 @@
 #include"../operation.h"
 
 /**
- * @brief Base class for operation functions. Derive from this class to create an activation function.
+ * @brief Base class for operation functions. Template class to create an activation function that executes elementwise.
  */
 class ACTIVATION_FUNCTION : public OPERATION
 {
@@ -72,8 +72,9 @@ std::shared_ptr<TENSOR<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shar
 #include "linear.h"
 #include "heavyside_step.h"
 #include "sigmoid.h"
+#include "softmax.h"
 
-using ACTIVATION_FUNCTION_VARIANT = std::variant<ReLU, HyperbolicTangent, Linear, HeavysideStep, Sigmoid>; // this can be used from the user side and should move to a different location at some point
+using ACTIVATION_FUNCTION_VARIANT = std::variant<ReLU, HyperbolicTangent, Linear, HeavysideStep, Sigmoid, Softmax>; // this can be used from the user side and should move to a different location at some point
 
 
 #endif // ACTIVATION_FUNCTION_INCLUDE_GUARD
