@@ -19,7 +19,7 @@ class MATMUL : public OPERATION
      * @param k the index of the coloum in the right matrix
      */
     void blockmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix, std::shared_ptr<TENSOR<double>> & result, std::uint32_t k);
-public:
+
     /**
      * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
      * @param left_matrix the left matrix
@@ -27,6 +27,7 @@ public:
      * @return the result of the matrix multiplication
      */
     std::shared_ptr<TENSOR<double>> matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix);
+public:    
     MATMUL(){};
     ~MATMUL(){};
     /**
