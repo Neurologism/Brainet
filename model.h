@@ -44,6 +44,7 @@ public:
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
      * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
      * @param epochs The number of epochs.
+     * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
     void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
@@ -52,6 +53,7 @@ public:
      * @param data The data.
      * @param label The label.
      * @param epochs The number of epochs.
+     * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
     void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
