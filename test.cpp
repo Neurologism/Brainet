@@ -4,7 +4,7 @@
 
 using namespace std;
 
-// implementin general tests
+// implementing general tests
 std::int32_t main()
 {
     typedef std::vector<std::vector<double>> data_type;
