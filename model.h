@@ -57,6 +57,18 @@ public:
      * @param learning_rate The learning rate.
      */
     void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
+
+    /**
+     * @brief This function gets the test error of the model.
+     * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
+     */
+    void test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs);
+    /**
+     * @brief Shortcut for testing a model with only one data/label pair. Assumes the ID is 0.
+     * @param data The data.
+     * @param label The label.
+     */
+    void test(data_type const data, label_type const label);
 };
 
 void MODEL::load()
@@ -159,6 +171,47 @@ void MODEL::train(data_type const data, label_type const label, std::uint32_t co
     }
     data_label_pairs[0] = std::make_pair(data, label);
     train(data_label_pairs, epochs, batch_size, learning_rate);
+}
+
+
+void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs)
+{
+    for (auto const & data_label_pair : data_label_pairs)
+    {
+        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) data_label_pair.second.first.size(), (std::uint32_t) data_label_pair.second.first[0].size()}, 0.0, false));
+        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) data_label_pair.second.second.size(),(std::uint32_t) data_label_pair.second.second[0].size()}, 0.0, false));
+
+        for (std::uint32_t i = 0; i < data_label_pair.second.first.size(); i++)
+        {
+            for (std::uint32_t j = 0; j < data_label_pair.second.first[i].size(); j++)
+            {
+                data_tensor->data()[i * data_label_pair.second.first[i].size() + j] = data_label_pair.second.first[i][j];
+            }
+            for (std::uint32_t j = 0; j < data_label_pair.second.second[i].size(); j++)
+            {
+                label_tensor->data()[i * data_label_pair.second.second[i].size() + j] = data_label_pair.second.second[i][j];
+            }
+        }
+
+        __data_label_pairs[data_label_pair.first].first->get_data() = data_tensor;
+        __data_label_pairs[data_label_pair.first].second->get_data() = label_tensor;
+
+        __graph->forward();
+        std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
+        std::cout << "Test Loss: " << loss->data()[0] << std::endl; // print loss
+    }
+}
+
+
+void MODEL::test(data_type const data, label_type const label)
+{
+    std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
+    if (__data_label_pairs.find(0) == __data_label_pairs.end())
+    {
+        throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
+    }
+    data_label_pairs[0] = std::make_pair(data, label);
+    test(data_label_pairs);
 }
 
 #endif // MODEL_INCLUDE_GUARD
