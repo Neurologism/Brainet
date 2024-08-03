@@ -61,14 +61,16 @@ public:
     /**
      * @brief This function gets the test error of the model.
      * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
+     * @param test_size takes the first test_size elements of the data/label pairs, if test_size = 0, it takes all elements
      */
-    void test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs);
+    void test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const test_size = 0);
     /**
      * @brief Shortcut for testing a model with only one data/label pair. Assumes the ID is 0.
      * @param data The data.
      * @param label The label.
+     * @param test_size takes the first test_size elements of the data/label pairs, if test_size = 0, it takes all elements
      */
-    void test(data_type const data, label_type const label);
+    void test(data_type const data, label_type const label, std::uint32_t const test_size = 0);
 };
 
 void MODEL::load()
@@ -174,14 +176,14 @@ void MODEL::train(data_type const data, label_type const label, std::uint32_t co
 }
 
 
-void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs)
+void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const test_size)
 {
     for (auto const & data_label_pair : data_label_pairs)
     {
-        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) data_label_pair.second.first.size(), (std::uint32_t) data_label_pair.second.first[0].size()}, 0.0, false));
-        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) data_label_pair.second.second.size(),(std::uint32_t) data_label_pair.second.second[0].size()}, 0.0, false));
+        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({std::min((std::uint32_t)data_label_pair.second.first.size(), test_size), (std::uint32_t) data_label_pair.second.first[0].size()}, 0.0, false));
+        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({std::min((std::uint32_t)data_label_pair.second.second.size(), test_size), (std::uint32_t) data_label_pair.second.second[0].size()}, 0.0, false));
 
-        for (std::uint32_t i = 0; i < data_label_pair.second.first.size(); i++)
+        for (std::uint32_t i = 0; i < std::min((std::uint32_t)data_label_pair.second.first.size(), test_size); i++)
         {
             for (std::uint32_t j = 0; j < data_label_pair.second.first[i].size(); j++)
             {
@@ -203,7 +205,7 @@ void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const
 }
 
 
-void MODEL::test(data_type const data, label_type const label)
+void MODEL::test(data_type const data, label_type const label, std::uint32_t const test_size)
 {
     std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
@@ -211,7 +213,7 @@ void MODEL::test(data_type const data, label_type const label)
         throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
     }
     data_label_pairs[0] = std::make_pair(data, label);
-    test(data_label_pairs);
+    test(data_label_pairs, test_size);
 }
 
 #endif // MODEL_INCLUDE_GUARD
