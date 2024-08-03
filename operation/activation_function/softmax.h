@@ -76,24 +76,19 @@ std::shared_ptr<TENSOR<double>> Softmax::bprop(std::vector<std::shared_ptr<VARIA
     for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape()[0]; i++)
     {
         double _sum = 0;
-        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape()[1]; j++)
+        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape()[1]; j++) // precalculate the sum of the gradient
         {
             _sum += _data->at({i, j}) * gradient->at({i, j});
         }
 
-        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape()[1]; j++)
+        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape()[1]; j++)  
         {
             _sum -= _data->at({i, j}) * gradient->at({i, j});
             _grad->set({i, j}, _data->at({i,j}) * (1-_data->at({i,j})) * _grad->at({i,j}) - _sum * _data->at({i,j}));
             _sum += _data->at({i, j}) * gradient->at({i, j});
         }
-            
-    
+    }
+
+    return _grad; // return the gradient
 }
-    
-
-
-
-
-
 #endif // SOFTMAX_INCLUDE_GUARD
