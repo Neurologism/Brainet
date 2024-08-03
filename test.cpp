@@ -4,7 +4,7 @@
 
 using namespace std;
 
-// implementin general tests
+// implementing general tests
 std::int32_t main()
 {
     typedef std::vector<std::vector<double>> data_type;
@@ -13,8 +13,8 @@ std::int32_t main()
 
 
     MODEL model;
-    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),10), DENSE(ReLU(),10), DENSE(Linear(),1), COST(MSE())});   
+    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),100), DENSE(ReLU(),100), DENSE(Sigmoid(),10), COST(MSE(),10)});   
 
-    model.train(input,target,50,200,0.0001);
+    model.train(input,target,50,100,0.01);
     return 0; 
 }
