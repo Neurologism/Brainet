@@ -19,8 +19,11 @@ std::int32_t main()
 {
     
     typedef std::vector<std::vector<double>> data_type;
-    data_type input = read_idx("datasets/train-images.idx3-ubyte");
-    data_type target = read_idx("datasets/train-labels.idx1-ubyte");
+    data_type input = read_idx("datasets/mnist/train-images.idx3-ubyte");
+    data_type target = read_idx("datasets/mnist/train-labels.idx1-ubyte");
+
+    data_type test_input = read_idx("datasets/mnist/t10k-images-idx3-ubyte");
+    data_type test_target = read_idx("datasets/mnist/t10k-labels-idx1-ubyte");
 
     // suported modules to be used in sequential can be found in the module folder or just look at the model variant
 
@@ -33,6 +36,6 @@ std::int32_t main()
 
     model.train(input,target,25,100,0.01);
 
-    model.test(input,target, 1000);
+    model.test(test_input,test_target);
     return 0; 
 }
