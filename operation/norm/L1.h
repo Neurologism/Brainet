@@ -9,8 +9,12 @@
 class L1_NORM : public OPERATION
 {
     double _lambda;
-
+    static double _default_lambda;
 public:
+    /**
+     * @brief add a L1 norm penalty to the graph, using a default lambda value
+     */
+    L1_NORM();
     /**
     * @brief add a L1 norm penalty to the graph
     * @param lambda the lambda value to be used
@@ -29,6 +33,11 @@ public:
     */
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 };
+
+L1_NORM::L1_NORM()
+{
+    _lambda = _default_lambda;
+}
 
 L1_NORM::L1_NORM(double lambda)
 {

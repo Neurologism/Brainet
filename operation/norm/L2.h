@@ -9,9 +9,12 @@
 class L2_NORM : public OPERATION
 {
     double _lambda;
-
+    static double _default_lambda;
 public:
-
+    /**
+     * @brief add a L2 norm penalty to the graph, using a default lambda value
+     */
+    L2_NORM();
     /**
      * @brief add a L2 norm penalty to the graph
      * @param lambda the lambda value to be used
@@ -30,6 +33,11 @@ public:
     */
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 };
+
+L2_NORM::L2_NORM()
+{
+    _lambda = _default_lambda;
+}
 
 L2_NORM::L2_NORM(double lambda)
 {
