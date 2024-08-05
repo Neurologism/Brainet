@@ -5,6 +5,7 @@
 #include "../operation/linear_algebra/matmul.h"
 #include "../operation/processing/padding.h"
 #include "../operation/activation_function/activation_function.h"
+#include "../operation/norm/norm.h"
 
 /**
  * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
@@ -18,6 +19,11 @@ class DENSE : public MODULE
     std::shared_ptr<VARIABLE> _padding_variable; // used to pad the input with 1s for the bias
     std::shared_ptr<VARIABLE> _norm_variable; // used to compute a norm of the weights
 
+    static std::shared_ptr<OPERATION> _default_norm; // default norm to use
+    static double _default_lambda; // default lambda value to use
+
+    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda);
+
 public:
     /**
      * @brief add a dense layer to the graph
@@ -25,6 +31,7 @@ public:
      * @param units the number of neurons in the layer.
      */
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units);
+    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm, double lambda);
     ~DENSE() = default;
     /**
      * @brief used to mark variables as input for the module.
@@ -57,7 +64,7 @@ public:
     }
 };
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda)
 {
     // error checks
     if(__graph == nullptr)
@@ -87,6 +94,11 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t unit
     _padding_variable->get_consumers().push_back(_matmul_variable);
     _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
     _matmul_variable->get_consumers().push_back(_activation_variable);    
+}
+
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
+{
+    DENSE(activation_function, units, _default_norm, _default_lambda);
 }
 
 #endif // DENSE_INCLUDE_GUARD
