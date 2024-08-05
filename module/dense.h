@@ -16,6 +16,7 @@ class DENSE : public MODULE
     std::shared_ptr<VARIABLE> _matmul_variable; // multiplication of the input and the weights
     std::shared_ptr<VARIABLE> _activation_variable; // activation function applied
     std::shared_ptr<VARIABLE> _padding_variable; // used to pad the input with 1s for the bias
+    std::shared_ptr<VARIABLE> _norm_variable; // used to compute a norm of the weights
 
 public:
     /**
