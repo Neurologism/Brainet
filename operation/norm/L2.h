@@ -70,7 +70,7 @@ std::shared_ptr<TENSOR<double>> L2_NORM::bprop(std::vector<std::shared_ptr<VARIA
 
     for (std::uint32_t i = 0; i < input->size(); i++)
     {
-        result->data()[i] = _lambda * input->data()[i] * gradient->data()[0];
+        result->data()[i] = -_lambda * input->data()[i] * gradient->data()[0];
     }
 
     return result;
