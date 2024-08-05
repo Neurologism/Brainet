@@ -22,7 +22,7 @@ class DENSE : public MODULE
     static std::shared_ptr<OPERATION> _default_norm; // default norm to use
     static double _default_lambda; // default lambda value to use
 
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda);
+    void dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda);
 
 public:
     /**
@@ -31,6 +31,13 @@ public:
      * @param units the number of neurons in the layer.
      */
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units);
+    /**
+     * @brief add a dense layer to the graph
+     * @param activation_function the operation representing the activation function.
+     * @param units the number of neurons in the layer.
+     * @param norm the norm to use for regularization.
+     * @param lambda the lambda value to use for regularization.
+     */
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm, double lambda);
     ~DENSE() = default;
     /**
@@ -64,7 +71,7 @@ public:
     }
 };
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda)
+void DENSE::dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda)
 {
     // error checks
     if(__graph == nullptr)
@@ -90,15 +97,27 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t unit
 
     _activation_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(operation_ptr, {_matmul_variable}, {})));
 
+    // adding norm to activation function
+    _norm_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(norm, {_weight_matrix_variable}, {})));
+
     // conections within the module
     _padding_variable->get_consumers().push_back(_matmul_variable);
     _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
+    _weight_matrix_variable->get_consumers().push_back(_norm_variable);
     _matmul_variable->get_consumers().push_back(_activation_variable);    
 }
 
 DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
 {
-    DENSE(activation_function, units, _default_norm, _default_lambda);
+    dense(activation_function, units, _default_norm, _default_lambda);
+}
+
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm, double lambda)
+{
+    std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) {
+        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, NORM_VARIANT{norm}); // convert norm to operation
+    
+    dense(activation_function, units, operation_ptr, lambda);
 }
 
 #endif // DENSE_INCLUDE_GUARD
