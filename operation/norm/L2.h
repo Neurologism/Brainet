@@ -4,7 +4,7 @@
 #include "../operation/operation.h"
 
 /**
- * @brief Used to add a L2 norm penalty to the graph. This is used to prevent overfitting.
+ * @brief Used to add a L2 norm penalty to a weight matrix. This is used to prevent overfitting.
  */
 class L2_NORM : public OPERATION
 {
@@ -75,9 +75,5 @@ std::shared_ptr<TENSOR<double>> L2_NORM::bprop(std::vector<std::shared_ptr<VARIA
 
     return result;
 }
-
-
-
-
 
 #endif // L2_NORM_INCLUDE_GUARD
