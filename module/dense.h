@@ -19,10 +19,9 @@ class DENSE : public MODULE
     std::shared_ptr<VARIABLE> _padding_variable; // used to pad the input with 1s for the bias
     std::shared_ptr<VARIABLE> _norm_variable; // used to compute a norm of the weights
 
-    static std::shared_ptr<OPERATION> _default_norm; // default norm to use
-    static double _default_lambda; // default lambda value to use
+    static NORM_VARIANT _default_norm; // default norm to use
 
-    void dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda);
+    void dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm);
 
 public:
     /**
@@ -38,7 +37,7 @@ public:
      * @param norm the norm to use for regularization.
      * @param lambda the lambda value to use for regularization.
      */
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm, double lambda);
+    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm);
     ~DENSE() = default;
     /**
      * @brief used to mark variables as input for the module.
@@ -71,7 +70,7 @@ public:
     }
 };
 
-void DENSE::dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm, double lambda)
+void DENSE::dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, std::shared_ptr<OPERATION> norm)
 {
     // error checks
     if(__graph == nullptr)
@@ -109,15 +108,17 @@ void DENSE::dense(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t
 
 DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
 {
-    dense(activation_function, units, _default_norm, _default_lambda);
+    std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) {
+        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, NORM_VARIANT{_default_norm}); // convert norm to operation
+    dense(activation_function, units, operation_ptr);
 }
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm, double lambda)
+DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm)
 {
     std::shared_ptr<OPERATION> operation_ptr = std::visit([](auto&& arg) {
         return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, NORM_VARIANT{norm}); // convert norm to operation
     
-    dense(activation_function, units, operation_ptr, lambda);
+    dense(activation_function, units, operation_ptr);
 }
 
 #endif // DENSE_INCLUDE_GUARD
