@@ -35,9 +35,7 @@ public:
      * @param activation_function the operation representing the activation function.
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
-     * @param lambda the lambda value to use for regularization.
      */
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units);
     DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm);
     ~DENSE() = default;
     /**

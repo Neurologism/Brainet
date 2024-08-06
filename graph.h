@@ -64,6 +64,7 @@ public:
     std::uint32_t add_output(std::shared_ptr<VARIABLE> var)
     {
         __outputs.push_back(var);
+        return __outputs.size()-1;
     };
     /**
      * @brief This function returns the data of the output variable at the given index.
