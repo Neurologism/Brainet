@@ -50,6 +50,7 @@ public:
         {
             _norm_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(_norm, {_weight_matrix_variable}, {})));
             __graph->add_output(_norm_variable);    
+            _weight_matrix_variable->get_consumers().push_back(_norm_variable);
         }
     }
     /**
@@ -104,10 +105,10 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t unit
     // conections within the module
     _padding_variable->get_consumers().push_back(_matmul_variable);
     _weight_matrix_variable->get_consumers().push_back(_matmul_variable);
-    _weight_matrix_variable->get_consumers().push_back(_norm_variable);
+    
     _matmul_variable->get_consumers().push_back(_activation_variable);    
 
-    // norm
+    // init default norm
     if(_norm == nullptr && _default_norm != nullptr)
     {
         _norm = std::visit([](auto&& arg) {
