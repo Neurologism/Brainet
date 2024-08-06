@@ -18,7 +18,6 @@ public:
      * @param lambda the lambda value to be used
      */
     L2_NORM(double lambda) : NORM(lambda) {};
-    ~L2_NORM();
     /**
      * @brief compute the L2 norm of the input tensor
     */
