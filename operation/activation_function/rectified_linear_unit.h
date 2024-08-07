@@ -8,8 +8,6 @@
 */
 class ReLU : public ACTIVATION_FUNCTION
 {
-    std::string __dbg_name = "RELU";
-protected:
     double __gradient; // gradient of left part of the function
 
     double activation_function(double input)override;
@@ -25,6 +23,7 @@ public:
 ReLU::ReLU(double gradient)
 {
     __gradient = gradient; // gradient of (-inf, 0)
+    __dbg_name = "RELU";
 }
 
 double ReLU::activation_function(double input)

@@ -8,14 +8,14 @@
 */
 class Softmax : public OPERATION
 {   
-    std::string __dbg_name = "SOFTMAX";
+protected:
     double activation_function(double input);
 
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 
 public:
-    Softmax() = default;
+    Softmax() { __dbg_name = "SOFTMAX"; }
     ~Softmax() = default;
 };
 

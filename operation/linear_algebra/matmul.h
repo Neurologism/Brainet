@@ -10,7 +10,7 @@
 */
 class MATMUL : public OPERATION
 {   
-    std::string __dbg_name = "MATMUL";
+protected:
     static const std::uint32_t threads = 200;
     /**
      * @brief  matrix vector multiplication function
@@ -29,7 +29,7 @@ class MATMUL : public OPERATION
      */
     std::shared_ptr<TENSOR<double>> matmul(std::shared_ptr<TENSOR<double>> & left_matrix, std::shared_ptr<TENSOR<double>> & right_matrix);
 public:    
-    MATMUL(){};
+    MATMUL(){__dbg_name = "MATMUL";};
     ~MATMUL(){};
     /**
      * @brief wrapper function for matmul. Does error checking and handles inputs and outputs.
