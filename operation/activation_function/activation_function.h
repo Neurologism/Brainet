@@ -10,6 +10,10 @@ class ACTIVATION_FUNCTION : public OPERATION
 {
 public:
     /**
+     * @brief Construct a new ACTIVATION_FUNCTION object
+     */
+    ACTIVATION_FUNCTION() { __dbg_name = "ACTIVATION_FUNCTION"; }
+    /**
      * @brief Forward pass is similar for all activation functions. It applies the activation function to each element of the input tensor.
      */
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;

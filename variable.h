@@ -17,8 +17,10 @@ class VARIABLE
     std::shared_ptr<TENSOR<double>> __data; // the data of the variable
     static std::uint32_t __counter; // keep track of the number of variables created
     std::uint32_t __id; // the unique id of the variable
+    std::string __operation_name; // the name of the operation that calculates the data
 
 public:
+
     /**
      * @brief Construct a new VARIABLE object.
      * @param op The operation that calculates the data.
@@ -27,6 +29,7 @@ public:
      * @param data The initial data of the variable.
      */
     VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std::shared_ptr<VARIABLE>> & parents = {}, const std::vector<std::shared_ptr<VARIABLE>> & children = {}, const std::shared_ptr<TENSOR<double>> & data = nullptr);
+
     /**
      * @brief Copy constructor not allowed.
      */
@@ -34,6 +37,7 @@ public:
     {
         throw std::runtime_error("A variable should not be copied. Use a shared pointer instead.");
     }
+
     /**
      * @brief Copy assignment not allowed.
      */
@@ -44,26 +48,31 @@ public:
     VARIABLE(VARIABLE && var) = default;
     VARIABLE & operator=(VARIABLE && var) = default;
     ~VARIABLE() = default;
+
     /**
      * @brief This function returns the operation that calculates the data.
      * @return std::shared_ptr<OPERATION> The operation that calculates the data.
      */
     std::shared_ptr<OPERATION> get_operation();
+
     /**
      * @brief This function returns the children of the variable.
      * @return std::vector<std::shared_ptr<VARIABLE>> The children of the variable.
      */
     std::vector<std::shared_ptr<VARIABLE>> & get_consumers();
+
     /**
      * @brief This function returns the parents of the variable.
      * @return std::vector<std::shared_ptr<VARIABLE>> The parents of the variable.
      */
     std::vector<std::shared_ptr<VARIABLE>> & get_inputs();
+
     /**
      * @brief This function returns the data of the variable.
      * @return std::shared_ptr<TENSOR<double>> The data of the variable.
      */
     std::shared_ptr<TENSOR<double>> & get_data();
+
     /**
      * @brief This function returns the id of the variable.
      * @return std::uint32_t The id of the variable.
@@ -79,6 +88,7 @@ VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std:
     __parents = parents;
     __children = children;
     __data = data;
+    __operation_name = op->get_name();
 };
 
 std::shared_ptr<OPERATION> VARIABLE::get_operation()

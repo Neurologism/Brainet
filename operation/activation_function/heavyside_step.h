@@ -11,7 +11,7 @@ class HeavysideStep : public ACTIVATION_FUNCTION
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 public:
-    HeavysideStep() = default;
+    HeavysideStep() { __dbg_name = "HEAVYSIDE_STEP"; };
     ~HeavysideStep() = default;
 };
 

@@ -12,15 +12,20 @@ class VARIABLE;
 */
 class OPERATION
 {
-private:
     std::shared_ptr<VARIABLE> __variable = nullptr; // necessary for storing the result of the operation
+
+protected:
+    std::string __dbg_name;
+
 public:
     OPERATION() = default;
     virtual ~OPERATION() = default;
+
     /**
      * @brief mathematical function the operation implements
     */
     virtual void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) =0; 
+
     /**
      * @brief derivative of the function
      * assumes that the gradient is already calculated for the output variables 
@@ -29,14 +34,24 @@ public:
      * @param gradient the sum of the gradients of the consumers
     */
     virtual std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) =0;
+
     /**
      * @brief sets the variable of the operation
     */
     void set_variable(std::shared_ptr<VARIABLE> variable);
+
     /**
      * @brief returns the variable of the operation
     */
     std::shared_ptr<VARIABLE> get_variable();
+
+    /**
+     * @brief returns the name of the operation
+    */
+    std::string get_name()
+    {
+        return __dbg_name;
+    }
 };
 
 void OPERATION::set_variable(std::shared_ptr<VARIABLE> variable)

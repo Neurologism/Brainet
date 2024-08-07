@@ -44,6 +44,15 @@ public:
     void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t input_units) override
     {
         _padding_variable->get_inputs().push_back(input);
+        
+        // init default norm
+        if(_norm == nullptr && _default_norm != nullptr)
+        {
+            _norm = std::visit([](auto&& arg) {
+                // Assuming all types in the variant can be dynamically casted to OPERATION*
+                return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *_default_norm);
+        }
+        
         _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({input_units+1,__units}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
         
         if (_norm != nullptr) // adding norm to activation function
@@ -115,13 +124,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t unit
     
     _matmul_variable->get_consumers().push_back(_activation_variable);    
 
-    // init default norm
-    if(_norm == nullptr && _default_norm != nullptr)
-    {
-        _norm = std::visit([](auto&& arg) {
-            // Assuming all types in the variant can be dynamically casted to OPERATION*
-            return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *_default_norm);
-    }
+    
 }
 
 DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm)

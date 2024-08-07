@@ -11,7 +11,7 @@ class HyperbolicTangent : public ACTIVATION_FUNCTION
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 public:
-    HyperbolicTangent() = default;
+    HyperbolicTangent() { __dbg_name = "HYPERBOLIC_TANGENT"; };
     ~HyperbolicTangent() = default;
 };
 

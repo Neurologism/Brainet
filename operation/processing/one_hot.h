@@ -38,6 +38,7 @@ OneHot::OneHot(std::uint32_t size, double on_value, double off_value)
     _size = size;
     _on_value = on_value;
     _off_value = off_value;
+    __dbg_name = "ONE_HOT";
 }
 
 void OneHot::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)

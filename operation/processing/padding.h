@@ -38,6 +38,7 @@ Padding::Padding(std::uint32_t x_padding, std::uint32_t y_padding, double paddin
     _x_padding = x_padding;
     _y_padding = y_padding;
     _padding_value = padding_value;
+    __dbg_name = "PADDING";
 }
 
 void Padding::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)

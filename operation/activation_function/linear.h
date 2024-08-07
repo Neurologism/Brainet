@@ -11,7 +11,7 @@ class Linear : public ACTIVATION_FUNCTION
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 public:
-    Linear() = default;
+    Linear() { __dbg_name = "LINEAR"; };
     ~Linear() = default;
 };
 
