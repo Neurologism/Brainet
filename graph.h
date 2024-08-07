@@ -11,6 +11,8 @@
 class GRAPH 
 {
     std::vector<std::shared_ptr<VARIABLE>> __variables; // all variables in the graph
+    std::vector<std::shared_ptr<VARIABLE>> __outputs; // the variables that are to be differentiated
+    
     /**
      * @brief This function builds the gradient table for the variable focus. It is a recursive function that calculates the gradient of the focus variable with respect to all other variables in the graph.
      * To do this it uses dynamic programming.
@@ -34,10 +36,9 @@ public:
      * @brief This function calculates the gradients of the target variables with respect to the variables in the differentiate vector.
      * It utilizes the well know general backpropagation algorithm and is implemented in a dynamic programming fashion.
      * @param target The target variables for which the gradients are calculated.
-     * @param differentiate The variables with respect to which the gradients are calculated.
      * @return std::vector<std::shared_ptr<TENSOR<double>> The gradients of the target variables with respect to the differentiate variables.
      */
-    std::vector<std::shared_ptr<TENSOR<double>>> backprop(std::vector<std::shared_ptr<VARIABLE>> & target, std::vector<std::shared_ptr<VARIABLE>> differentiate);
+    std::vector<std::shared_ptr<TENSOR<double>>> backprop(std::vector<std::shared_ptr<VARIABLE>> & target);
     /**
      * @brief This function returns all variables in the graph.
      * @return std::vector<std::shared_ptr<VARIABLE>> The variables in the graph.
@@ -53,6 +54,26 @@ public:
         __variables.push_back(var); 
         if(var->get_operation()!=nullptr)var->get_operation()->set_variable(__variables.back()); // address of variable has changed -> invalidation of pointers
         return __variables.back();
+    };
+    
+    /**
+     * @brief This function adds a variable to the list of variables that have a gradient of 1.
+     * @param var The variable to be added.
+     * @return std::uint32_t The index of the added variable used to access it later.
+     */
+    std::uint32_t add_output(std::shared_ptr<VARIABLE> var)
+    {
+        __outputs.push_back(var);
+        return __outputs.size()-1;
+    };
+    /**
+     * @brief This function returns the data of the output variable at the given index.
+     * @param index The index of the output variable.
+     * @return std::shared_ptr<TENSOR<double>> The data of the output variable.
+     */
+    std::shared_ptr<TENSOR<double>> get_output(std::uint32_t index)
+    {
+        return __outputs[index]->get_data();
     };
 }; 
 
@@ -101,10 +122,10 @@ void GRAPH::forward()
     }
 }
 
-std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::shared_ptr<VARIABLE>> & targets, std::vector<std::shared_ptr<VARIABLE>> differentiate)
+std::vector<std::shared_ptr<TENSOR<double>>> GRAPH::backprop(std::vector<std::shared_ptr<VARIABLE>> & targets)
 {
     std::vector<std::shared_ptr<TENSOR<double>>> grad_table(__variables.size(),nullptr); // data table for the gradients 
-    for(std::shared_ptr<VARIABLE> var : differentiate)
+    for(std::shared_ptr<VARIABLE> var : __outputs) // initialize the gradient table with the output variables
     {
         grad_table[var->get_id()] = std::make_shared<TENSOR<double>>(TENSOR<double>(var->get_data()->shape())); // initialize the gradient table with the differentiate variables
         for(std::uint32_t i = 0; i < var->get_data()->size(); i++)

@@ -1,25 +1,23 @@
 #ifndef L1_NORM_INCLUDE_GUARD
 #define L1_NORM_INCLUDE_GUARD
 
-#include "../operation/operation.h"
+#include "norm.h"
 
 /**
  * @brief Used to add a L1 norm penalty to a weight matrix. This is used to prevent overfitting.
  */
-class L1_NORM : public OPERATION
+class L1_NORM : public NORM
 {
-    double _lambda;
-    static double _default_lambda;
 public:
     /**
      * @brief add a L1 norm penalty to the graph, using a default lambda value
      */
-    L1_NORM();
+    L1_NORM() : NORM() {};
     /**
     * @brief add a L1 norm penalty to the graph
     * @param lambda the lambda value to be used
     */
-    L1_NORM(double lambda);
+    L1_NORM(double lambda) : NORM(lambda) {};
     ~L1_NORM() = default;
     /**
     * @brief compute the L1 norm of the input tensor
@@ -33,16 +31,6 @@ public:
     */
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
 };
-
-L1_NORM::L1_NORM()
-{
-    _lambda = _default_lambda;
-}
-
-L1_NORM::L1_NORM(double lambda)
-{
-    _lambda = lambda;
-}
 
 void L1_NORM::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
 {

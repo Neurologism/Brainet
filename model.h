@@ -15,9 +15,10 @@ class MODEL
     typedef std::vector<std::vector<double>> data_type;
     typedef std::vector<std::vector<double>> label_type;
 
+    std::uint32_t __loss_index; // the index of the loss function in the graph
+
 
     std::shared_ptr<GRAPH> __graph = std::make_shared<GRAPH>(); // the computational graph
-    std::vector<std::shared_ptr<VARIABLE>> __to_be_differentiated; // the variables that are to be differentiated
     std::map<std::uint32_t, std::pair<std::shared_ptr<VARIABLE>, std::shared_ptr<VARIABLE>>> __data_label_pairs; // the data/label pairs
 
 
@@ -40,6 +41,15 @@ public:
      * @param ID The ID of the data/label pair.
      */
     void sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID = 0);
+
+    /**
+     * @brief This function creates a sequential neural network.
+     * @param layers The layers of the neural network.
+     * @param norm The norm to use for regularization.
+     * @param ID The ID of the data/label pair.
+     */
+    void sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID = 0);
+
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
      * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
@@ -94,7 +104,7 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
         clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->getUnits());
     }
 
-    __to_be_differentiated.push_back(clusters.back()->output());
+    __loss_index = __graph->add_output(clusters.back()->output());
     if (__data_label_pairs.find(ID) != __data_label_pairs.end())
     {
         throw std::runtime_error("ID already exists");
@@ -104,6 +114,13 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
     std::shared_ptr<COST> output = std::dynamic_pointer_cast<COST>(clusters.back());
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
+
+void MODEL::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID)
+{
+    DENSE::set_default_norm(norm);
+    sequential(layers, ID);
+}
+
 
 void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
 {
@@ -147,9 +164,9 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
 
 
         __graph->forward();
-        std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
+        std::shared_ptr<TENSOR<double>> loss = __graph->get_output(__loss_index);
         std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
-        std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters(), __to_be_differentiated); // backpropagation
+        std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
         for(std::uint32_t i = 0; i < MODULE::get_learnable_parameters().size(); i++)
         {
             //std::cout << "Parameter " << i << " "; // debug
@@ -199,7 +216,7 @@ void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const
         __data_label_pairs[data_label_pair.first].second->get_data() = label_tensor;
 
         __graph->forward();
-        std::shared_ptr<TENSOR<double>> loss = __to_be_differentiated[0]->get_data();
+        std::shared_ptr<TENSOR<double>> loss = __graph->get_output(__loss_index);
         std::cout << "Test Loss: " << loss->data()[0] << std::endl; // print loss
     }
 }
