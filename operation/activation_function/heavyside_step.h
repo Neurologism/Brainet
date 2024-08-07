@@ -8,6 +8,7 @@
 */
 class HeavysideStep : public ACTIVATION_FUNCTION
 {   
+    std::string __dbg_name = "HEAVYSIDE_STEP";
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 public:

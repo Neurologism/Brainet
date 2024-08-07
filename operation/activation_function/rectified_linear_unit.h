@@ -8,9 +8,9 @@
 */
 class ReLU : public ACTIVATION_FUNCTION
 {
+    std::string __dbg_name = "RELU";
 protected:
     double __gradient; // gradient of left part of the function
-    
 
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;

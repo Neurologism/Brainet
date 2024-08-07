@@ -8,6 +8,7 @@
  */
 class ACTIVATION_FUNCTION : public OPERATION
 {
+    std::string __dbg_name = "ACTIVATION_FUNCTION";
 public:
     /**
      * @brief Forward pass is similar for all activation functions. It applies the activation function to each element of the input tensor.

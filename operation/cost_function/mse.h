@@ -9,6 +9,7 @@
 */
 class MSE : public OPERATION
 {
+    std::string __dbg_name = "MSE";
 public:
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
     std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;

@@ -8,6 +8,7 @@
 */
 class OneHot : public OPERATION
 {
+    std::string __dbg_name = "ONE_HOT";
     std::uint32_t _size; // size of the one hot encoding
     double _on_value;
     double _off_value;

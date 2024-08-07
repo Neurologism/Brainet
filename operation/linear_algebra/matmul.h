@@ -10,6 +10,7 @@
 */
 class MATMUL : public OPERATION
 {   
+    std::string __dbg_name = "MATMUL";
     static const std::uint32_t threads = 200;
     /**
      * @brief  matrix vector multiplication function

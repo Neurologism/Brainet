@@ -8,6 +8,7 @@
 */
 class Softmax : public OPERATION
 {   
+    std::string __dbg_name = "SOFTMAX";
     double activation_function(double input);
 
     void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;

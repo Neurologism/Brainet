@@ -8,6 +8,7 @@
 */
 class Padding : public OPERATION
 {
+    std::string __dbg_name = "PADDING";
     // store data
     std::uint32_t _x_padding;
     std::uint32_t _y_padding;

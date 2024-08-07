@@ -12,8 +12,8 @@ class VARIABLE;
 */
 class OPERATION
 {
-private:
     std::shared_ptr<VARIABLE> __variable = nullptr; // necessary for storing the result of the operation
+    std::string __dbg_name = "OPERATION";
 public:
     OPERATION() = default;
     virtual ~OPERATION() = default;

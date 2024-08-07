@@ -8,6 +8,7 @@
  */
 class L1_NORM : public NORM
 {
+    std::string __dbg_name = "L1_NORM";
 public:
     /**
     * @brief add a L1 norm penalty to the graph
