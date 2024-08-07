@@ -57,43 +57,58 @@ public:
      * @return T The element at the given indices.
      */
     T at(std::vector<std::uint32_t> index);
+
+    /**
+     * @brief This function is used to access the data of the tensor. To do so it uses a single index.
+     * @param index The index of the element.
+     * @return T The element at the given index.
+     */
+    T at(std::uint32_t index);
+
     /**
      * @brief This function is used to set the value of an element in the tensor. To do so it uses a vector of indices.
      * @param index The indices of the element.
      * @param value The value to be set.
      */
     void set(std::vector<std::uint32_t> index, T value);
+
     /**
      * @brief This function returns the shape of the tensor.
      * @return std::vector<std::uint32_t> The shape of the tensor.
      */
     std::vector<std::uint32_t> shape(){return __shape;};
+
     /**
      * @brief This function returns the shape of the tensor at a given index.
      * @param index The index of the shape.
      * @return std::uint32_t The shape at the given index.
      */
     std::uint32_t shape(std::uint32_t index){return __shape[index];};
+
     /**
      * @brief This function returns the dimensionality of the tensor.
      * @return std::uint32_t The dimensionality of the tensor.
      */
     std::uint32_t dimensionality(){return __shape.size();};
+
     /**
      * @brief This function returns the total capacity of the tensor.
      * @return The size of the tensor.
      */
     std::uint32_t size(){return __data.size();};
+
     /**
      * @brief This function resizes the tensor.
      * @param dimensionality The new dimensionality of the tensor.
      */
     void resize(std::vector<std::uint32_t> dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
+
     /**
      * @brief This function returns the data of the tensor.
      * @return std::vector<T> The data of the tensor.
      */
     std::vector<T> & data(){error_check();return __data;};
+
     /**
      * @brief This function returns a transposed version of the tensor if the tensor is 2D.
      * @return std::shared_ptr<TENSOR<T>> The transposed tensor.
@@ -123,6 +138,14 @@ T TENSOR<T>::at(std::vector<std::uint32_t> index)
     if(_index >= __data.size())
         throw std::out_of_range("Index out of range");
     return __data[_index]; // return the element
+}
+
+template <class T>
+T TENSOR<T>::at(std::uint32_t index)
+{
+    if(index >= __data.size())
+        throw std::out_of_range("Index out of range");
+    return __data[index]; // return the element
 }
 
 
