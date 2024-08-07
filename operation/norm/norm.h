@@ -14,10 +14,6 @@ protected:
 
 public:
     /**
-     * @brief add a norm penalty to the graph, using a default lambda value
-     */
-    NORM() : _lambda(_default_lambda) {};
-    /**
      * @brief add a norm penalty to the graph
      * @param lambda the lambda value to be used
      */

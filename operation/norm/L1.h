@@ -10,10 +10,6 @@ class L1_NORM : public NORM
 {
 public:
     /**
-     * @brief add a L1 norm penalty to the graph, using a default lambda value
-     */
-    L1_NORM() : NORM() {};
-    /**
     * @brief add a L1 norm penalty to the graph
     * @param lambda the lambda value to be used
     */
