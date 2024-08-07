@@ -41,6 +41,15 @@ public:
      * @param ID The ID of the data/label pair.
      */
     void sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID = 0);
+
+    /**
+     * @brief This function creates a sequential neural network.
+     * @param layers The layers of the neural network.
+     * @param norm The norm to use for regularization.
+     * @param ID The ID of the data/label pair.
+     */
+    void sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID = 0);
+
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
      * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
@@ -105,6 +114,13 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
     std::shared_ptr<COST> output = std::dynamic_pointer_cast<COST>(clusters.back());
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
+
+void MODEL::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID)
+{
+    DENSE::set_default_norm(norm);
+    sequential(layers, ID);
+}
+
 
 void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
 {

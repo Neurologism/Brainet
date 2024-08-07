@@ -11,7 +11,6 @@ class NORM : public OPERATION
 {
 protected:
     double _lambda;
-    static double _default_lambda;
 
 public:
     /**
@@ -28,8 +27,6 @@ public:
     virtual void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) = 0;
     virtual std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) = 0;
 };
-
-double NORM::_default_lambda = 0;
 
 
 #include "L1.h"

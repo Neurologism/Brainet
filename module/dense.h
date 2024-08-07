@@ -74,6 +74,13 @@ public:
     {
         return _activation_variable;
     }
+    /**
+     * @brief used to set the default norm to use for regularization.
+     */
+    static void set_default_norm(NORM_VARIANT const & norm)
+    {
+        _default_norm = std::make_shared<NORM_VARIANT>(norm);
+    }
 };
 
 DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
