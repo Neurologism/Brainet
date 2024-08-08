@@ -172,7 +172,7 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
             //std::cout << "Parameter " << i << " "; // debug
             for(std::uint32_t j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
-                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] += learning_rate * v[i]->data()[j];
+                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= learning_rate * v[i]->data()[j];
                 //std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " "; // debug
             }
             //std::cout << std::endl; // debug
