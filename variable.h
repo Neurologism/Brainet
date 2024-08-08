@@ -88,7 +88,14 @@ VARIABLE::VARIABLE(const std::shared_ptr<OPERATION> & op, const std::vector<std:
     __parents = parents;
     __children = children;
     __data = data;
-    __operation_name = op->get_name();
+    if (op != nullptr)
+    {
+        __operation_name = op->get_name();
+    }
+    else
+    {
+        __operation_name = "INPUT";
+    }
 };
 
 std::shared_ptr<OPERATION> VARIABLE::get_operation()
