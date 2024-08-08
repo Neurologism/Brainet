@@ -13,7 +13,7 @@ public:
     * @brief add a L1 norm penalty to the graph
     * @param lambda the lambda value to be used
     */
-    L1_NORM(double lambda) : NORM(lambda) {__dbg_name = "L1_NORM";};
+    L1_NORM(double lambda) : NORM(lambda) { __dbg_name = "L1_NORM"; };
     ~L1_NORM() = default;
     /**
     * @brief compute the L1 norm of the input tensor

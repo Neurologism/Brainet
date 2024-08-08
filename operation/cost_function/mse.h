@@ -32,7 +32,7 @@ void MSE::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     double sum = 0;
     for(std::uint32_t i = 0; i < inputs[0]->get_data()->size(); i++)
     {
-        sum += pow(inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i], 2);
+        sum += pow(inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i], 2)/2;
     }
     sum /= inputs[0]->get_data()->size();
     // store the result
@@ -60,7 +60,7 @@ std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>
     std::shared_ptr<TENSOR<double>> _gradient = std::make_shared<TENSOR<double>>(TENSOR<double>(inputs[0]->get_data()->shape()));
     for(std::uint32_t i = 0; i < inputs[0]->get_data()->size(); i++)
     {
-        _gradient->data()[i] = (inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i]) * 2 * gradient->data()[0];
+        _gradient->data()[i] = -(inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i]) * gradient->data()[0] / inputs[0]->get_data()->size();
     }
 
     return _gradient;
