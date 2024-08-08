@@ -15,7 +15,7 @@ class OPERATION
     std::shared_ptr<VARIABLE> __variable = nullptr; // necessary for storing the result of the operation
 
 protected:
-    std::string __dbg_name;
+    std::string __dbg_name = "OPERATION"; // name of the operation	
 
 public:
     OPERATION() = default;
