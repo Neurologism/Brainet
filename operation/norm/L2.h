@@ -40,6 +40,10 @@ void L2_NORM::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     double sum = 0;
     for (std::uint32_t i = 0; i < input->size(); i++)
     {
+        if ((i-1) % input->shape(0) == 0) // no penalty on the bias
+        {
+            continue;
+        }
         sum += input->at({i}) * input->at({i});
     }
 
@@ -61,6 +65,11 @@ std::shared_ptr<TENSOR<double>> L2_NORM::bprop(std::vector<std::shared_ptr<VARIA
 
     for (std::uint32_t i = 0; i < input->size(); i++)
     {
+        if ((i-1) % input->shape(0) == 0) // no penalty on the bias
+        {
+            result->data()[i] = 0;
+            continue;
+        }
         result->data()[i] = _lambda * input->data()[i] * gradient->data()[0];
     }
 
