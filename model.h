@@ -165,14 +165,14 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
 
         __graph->forward();
         std::shared_ptr<TENSOR<double>> loss = __graph->get_output(__loss_index);
-        std::cout << "Epoch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
+        std::cout << "Batch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
         std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
         for(std::uint32_t i = 0; i < MODULE::get_learnable_parameters().size(); i++)
         {
             //std::cout << "Parameter " << i << " "; // debug
             for(std::uint32_t j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
-                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= learning_rate * v[i]->data()[j];
+                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= learning_rate * v[i]->data()[j] / batch_size;
                 //std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " "; // debug
             }
             //std::cout << std::endl; // debug

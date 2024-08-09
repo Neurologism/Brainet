@@ -53,6 +53,7 @@ public:
                 return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *_default_norm);
         }
         
+        // +1 for the weight
         _weight_matrix_variable->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({input_units+1,__units}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
         
         if (_norm != nullptr) // adding norm to activation function
