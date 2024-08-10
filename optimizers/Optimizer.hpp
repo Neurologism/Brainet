@@ -9,14 +9,17 @@
  */
 class Optimizer
 {
-protected:
-    std::shared_ptr<GRAPH> graph;
 public:
     Optimizer() = default;
     virtual ~Optimizer() = default;
 
-    virtual void update(const std::vector<std::shared_ptr<TENSOR<double>>> & gradients) = 0; 
+    virtual void update(const std::vector<std::shared_ptr<TENSOR<double>>> & gradients, std::uint32_t batch_size) = 0;
 };
+
+
+#include "primitive_SGD.hpp"
+
+using Optimizer_Variant = std::variant<primitive_SGD>;
 
 
 #endif // Optimizer_HPP
