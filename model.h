@@ -57,7 +57,7 @@ public:
      * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
+    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double initial_learning_rate, double decay_rate);
     /**
      * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
      * @param data The data.
@@ -66,7 +66,7 @@ public:
      * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
+    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double initial_learning_rate, double decay_rate);
 
     /**
      * @brief This function gets the test error of the model.
@@ -122,7 +122,7 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, st
 }
 
 
-void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
+void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double initial_learning_rate, double decay_rate)
 {
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
@@ -172,16 +172,17 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
             //std::cout << "Parameter " << i << " "; // debug
             for(std::uint32_t j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
             {
-                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= learning_rate * v[i]->data()[j] / batch_size;
+                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= initial_learning_rate * v[i]->data()[j] / batch_size;
                 //std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " "; // debug
             }
             //std::cout << std::endl; // debug
         }
+        initial_learning_rate *= decay_rate;
     }
 }
 
 
-void MODEL::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
+void MODEL::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double initial_learning_rate, double decay_rate)
 {
     std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
@@ -189,7 +190,7 @@ void MODEL::train(data_type const data, label_type const label, std::uint32_t co
         throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
     }
     data_label_pairs[0] = std::make_pair(data, label);
-    train(data_label_pairs, epochs, batch_size, learning_rate);
+    train(data_label_pairs, epochs, batch_size, initial_learning_rate, decay_rate);
 }
 
 
