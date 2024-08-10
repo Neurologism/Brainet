@@ -2,6 +2,7 @@
 #define INPUT_INCLUDE_GUARD
 
 #include "./module.h"
+#include "../operation/processing/noise.h"
 
 /**
  * @brief this can store the input data of the model. Initalize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.
@@ -10,13 +11,19 @@
 class INPUT : public MODULE
 {
     std::shared_ptr<VARIABLE> _input_variable;
+    std::shared_ptr<VARIABLE> _noise_variable;
 public:
     /**
      * @brief add an input to the graph
-     * @param data a pointer to the input data
      * @param units the respective size of a single input
      */
     INPUT(std::uint32_t units);
+    /**
+     * @brief add an input to the graph with a noise operation
+     * @param units the respective size of a single input
+     * @param noise the noise operation to add to the input
+     */
+    INPUT(std::uint32_t units, Noise noise);
     ~INPUT() = default;
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
@@ -52,6 +59,26 @@ INPUT::INPUT(std::uint32_t units)
     // create the input variable
     _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
     __units = units; // set the number of neurons in the layer
+
+    _noise_variable = nullptr; // no noise is added
+}
+
+INPUT::INPUT(std::uint32_t units, Noise noise)
+{
+    // error checks
+    if(__graph == nullptr)
+    {
+        throw std::runtime_error("graph is not set");
+    }
+    
+    // create the input variable
+    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+    __units = units; // set the number of neurons in the layer
+
+    // create the noise variable
+    _noise_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<Noise>(noise), {_input_variable})));
+    
+    _input_variable->get_consumers().push_back(_noise_variable); // add the noise variable as a consumer of the input variable
 }
 
 void INPUT::add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units)
@@ -61,7 +88,14 @@ void INPUT::add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units)
 
 void INPUT::add_output(std::shared_ptr<VARIABLE> output)
 {
-    _input_variable->get_consumers().push_back(output);
+    if(_noise_variable != nullptr)
+    {
+        _noise_variable->get_consumers().push_back(output);
+    }
+    else
+    {
+        _input_variable->get_consumers().push_back(output);
+    }
 }
 
 std::shared_ptr<VARIABLE> INPUT::input(std::uint32_t index)
@@ -72,6 +106,10 @@ std::shared_ptr<VARIABLE> INPUT::input(std::uint32_t index)
 
 std::shared_ptr<VARIABLE> INPUT::output(std::uint32_t index)
 {
+    if(_noise_variable != nullptr)
+    {
+        return _noise_variable;
+    }
     return _input_variable;
 }
 
