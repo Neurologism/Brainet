@@ -5,6 +5,7 @@
 #include "graph.h"
 #include "module/module.h"
 #include "operation/activation_function/activation_function.h"
+#include "optimizers/Optimizer.hpp"
 
 /**
  * @brief The model class is the main interface for the user to create a neural network. It is used to build the network and to train it.
@@ -57,7 +58,7 @@ public:
      * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
+    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer);
     /**
      * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
      * @param data The data.
@@ -66,7 +67,7 @@ public:
      * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate);
+    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer);
 
     /**
      * @brief This function gets the test error of the model.
@@ -122,7 +123,7 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, st
 }
 
 
-void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
+void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
 {
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
@@ -166,22 +167,15 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
         __graph->forward();
         std::shared_ptr<TENSOR<double>> loss = __graph->get_output(__loss_index);
         std::cout << "Batch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
-        std::vector<std::shared_ptr<TENSOR<double>>> v = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
-        for(std::uint32_t i = 0; i < MODULE::get_learnable_parameters().size(); i++)
-        {
-            //std::cout << "Parameter " << i << " "; // debug
-            for(std::uint32_t j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
-            {
-                MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= learning_rate * v[i]->data()[j] / batch_size;
-                //std::cout << MODULE::get_learnable_parameters()[i]->get_data()->data()[j] << " "; // debug
-            }
-            //std::cout << std::endl; // debug
-        }
+        std::vector<std::shared_ptr<TENSOR<double>>> __gradients = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
+        
+        std::visit([__gradients, batch_size](auto&& arg) {
+            arg.update(__gradients, batch_size);}, optimizer);
     }
 }
 
 
-void MODEL::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, double const learning_rate)
+void MODEL::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
 {
     std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
@@ -189,7 +183,7 @@ void MODEL::train(data_type const data, label_type const label, std::uint32_t co
         throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
     }
     data_label_pairs[0] = std::make_pair(data, label);
-    train(data_label_pairs, epochs, batch_size, learning_rate);
+    train(data_label_pairs, epochs, batch_size, optimizer);
 }
 
 

@@ -34,7 +34,7 @@ std::int32_t main()
     MODEL model;
     model.sequential({INPUT(input[0].size()), DENSE(ReLU(),300), DENSE(Sigmoid(),10), COST(MSE(),10)});   
 
-    model.train(input,target,50,200,0.01);
+    model.train(input,target,100,200,0.01,0.99);
 
     model.test(test_input,test_target);
     return 0; 
