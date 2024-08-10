@@ -25,6 +25,13 @@ public:
      * @param one_hot_ecoding_off_value the value to set the rest of the tensor to. Default is 0.
      */
     COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_ecoding_size = 0, std::uint32_t one_hot_ecoding_on_value = 1, std::uint32_t one_hot_ecoding_off_value = 0);
+    /**
+     * @brief add a cost function to the graph
+     * @param cost_function the operation representing the cost function.
+     * @param one_hot_ecoding_size the size of the one hot encoding. Default is 0. One hot encoding assumes that the y truth is initially a single value giving the index of the on value.
+     * @param label_smoothing the value to smooth the labels. Default is 0.
+     */
+    COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_ecoding_size, double label_smoothing);
     ~COST() = default;
 
     /**
@@ -104,4 +111,16 @@ COST::COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_ecoding_si
     }
 }
 
+COST::COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_ecoding_size, double label_smoothing)
+{
+    if (label_smoothing <= 0)
+    {
+        throw std::invalid_argument("COST::COST: label_smoothing must be greater than 0");
+    }
+    if (label_smoothing >= 1)
+    {
+        throw std::invalid_argument("COST::COST: label_smoothing must be less than 1");
+    }
+    COST(cost_function, one_hot_ecoding_size, 1-label_smoothing, label_smoothing/(one_hot_ecoding_size-1));
+}
 #endif // COST_INCLUDE_GUARD
