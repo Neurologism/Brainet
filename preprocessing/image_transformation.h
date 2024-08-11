@@ -6,7 +6,7 @@
 /**
  * @brief Used to apply various transformations to an image. This is used to augment the dataset.
  */
-class IMAGE_TRANSFORMATION
+class ImageTransformation
 {
     typedef std::vector<std::vector<double>> data_type;
 

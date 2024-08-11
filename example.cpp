@@ -31,7 +31,7 @@ std::int32_t main()
 
     // feel free to contact me via email : samsun2006@outlook.com if you have any questions, suggestions or if you want to know how the project works
 
-    MODEL model;
+    Model model;
     model.sequential({INPUT(input[0].size()), DENSE(ReLU(),300), DENSE(Sigmoid(),10), COST(MSE(),10)});   
 
     model.train(input,target,100,200,0.01,0.99);

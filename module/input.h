@@ -10,8 +10,8 @@
  */
 class INPUT : public MODULE
 {
-    std::shared_ptr<VARIABLE> _input_variable;
-    std::shared_ptr<VARIABLE> _noise_variable;
+    std::shared_ptr<Variable> _input_variable;
+    std::shared_ptr<Variable> _noise_variable;
 public:
     /**
      * @brief add an input to the graph
@@ -28,23 +28,23 @@ public:
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
      */
-    void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units) override;
+    void add_input(std::shared_ptr<Variable> input, std::uint32_t units) override;
     /**
      * @brief used to mark variables as output for the module.
      */
-    void add_output(std::shared_ptr<VARIABLE> output) override;
+    void add_output(std::shared_ptr<Variable> output) override;
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
      */
-    std::shared_ptr<VARIABLE> input(std::uint32_t index) override;
+    std::shared_ptr<Variable> input(std::uint32_t index) override;
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> output(std::uint32_t index) override;
+    std::shared_ptr<Variable> output(std::uint32_t index) override;
     /**
      * @brief used to get the variable used to load the data.
      */
-    std::shared_ptr<VARIABLE> data();
+    std::shared_ptr<Variable> data();
     
 };
 
@@ -57,7 +57,7 @@ INPUT::INPUT(std::uint32_t units)
     }
     
     // create the input variable
-    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+    _input_variable = __graph->add_variable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
     __units = units; // set the number of neurons in the layer
 
     _noise_variable = nullptr; // no noise is added
@@ -72,21 +72,21 @@ INPUT::INPUT(std::uint32_t units, Noise noise)
     }
     
     // create the input variable
-    _input_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+    _input_variable = __graph->add_variable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
     __units = units; // set the number of neurons in the layer
 
     // create the noise variable
-    _noise_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<Noise>(noise), {_input_variable})));
+    _noise_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::make_shared<Noise>(noise), {_input_variable})));
     
     _input_variable->get_consumers().push_back(_noise_variable); // add the noise variable as a consumer of the input variable
 }
 
-void INPUT::add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units)
+void INPUT::add_input(std::shared_ptr<Variable> input, std::uint32_t units)
 {
     throw std::runtime_error("Input variable cannot have an input");
 }
 
-void INPUT::add_output(std::shared_ptr<VARIABLE> output)
+void INPUT::add_output(std::shared_ptr<Variable> output)
 {
     if(_noise_variable != nullptr)
     {
@@ -98,13 +98,13 @@ void INPUT::add_output(std::shared_ptr<VARIABLE> output)
     }
 }
 
-std::shared_ptr<VARIABLE> INPUT::input(std::uint32_t index)
+std::shared_ptr<Variable> INPUT::input(std::uint32_t index)
 {
     throw std::runtime_error("Input variable cannot have an input");
     return nullptr;
 }
 
-std::shared_ptr<VARIABLE> INPUT::output(std::uint32_t index)
+std::shared_ptr<Variable> INPUT::output(std::uint32_t index)
 {
     if(_noise_variable != nullptr)
     {
@@ -113,7 +113,7 @@ std::shared_ptr<VARIABLE> INPUT::output(std::uint32_t index)
     return _input_variable;
 }
 
-std::shared_ptr<VARIABLE> INPUT::data()
+std::shared_ptr<Variable> INPUT::data()
 {
     return _input_variable;
 }

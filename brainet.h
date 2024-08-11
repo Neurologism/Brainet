@@ -5,6 +5,7 @@
 
 #include "model.h"
 #include "readers/idx_reader.h"
+#include "optimizers/Optimizer.hpp"
 
 
 #endif // BRAINET_INCLUDE_GUARD

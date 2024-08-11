@@ -1,5 +1,5 @@
-#ifndef Optimizer_HPP
-#define Optimizer_HPP
+#ifndef OPTIMIZER_HPP
+#define OPTIMIZER_HPP
 
 #include "../dependencies.h"
 #include "../graph.h"
@@ -13,13 +13,13 @@ public:
     Optimizer() = default;
     virtual ~Optimizer() = default;
 
-    virtual void update(const std::vector<std::shared_ptr<TENSOR<double>>> & gradients, std::uint32_t batch_size) = 0;
+    virtual void update(const std::vector<std::shared_ptr<Tensor<double>>> & gradients, std::uint32_t batch_size) = 0;
 };
 
 
 #include "primitive_SGD.hpp"
 
-using Optimizer_Variant = std::variant<primitive_SGD>;
+using Optimizer_Variant = std::variant<PrimitiveSGD>;
 
 
 #endif // Optimizer_HPP

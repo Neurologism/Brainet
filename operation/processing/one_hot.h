@@ -6,7 +6,7 @@
 /**
  * @brief One hot encoding class, used to perform one hot encoding on the input tensor. Only supporting forward pass.
 */
-class OneHot : public OPERATION
+class OneHot : public Operation
 {
     std::uint32_t _size; // size of the one hot encoding
     double _on_value;
@@ -25,12 +25,12 @@ public:
     /**
      * @brief Perform one hot encoding on the input tensor.
      */
-    void f(std::vector<std::shared_ptr<VARIABLE>>& inputs)override;
+    void f(std::vector<std::shared_ptr<Variable>>& inputs)override;
 
     /**
      * @brief Backward pass is not supported for one hot encoding.
      */
-    std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)override;
+    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)override;
 };
 
 OneHot::OneHot(std::uint32_t size, double on_value, double off_value)
@@ -41,7 +41,7 @@ OneHot::OneHot(std::uint32_t size, double on_value, double off_value)
     __dbg_name = "ONE_HOT";
 }
 
-void OneHot::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
+void OneHot::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
     // might try assigning input values to indices in the future
     if (inputs.size() != 1)
@@ -49,7 +49,7 @@ void OneHot::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
         throw std::invalid_argument("OneHot::f: Invalid number of input variables.");
     }
 
-    std::shared_ptr<TENSOR<double>> _data = std::make_shared<TENSOR<double>>(TENSOR<double>({inputs.front()->get_data()->shape(0), _size}, _off_value)); // create a new tensor to store the result
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(Tensor<double>({inputs.front()->get_data()->shape(0), _size}, _off_value)); // create a new tensor to store the result
 
     for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape(0); i++)
     {
@@ -63,7 +63,7 @@ void OneHot::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     this->get_variable()->get_data() = _data; // store the result in the variable
 }
 
-std::shared_ptr<TENSOR<double>> OneHot::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)
+std::shared_ptr<Tensor<double>> OneHot::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
     throw std::invalid_argument("OneHot::bprop: Backward pass is not supported for one hot encoding.");
 }

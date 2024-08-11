@@ -11,7 +11,7 @@
  * @brief The model class is the main interface for the user to create a neural network. It is used to build the network and to train it.
  * The model class combines the graph, the module and the operation classes to create a neural network.
  */
-class MODEL
+class Model
 {
     typedef std::vector<std::vector<double>> data_type;
     typedef std::vector<std::vector<double>> label_type;
@@ -19,19 +19,19 @@ class MODEL
     std::uint32_t __loss_index; // the index of the loss function in the graph
 
 
-    std::shared_ptr<GRAPH> __graph = std::make_shared<GRAPH>(); // the computational graph
-    std::map<std::uint32_t, std::pair<std::shared_ptr<VARIABLE>, std::shared_ptr<VARIABLE>>> __data_label_pairs; // the data/label pairs
+    std::shared_ptr<Graph> __graph = std::make_shared<Graph>(); // the computational graph
+    std::map<std::uint32_t, std::pair<std::shared_ptr<Variable>, std::shared_ptr<Variable>>> __data_label_pairs; // the data/label pairs
 
 
 public:
     /**
-     * @brief Construct a new MODEL object.
+     * @brief Construct a new Model object.
      */
-    MODEL()
+    Model()
     {
         MODULE::set_graph(__graph); // set the static graph pointer in the module class
     };
-    ~MODEL(){};
+    ~Model(){};
     /**
      * @brief This function loads the graph of the model into the module class.
      */
@@ -84,12 +84,12 @@ public:
     void test(data_type const data, label_type const label, std::uint32_t const max_test_size = std::numeric_limits<std::uint32_t>::max());
 };
 
-void MODEL::load()
+void Model::load()
 {
     MODULE::set_graph(__graph);
 }
 
-void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
+void Model::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
 {
     std::vector<std::shared_ptr<MODULE>> clusters;
     for (MODULE_VARIANT& layer : layers) {
@@ -116,14 +116,14 @@ void MODEL::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
 
-void MODEL::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID)
+void Model::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID)
 {
     DENSE::set_default_norm(norm);
     sequential(layers, ID);
 }
 
 
-void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
+void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
 {
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
@@ -143,8 +143,8 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
             batch_label.push_back(label[random_index]);
             // Use batch_data and batch_label for training
         }
-        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) batch_data.size(), (std::uint32_t) batch_data[0].size()}, 0.0, false));
-        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({(std::uint32_t) batch_label.size(),(std::uint32_t) batch_label[0].size()}, 0.0, false));
+        std::shared_ptr<Tensor<double>> data_tensor = std::make_shared<Tensor<double>>(Tensor<double>({(std::uint32_t) batch_data.size(), (std::uint32_t) batch_data[0].size()}, 0.0, false));
+        std::shared_ptr<Tensor<double>> label_tensor = std::make_shared<Tensor<double>>(Tensor<double>({(std::uint32_t) batch_label.size(),(std::uint32_t) batch_label[0].size()}, 0.0, false));
 
         for (std::uint32_t i = 0; i < batch_data.size(); i++)
         {
@@ -165,9 +165,9 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
 
 
         __graph->forward();
-        std::shared_ptr<TENSOR<double>> loss = __graph->get_output(__loss_index);
+        std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
         std::cout << "Batch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
-        std::vector<std::shared_ptr<TENSOR<double>>> __gradients = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
+        std::vector<std::shared_ptr<Tensor<double>>> __gradients = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
         
         std::visit([__gradients, batch_size](auto&& arg) {
             arg.update(__gradients, batch_size);}, optimizer);
@@ -175,7 +175,7 @@ void MODEL::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
 }
 
 
-void MODEL::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
+void Model::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
 {
     std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
@@ -187,12 +187,12 @@ void MODEL::train(data_type const data, label_type const label, std::uint32_t co
 }
 
 
-void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const max_test_size)
+void Model::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const max_test_size)
 {
     for (auto const & data_label_pair : data_label_pairs)
     {
-        std::shared_ptr<TENSOR<double>> data_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({std::min((std::uint32_t)data_label_pair.second.first.size(), max_test_size), (std::uint32_t) data_label_pair.second.first[0].size()}, 0.0, false));
-        std::shared_ptr<TENSOR<double>> label_tensor = std::make_shared<TENSOR<double>>(TENSOR<double>({std::min((std::uint32_t)data_label_pair.second.second.size(), max_test_size), (std::uint32_t) data_label_pair.second.second[0].size()}, 0.0, false));
+        std::shared_ptr<Tensor<double>> data_tensor = std::make_shared<Tensor<double>>(Tensor<double>({std::min((std::uint32_t)data_label_pair.second.first.size(), max_test_size), (std::uint32_t) data_label_pair.second.first[0].size()}, 0.0, false));
+        std::shared_ptr<Tensor<double>> label_tensor = std::make_shared<Tensor<double>>(Tensor<double>({std::min((std::uint32_t)data_label_pair.second.second.size(), max_test_size), (std::uint32_t) data_label_pair.second.second[0].size()}, 0.0, false));
 
         for (std::uint32_t i = 0; i < std::min((std::uint32_t)data_label_pair.second.first.size(), max_test_size); i++)
         {
@@ -210,13 +210,13 @@ void MODEL::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const
         __data_label_pairs[data_label_pair.first].second->get_data() = label_tensor;
 
         __graph->forward();
-        std::shared_ptr<TENSOR<double>> loss = __graph->get_output(__loss_index);
+        std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
         std::cout << "Test Loss: " << loss->data()[0] << std::endl; // print loss
     }
 }
 
 
-void MODEL::test(data_type const data, label_type const label, std::uint32_t const max_test_size)
+void Model::test(data_type const data, label_type const label, std::uint32_t const max_test_size)
 {
     std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())
@@ -227,4 +227,4 @@ void MODEL::test(data_type const data, label_type const label, std::uint32_t con
     test(data_label_pairs, max_test_size);
 }
 
-#endif // MODEL_INCLUDE_GUARD
+#endif // Model_INCLUDE_GUARD

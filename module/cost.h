@@ -12,9 +12,9 @@
  */
 class COST : public MODULE
 {
-    std::shared_ptr<VARIABLE> _target_variable; // storing y truth
-    std::shared_ptr<VARIABLE> _output_variable; // actual cost funtion 
-    std::shared_ptr<VARIABLE> _one_hot_variable; // one hot encoding of the y truth
+    std::shared_ptr<Variable> _target_variable; // storing y truth
+    std::shared_ptr<Variable> _output_variable; // actual cost funtion 
+    std::shared_ptr<Variable> _one_hot_variable; // one hot encoding of the y truth
 
 
     
@@ -39,35 +39,35 @@ public:
     /**
      * @brief used to mark variables as input for the module.
      */
-    void add_input(std::shared_ptr<VARIABLE> input, std::uint32_t units) override
+    void add_input(std::shared_ptr<Variable> input, std::uint32_t units) override
     {
         _output_variable->get_inputs().push_back(input);
     }
     /**
      * @brief used to mark variables as output for the module.
      */
-    void add_output(std::shared_ptr<VARIABLE> output) override
+    void add_output(std::shared_ptr<Variable> output) override
     {
         _output_variable->get_consumers().push_back(output);
     }
     /**
      * @brief used to get the input variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> input(std::uint32_t index) override
+    std::shared_ptr<Variable> input(std::uint32_t index) override
     {
         return _output_variable;
     }
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
-    std::shared_ptr<VARIABLE> output(std::uint32_t index) override
+    std::shared_ptr<Variable> output(std::uint32_t index) override
     {
         return _output_variable;
     }
     /**
      * @brief used to get the target variable of the module.
      */
-    std::shared_ptr<VARIABLE> target()
+    std::shared_ptr<Variable> target()
     {
         return _target_variable;
     }
@@ -91,15 +91,15 @@ COST::COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_encoding_s
     }
 
     // add variables to the graph
-    _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+    _target_variable = __graph->add_variable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     
     // variable performing one hot encoding; no backward pass is supported
-    _one_hot_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::make_shared<OneHot>(OneHot(10, 1-label_smoothing, label_smoothing/(one_hot_encoding_size-1))), {_target_variable}, {}))); 
+    _one_hot_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(10, 1-label_smoothing, label_smoothing/(one_hot_encoding_size-1))), {_target_variable}, {}))); 
 
     // conversion of the COST_FUNCTION_VARIANT to an operation pointer
-    _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
-        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_one_hot_variable}, {})));
+    _output_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_one_hot_variable}, {})));
     
     // connections within the module
     _target_variable->get_consumers().push_back(_one_hot_variable);
@@ -116,15 +116,15 @@ COST::COST(COST_FUNCTION_VARIANT cost_function)
 
 
     // add variables to the graph
-    _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+    _target_variable = __graph->add_variable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     _one_hot_variable = nullptr;
         
     // add variables to the graph
-    _target_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(nullptr, {}, {})));
+    _target_variable = __graph->add_variable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
-    _output_variable = __graph->add_variable(std::make_shared<VARIABLE>(VARIABLE(std::visit([](auto&& arg) {
-        return std::shared_ptr<OPERATION>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));
+    _output_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));
     
     // connections within the module
     _target_variable->get_consumers().push_back(_output_variable);
