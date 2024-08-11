@@ -6,17 +6,17 @@
 #include "../graph.h"
 
 /**
- * @brief The MODULE class can be used to group multiple variables together. This is useful for adding substructures to the graph. It is mainly used to add something similar to layers to the graph.
+ * @brief The Module class can be used to group multiple variables together. This is useful for adding substructures to the graph. It is mainly used to add something similar to layers to the graph.
  * It is intended that all cost functions add their variables to the graph in the constructor. 
  */
-class MODULE
+class Module
 {
 protected:
     static std::shared_ptr<Graph> __graph; // shared by all clusters , points to the graph into which the module should add its variables
     static std::vector<std::shared_ptr<Variable>> __learnable_parameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
     std::uint32_t __units = -1; // stores the input size of the module (could be moved to respective derived classes)
 public:
-    virtual ~MODULE() = default;
+    virtual ~Module() = default;
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as input for the module. 
      */
@@ -54,8 +54,8 @@ public:
 
 // this is mainly for interface purposes
 
-std::shared_ptr<Graph> MODULE::__graph = nullptr;
-std::vector<std::shared_ptr<Variable>> MODULE::__learnable_parameters = {};
+std::shared_ptr<Graph> Module::__graph = nullptr;
+std::vector<std::shared_ptr<Variable>> Module::__learnable_parameters = {};
 
 
 // code of all child classes
@@ -63,6 +63,6 @@ std::vector<std::shared_ptr<Variable>> MODULE::__learnable_parameters = {};
 #include "dense.h"
 #include "cost.h"
 
-using MODULE_VARIANT = std::variant<INPUT, DENSE, COST>;
+using Module_VARIANT = std::variant<Input, Dense, Cost>;
 
-#endif // MODULE_INCLUDE_GUARD
+#endif // Module_INCLUDE_GUARD

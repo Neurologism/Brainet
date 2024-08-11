@@ -6,7 +6,7 @@
 /**
  * @brief Heavyside step function class, representing the Heavyside step function f(x) = 1 if x >= 0, 0 otherwise.
 */
-class HeavysideStep : public ACTIVATION_FUNCTION
+class HeavysideStep : public ActivationFunction
 {   
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;

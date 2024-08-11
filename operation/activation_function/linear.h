@@ -6,7 +6,7 @@
 /**
  * @brief Linear function class, representing the linear function f(x) = x.
 */
-class Linear : public ACTIVATION_FUNCTION
+class Linear : public ActivationFunction
 {   
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;

@@ -10,7 +10,7 @@
 /**
  * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
  */
-class DENSE : public MODULE
+class Dense : public Module
 {
     // storing index of the variables in the graph
     std::shared_ptr<Variable> _weight_matrix_variable; // learnable parameters of the layer (weights + bias)
@@ -29,15 +29,15 @@ public:
      * @param activation_function the operation representing the activation function.
      * @param units the number of neurons in the layer.
      */
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units);
+    Dense(ActivationVariant activation_function, std::uint32_t units);
     /**
      * @brief add a dense layer to the graph
      * @param activation_function the operation representing the activation function.
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
      */
-    DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NormVariant norm);
-    ~DENSE() = default;
+    Dense(ActivationVariant activation_function, std::uint32_t units, NormVariant norm);
+    ~Dense() = default;
     /**
      * @brief used to mark variables as input for the module.
      */
@@ -87,13 +87,13 @@ public:
     /**
      * @brief used to set the default norm to use for regularization.
      */
-    static void set_default_norm(NORM_VARIANT const & norm)
+    static void set_default_norm(NormVariant const & norm)
     {
-        _default_norm = std::make_shared<NORM_VARIANT>(norm);
+        _default_norm = std::make_shared<NormVariant>(norm);
     }
 };
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units)
+Dense::Dense(ActivationVariant activation_function, std::uint32_t units)
 {
     // error checks
     if(__graph == nullptr)
@@ -115,7 +115,7 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t unit
     // Use std::visit to handle the variant
     std::shared_ptr<Operation> operation_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, ACTIVATION_FUNCTION_VARIANT{activation_function});
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, ActivationVariant{activation_function});
 
     _activation_variable = __graph->add_variable(std::make_shared<Variable>(Variable(operation_ptr, {_matmul_variable}, {})));
 
@@ -128,14 +128,14 @@ DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t unit
     
 }
 
-DENSE::DENSE(ACTIVATION_FUNCTION_VARIANT activation_function, std::uint32_t units, NORM_VARIANT norm)
+Dense::Dense(ActivationVariant activation_function, std::uint32_t units, NormVariant norm)
 {
     _norm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, norm);
-    DENSE(activation_function, units);
+    Dense(activation_function, units);
 }
 
-std::shared_ptr<NORM_VARIANT> DENSE::_default_norm = nullptr;
+std::shared_ptr<NormVariant> Dense::_default_norm = nullptr;
 
-#endif // DENSE_INCLUDE_GUARD
+#endif // Dense_INCLUDE_GUARD

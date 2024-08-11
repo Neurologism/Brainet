@@ -6,7 +6,7 @@
 /**
  * @brief Hyperbolic tangent function class, representing the hyperbolic tangent function f(x) = tanh(x).
 */
-class HyperbolicTangent : public ACTIVATION_FUNCTION
+class HyperbolicTangent : public ActivationFunction
 {   
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;

@@ -10,7 +10,7 @@
  * @brief the cost module is intended for calculating the cost of various models. Currently only cost functions dependy on the output of the network and the y truth are supported.
  
  */
-class COST : public MODULE
+class Cost : public Module
 {
     std::shared_ptr<Variable> _target_variable; // storing y truth
     std::shared_ptr<Variable> _output_variable; // actual cost funtion 
@@ -24,7 +24,7 @@ public:
      * @brief add a cost function to the graph
      * @param cost_function the operation representing the cost function.
      */
-    COST(COST_FUNCTION_VARIANT cost_function);
+    Cost(CostVariant cost_function);
 
     /**
      * @brief add a cost function to the graph
@@ -32,9 +32,9 @@ public:
      * @param one_hot_encoding_size the size of the one hot encoding. Default is 0. One hot encoding assumes that the y truth is initially a single value giving the index of the on value.
      * @param label_smoothing the value to smooth the labels. Default is 0.
      */
-    COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_encoding_size, double label_smoothing = 0);
+    Cost(CostVariant cost_function, std::uint32_t one_hot_encoding_size, double label_smoothing = 0);
 
-    ~COST() = default;
+    ~Cost() = default;
 
     /**
      * @brief used to mark variables as input for the module.
@@ -73,15 +73,15 @@ public:
     }
 };
 
-COST::COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_encoding_size, double label_smoothing)
+Cost::Cost(CostVariant cost_function, std::uint32_t one_hot_encoding_size, double label_smoothing)
 {
     if (label_smoothing <= 0)
     {
-        throw std::invalid_argument("COST::COST: label_smoothing must be greater than 0");
+        throw std::invalid_argument("Cost::Cost: label_smoothing must be greater than 0");
     }
     if (label_smoothing >= 1)
     {
-        throw std::invalid_argument("COST::COST: label_smoothing must be less than 1");
+        throw std::invalid_argument("Cost::Cost: label_smoothing must be less than 1");
     }
     
     // error checks
@@ -97,16 +97,16 @@ COST::COST(COST_FUNCTION_VARIANT cost_function, std::uint32_t one_hot_encoding_s
     // variable performing one hot encoding; no backward pass is supported
     _one_hot_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(10, 1-label_smoothing, label_smoothing/(one_hot_encoding_size-1))), {_target_variable}, {}))); 
 
-    // conversion of the COST_FUNCTION_VARIANT to an operation pointer
+    // conversion of the CostVariant to an operation pointer
     _output_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_one_hot_variable}, {})));
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{cost_function}), {_one_hot_variable}, {})));
     
     // connections within the module
     _target_variable->get_consumers().push_back(_one_hot_variable);
     _one_hot_variable->get_consumers().push_back(_output_variable);
 }
 
-COST::COST(COST_FUNCTION_VARIANT cost_function)
+Cost::Cost(CostVariant cost_function)
 {
     // error checks
     if(__graph == nullptr)
@@ -124,9 +124,9 @@ COST::COST(COST_FUNCTION_VARIANT cost_function)
     _target_variable = __graph->add_variable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     _output_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, COST_FUNCTION_VARIANT{cost_function}), {_target_variable}, {})));
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{cost_function}), {_target_variable}, {})));
     
     // connections within the module
     _target_variable->get_consumers().push_back(_output_variable);
 }
-#endif // COST_INCLUDE_GUARD
+#endif // Cost_INCLUDE_GUARD

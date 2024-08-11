@@ -29,7 +29,7 @@ public:
      */
     Model()
     {
-        MODULE::set_graph(__graph); // set the static graph pointer in the module class
+        Module::set_graph(__graph); // set the static graph pointer in the module class
     };
     ~Model(){};
     /**
@@ -41,7 +41,7 @@ public:
      * @param layers The layers of the neural network.
      * @param ID The ID of the data/label pair.
      */
-    void sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID = 0);
+    void sequential(std::vector<Module_VARIANT> layers, std::uint32_t ID = 0);
 
     /**
      * @brief This function creates a sequential neural network.
@@ -49,7 +49,7 @@ public:
      * @param norm The norm to use for regularization.
      * @param ID The ID of the data/label pair.
      */
-    void sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID = 0);
+    void sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t ID = 0);
 
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
@@ -58,7 +58,7 @@ public:
      * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer);
+    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer);
     /**
      * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
      * @param data The data.
@@ -67,7 +67,7 @@ public:
      * @param batch_size The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer);
+    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer);
 
     /**
      * @brief This function gets the test error of the model.
@@ -86,16 +86,16 @@ public:
 
 void Model::load()
 {
-    MODULE::set_graph(__graph);
+    Module::set_graph(__graph);
 }
 
-void Model::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
+void Model::sequential(std::vector<Module_VARIANT> layers, std::uint32_t ID)
 {
-    std::vector<std::shared_ptr<MODULE>> clusters;
-    for (MODULE_VARIANT& layer : layers) {
-        std::shared_ptr<MODULE> cluster_ptr = std::visit([](auto&& arg) {
+    std::vector<std::shared_ptr<Module>> clusters;
+    for (Module_VARIANT& layer : layers) {
+        std::shared_ptr<Module> cluster_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return std::shared_ptr<MODULE>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, MODULE_VARIANT{layer});
+        return std::shared_ptr<Module>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, Module_VARIANT{layer});
         clusters.push_back(cluster_ptr);
     }
     
@@ -111,19 +111,19 @@ void Model::sequential(std::vector<MODULE_VARIANT> layers, std::uint32_t ID)
         throw std::runtime_error("ID already exists");
     }
     // add error checks in the future
-    std::shared_ptr<INPUT> input = std::dynamic_pointer_cast<INPUT>(clusters.front());
-    std::shared_ptr<COST> output = std::dynamic_pointer_cast<COST>(clusters.back());
+    std::shared_ptr<Input> input = std::dynamic_pointer_cast<Input>(clusters.front());
+    std::shared_ptr<Cost> output = std::dynamic_pointer_cast<Cost>(clusters.back());
     __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
 }
 
-void Model::sequential(std::vector<MODULE_VARIANT> layers, NORM_VARIANT norm, std::uint32_t ID)
+void Model::sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t ID)
 {
-    DENSE::set_default_norm(norm);
+    Dense::set_default_norm(norm);
     sequential(layers, ID);
 }
 
 
-void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
+void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer)
 {
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
@@ -167,7 +167,7 @@ void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
         __graph->forward();
         std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
         std::cout << "Batch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
-        std::vector<std::shared_ptr<Tensor<double>>> __gradients = __graph->backprop(MODULE::get_learnable_parameters()); // backpropagation
+        std::vector<std::shared_ptr<Tensor<double>>> __gradients = __graph->backprop(Module::get_learnable_parameters()); // backpropagation
         
         std::visit([__gradients, batch_size](auto&& arg) {
             arg.update(__gradients, batch_size);}, optimizer);
@@ -175,7 +175,7 @@ void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
 }
 
 
-void Model::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, Optimizer_Variant optimizer)
+void Model::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer)
 {
     std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
     if (__data_label_pairs.find(0) == __data_label_pairs.end())

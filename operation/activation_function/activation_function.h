@@ -1,18 +1,18 @@
-#ifndef ACTIVATION_FUNCTION_INCLUDE_GUARD
-#define ACTIVATION_FUNCTION_INCLUDE_GUARD
+#ifndef ACTIVATIONFUNCTION_INCLUDE_GUARD
+#define ACTIVATIONFUNCTION_INCLUDE_GUARD
 
 #include"../operation.h"
 
 /**
  * @brief Base class for operation functions. Template class to create an activation function that executes elementwise.
  */
-class ACTIVATION_FUNCTION : public Operation
+class ActivationFunction : public Operation
 {
 public:
     /**
-     * @brief Construct a new ACTIVATION_FUNCTION object
+     * @brief Construct a new ActivationFunction object
      */
-    ACTIVATION_FUNCTION() { __dbg_name = "ACTIVATION_FUNCTION"; }
+    ActivationFunction() { __dbg_name = "ActivationFunction"; }
     /**
      * @brief Forward pass is similar for all activation functions. It applies the activation function to each element of the input tensor.
      */
@@ -32,12 +32,12 @@ public:
     virtual double activation_function_derivative(double x) = 0;
 };
 
-void ACTIVATION_FUNCTION::f(std::vector<std::shared_ptr<Variable>>& inputs)
+void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
     // always check for right number of inputs
     if (inputs.size() != 1)
     {
-        throw std::invalid_argument("ACTIVATION_FUNCTION::f: Invalid number of input variables.");
+        throw std::invalid_argument("ActivationFunction::f: Invalid number of input variables.");
     }
 
     std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->get_data()->shape()); // create a new tensor to store the result
@@ -50,12 +50,12 @@ void ACTIVATION_FUNCTION::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->get_variable()->get_data() = _data; // store the result in the variable
 }
 
-std::shared_ptr<Tensor<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
     // always check for right number of inputs
     if (inputs.size() != 1)
     {
-        throw std::invalid_argument("ACTIVATION_FUNCTION::bprop: Invalid number of input variables.");
+        throw std::invalid_argument("ActivationFunction::bprop: Invalid number of input variables.");
     }
 
     // load derivative of activation into data 
@@ -69,7 +69,7 @@ std::shared_ptr<Tensor<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shar
     return _data;
 }
 
-// include all the activation functions to create an ACTIVATION_FUNCTION_VARIANT
+// include all the activation functions to create an ActivationFunction_VARIANT
 
 #include "rectified_linear_unit.h"
 #include "hyperbolic_tangent.h"
@@ -78,7 +78,7 @@ std::shared_ptr<Tensor<double>> ACTIVATION_FUNCTION::bprop(std::vector<std::shar
 #include "sigmoid.h"
 #include "softmax.h"
 
-using ACTIVATION_FUNCTION_VARIANT = std::variant<ReLU, HyperbolicTangent, Linear, HeavysideStep, Sigmoid, Softmax>; // this can be used from the user side and should move to a different location at some point
+using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Linear, HeavysideStep, Sigmoid, Softmax>; // this can be used from the user side and should move to a different location at some point
 
 
-#endif // ACTIVATION_FUNCTION_INCLUDE_GUARD
+#endif // ActivationFunction_INCLUDE_GUARD

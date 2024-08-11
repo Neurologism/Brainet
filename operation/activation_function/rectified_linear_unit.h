@@ -6,7 +6,7 @@
 /**
  * @brief Rectified linear unit class, representing the ReLU activation function f(x) = max(x, 0).
 */
-class ReLU : public ACTIVATION_FUNCTION
+class ReLU : public ActivationFunction
 {
     double __gradient; // gradient of left part of the function
 

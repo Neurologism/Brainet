@@ -8,7 +8,7 @@
  * @brief this can store the input data of the model. Initalize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.
  * Preprocessing could be added at this point in the future.
  */
-class INPUT : public MODULE
+class Input : public Module
 {
     std::shared_ptr<Variable> _input_variable;
     std::shared_ptr<Variable> _noise_variable;
@@ -17,14 +17,14 @@ public:
      * @brief add an input to the graph
      * @param units the respective size of a single input
      */
-    INPUT(std::uint32_t units);
+    Input(std::uint32_t units);
     /**
      * @brief add an input to the graph with a noise operation
      * @param units the respective size of a single input
      * @param noise the noise operation to add to the input
      */
-    INPUT(std::uint32_t units, Noise noise);
-    ~INPUT() = default;
+    Input(std::uint32_t units, Noise noise);
+    ~Input() = default;
     /**
      * @brief throw an error if this function is called because the input variable cannot have an input.
      */
@@ -48,7 +48,7 @@ public:
     
 };
 
-INPUT::INPUT(std::uint32_t units)
+Input::Input(std::uint32_t units)
 {
     // error checks
     if(__graph == nullptr)
@@ -63,7 +63,7 @@ INPUT::INPUT(std::uint32_t units)
     _noise_variable = nullptr; // no noise is added
 }
 
-INPUT::INPUT(std::uint32_t units, Noise noise)
+Input::Input(std::uint32_t units, Noise noise)
 {
     // error checks
     if(__graph == nullptr)
@@ -81,12 +81,12 @@ INPUT::INPUT(std::uint32_t units, Noise noise)
     _input_variable->get_consumers().push_back(_noise_variable); // add the noise variable as a consumer of the input variable
 }
 
-void INPUT::add_input(std::shared_ptr<Variable> input, std::uint32_t units)
+void Input::add_input(std::shared_ptr<Variable> input, std::uint32_t units)
 {
     throw std::runtime_error("Input variable cannot have an input");
 }
 
-void INPUT::add_output(std::shared_ptr<Variable> output)
+void Input::add_output(std::shared_ptr<Variable> output)
 {
     if(_noise_variable != nullptr)
     {
@@ -98,13 +98,13 @@ void INPUT::add_output(std::shared_ptr<Variable> output)
     }
 }
 
-std::shared_ptr<Variable> INPUT::input(std::uint32_t index)
+std::shared_ptr<Variable> Input::input(std::uint32_t index)
 {
     throw std::runtime_error("Input variable cannot have an input");
     return nullptr;
 }
 
-std::shared_ptr<Variable> INPUT::output(std::uint32_t index)
+std::shared_ptr<Variable> Input::output(std::uint32_t index)
 {
     if(_noise_variable != nullptr)
     {
@@ -113,9 +113,9 @@ std::shared_ptr<Variable> INPUT::output(std::uint32_t index)
     return _input_variable;
 }
 
-std::shared_ptr<Variable> INPUT::data()
+std::shared_ptr<Variable> Input::data()
 {
     return _input_variable;
 }
 
-#endif // INPUT_INCLUDE_GUARD
+#endif // Input_INCLUDE_GUARD

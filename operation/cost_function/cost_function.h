@@ -7,6 +7,6 @@
 #include "mse.h" // variant for all cost functions
 
 
-using COST_FUNCTION_VARIANT = std::variant<MSE>;
+using CostVariant = std::variant<MSE>;
 
 #endif // COST_FUNCTION_INCLUDE_GUARD
