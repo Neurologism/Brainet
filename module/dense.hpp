@@ -1,11 +1,11 @@
-#ifndef DENSE_INCLUDE_GUARD
-#define DENSE_INCLUDE_GUARD
+#ifndef DENSE_HPP
+#define DENSE_HPP
 
-#include "./module.h"
-#include "../operation/linear_algebra/matmul.h"
-#include "../operation/processing/padding.h"
-#include "../operation/activation_function/activation_function.h"
-#include "../operation/norm/norm.h"
+#include "./module.hpp"
+#include "../operation/linear_algebra/matmul.hpp"
+#include "../operation/processing/padding.hpp"
+#include "../operation/activation_function/activation_function.hpp"
+#include "../operation/norm/norm.hpp"
 
 /**
  * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
@@ -138,4 +138,4 @@ Dense::Dense(ActivationVariant activation_function, std::uint32_t units, NormVar
 
 std::shared_ptr<NormVariant> Dense::_default_norm = nullptr;
 
-#endif // Dense_INCLUDE_GUARD
+#endif // DENSE_HPP

@@ -1,7 +1,7 @@
-#ifndef MSE_INCLUDE_GUARD
-#define MSE_INCLUDE_GUARD
+#ifndef MSE_HPP
+#define MSE_HPP
 
-#include"../operation.h"
+#include"../operation.hpp"
 
 
 /**
@@ -66,4 +66,4 @@ std::shared_ptr<Tensor<double>> MSE::bprop(std::vector<std::shared_ptr<Variable>
     return _gradient;
 }
 
-#endif // MSE_INCLUDE_GUARD
+#endif // MSE_HPP

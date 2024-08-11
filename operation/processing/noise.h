@@ -1,5 +1,5 @@
-#ifndef NOISE_INCLUDE_GUARD
-#define NOISE_INCLUDE_GUARD
+#ifndef NOISE_HPP
+#define NOISE_HPP
 
 #include "../operation.h"
 

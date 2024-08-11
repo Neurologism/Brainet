@@ -1,7 +1,7 @@
-#ifndef HYPERBOLIC_TANGENT_INCLUDE_GUARD
-#define HYPERBOLIC_TANGENT_INCLUDE_GUARD
+#ifndef HYPERBOLICTANGENT_HPP
+#define HYPERBOLICTANGENT_HPP
 
-#include "activation_function.h"
+#include "activation_function.hpp"
 
 /**
  * @brief Hyperbolic tangent function class, representing the hyperbolic tangent function f(x) = tanh(x).
@@ -25,4 +25,4 @@ double HyperbolicTangent::activation_function_derivative(double input)
     return 1 - pow(activation_function(input), 2);
 }
 
-#endif // HYPERBOLIC_TANGENT_INCLUDE_GUARD
+#endif // HYPERBOLICTANGENT_HPP

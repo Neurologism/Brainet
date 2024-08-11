@@ -1,9 +1,8 @@
-#ifndef VARIABLE_INCLUDE_GUARD
-#define VARIABLE_INCLUDE_GUARD
+#ifndef VARIABLE_HPP
+#define VARIABLE_HPP
 
-#include "dependencies.h"
-#include "tensor.h"
-#include "operation/operation.h"
+#include "tensor.hpp"
+#include "operation/operation.hpp"
 
 class Operation;
 
@@ -125,4 +124,4 @@ std::uint32_t Variable::get_id()
 
 std::uint32_t Variable::__counter = 0; // initialize the static counter
 
-#endif // Variable_INCLUDE_GUARD
+#endif // VARIABLE_HPP

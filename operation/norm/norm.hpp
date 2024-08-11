@@ -1,7 +1,7 @@
-#ifndef Norm_INCLUDE_GUARD
-#define Norm_INCLUDE_GUARD
+#ifndef NORM_HPP
+#define NORM_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 
 /**
@@ -25,10 +25,10 @@ public:
 };
 
 
-#include "L1.h"
-#include "L2.h"
+#include "L1.hpp"
+#include "L2.hpp"
 
 using NormVariant = std::variant<L1, L2>;
 
 
-#endif // Norm_INCLUDE_GUARD
+#endif // NORM_HPP

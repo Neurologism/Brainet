@@ -1,7 +1,7 @@
-#ifndef SIGMOID_INCLUDE_GUARD
-#define SIGMOID_INCLUDE_GUARD
+#ifndef SIGMOID_HPP
+#define SIGMOID_HPP
 
-#include "activation_function.h"
+#include "activation_function.hpp"
 
 /**
  * @brief Sigmoid function class, representing the sigmoid function f(x) = 1 / (1 + exp(-x)).
@@ -25,4 +25,4 @@ double Sigmoid::activation_function_derivative(double input)
     return activation_function(input) * (1 - activation_function(input));
 }
 
-#endif // SIGMOID_INCLUDE_GUARD
+#endif // SIGMOID_HPP

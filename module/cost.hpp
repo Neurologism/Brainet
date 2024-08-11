@@ -1,10 +1,10 @@
-#ifndef COST_INCLUDE_GUARD
-#define COST_INCLUDE_GUARD
+#ifndef COST_HPP
+#define COST_HPP
 
-#include "../dependencies.h"
-#include "module.h"
-#include "../operation/cost_function/cost_function.h"
-#include "../operation/processing/one_hot.h"
+#include "../dependencies.hpp"
+#include "module.hpp"
+#include "../operation/cost_function/cost_function.hpp"
+#include "../operation/processing/one_hot.hpp"
 
 /**
  * @brief the cost module is intended for calculating the cost of various models. Currently only cost functions dependy on the output of the network and the y truth are supported.
@@ -129,4 +129,4 @@ Cost::Cost(CostVariant cost_function)
     // connections within the module
     _target_variable->get_consumers().push_back(_output_variable);
 }
-#endif // Cost_INCLUDE_GUARD
+#endif // COST_HPP

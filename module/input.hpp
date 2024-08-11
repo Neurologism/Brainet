@@ -1,8 +1,8 @@
-#ifndef INPUT_INCLUDE_GUARD
-#define INPUT_INCLUDE_GUARD
+#ifndef INPUT_HPP
+#define INPUT_HPP
 
-#include "./module.h"
-#include "../operation/processing/noise.h"
+#include "./module.hpp"
+#include "../operation/processing/noise.hpp"
 
 /**
  * @brief this can store the input data of the model. Initalize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.
@@ -118,4 +118,4 @@ std::shared_ptr<Variable> Input::data()
     return _input_variable;
 }
 
-#endif // Input_INCLUDE_GUARD
+#endif // INPUT_HPP

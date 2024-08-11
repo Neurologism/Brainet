@@ -1,7 +1,7 @@
-#ifndef TENSOR_INCLUDE_GUARD
-#define TENSOR_INCLUDE_GUARD
+#ifndef TENSOR_HPP
+#define TENSOR_HPP
 
-#include "dependencies.h"
+#include "dependencies.hpp"
 
 /**
  * @brief The tensor class is a implementation of a tensor. It is used to store data in a multidimensional array. To do this it uses a vector to store the data and a vector to store the shape of the tensor.
@@ -211,4 +211,4 @@ void Tensor<T>::reshape(std::vector<std::uint32_t> dimensionality)
     __shape = dimensionality; // set the new shape
 }
 
-#endif // Tensor_INCLUDE_GUARD
+#endif // TENSOR_HPP

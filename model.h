@@ -1,7 +1,6 @@
 #ifndef MODEL_INCLUDE_GUARD
 #define MODEL_INCLUDE_GUARD
 
-#include "dependencies.h"
 #include "graph.h"
 #include "module/module.h"
 #include "operation/activation_function/activation_function.h"

@@ -1,7 +1,7 @@
-#ifndef L1_INCLUDE_GUARD
-#define L1_INCLUDE_GUARD
+#ifndef L1_HPP
+#define L1_HPP
 
-#include "norm.h"
+#include "norm.hpp"
 
 /**
  * @brief Used to add a L1 norm penalty to a weight matrix. This is used to prevent overfitting.
@@ -88,4 +88,4 @@ std::shared_ptr<Tensor<double>> L1::bprop(std::vector<std::shared_ptr<Variable>>
     return result;
 }
 
-#endif // L1_INCLUDE_GUARD
+#endif // L1_HPP

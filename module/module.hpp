@@ -1,9 +1,9 @@
-#ifndef CLUSTER_INCLUDE_GUARD
-#define CLUSTER_INCLUDE_GUARD
+#ifndef MODULE_HPP
+#define MODULE_HPP
 
-#include "../dependencies.h"
-#include "../variable.h"
-#include "../graph.h"
+#include "../dependencies.hpp"
+#include "../variable.hpp"
+#include "../graph.hpp"
 
 /**
  * @brief The Module class can be used to group multiple variables together. This is useful for adding substructures to the graph. It is mainly used to add something similar to layers to the graph.
@@ -59,10 +59,10 @@ std::vector<std::shared_ptr<Variable>> Module::__learnable_parameters = {};
 
 
 // code of all child classes
-#include "input.h"
-#include "dense.h"
-#include "cost.h"
+#include "input.hpp"
+#include "dense.hpp"
+#include "cost.hpp"
 
 using Module_VARIANT = std::variant<Input, Dense, Cost>;
 
-#endif // Module_INCLUDE_GUARD
+#endif // MODULE_HPP

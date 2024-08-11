@@ -1,7 +1,7 @@
-#ifndef RECTIFIED_LINEAR_UNIT_INCLUDE_GUARD
-#define RECTIFIED_LINEAR_UNIT_INCLUDE_GUARD
+#ifndef RECTIFIEDLINEARUNIT_HPP
+#define RECTIFIEDLINEARUNIT_HPP
 
-#include "activation_function.h"
+#include "activation_function.hpp"
 
 /**
  * @brief Rectified linear unit class, representing the ReLU activation function f(x) = max(x, 0).
@@ -40,4 +40,4 @@ double ReLU::activation_function_derivative(double input)
 // add parametric RELU
 // add Maxout
 
-#endif // RECTIFIED_LINEAR_UNIT_INCLUDE_GUARD
+#endif // RECTIFIEDLINEARUNIT_HPP

@@ -1,7 +1,7 @@
-#ifndef MATMUL_INCLUDE_GUARD
-#define MATMUL_INCLUDE_GUARD
+#ifndef MATMUL_HPP
+#define MATMUL_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 
 /**
@@ -117,4 +117,4 @@ std::shared_ptr<Tensor<double>> Matmul::bprop(std::vector<std::shared_ptr<Variab
     }
 }
 
-#endif // MATRX_MULTIPLY_INCLUDE_GUARD
+#endif // MATMUL_HPP

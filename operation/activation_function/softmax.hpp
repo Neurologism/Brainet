@@ -1,7 +1,7 @@
-#ifndef SOFTMAX_INCLUDE_GUARD
-#define SOFTMAX_INCLUDE_GUARD
+#ifndef SOFTMAX_HPP
+#define SOFTMAX_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 /**
  * @brief Softmax function class, representing the softmax function f(x) = exp(x) / sum(exp(x)).
@@ -92,4 +92,4 @@ std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Varia
 
     return _grad; // return the gradient
 }
-#endif // SOFTMAX_INCLUDE_GUARD
+#endif // SOFTMAX_HPP

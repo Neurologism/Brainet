@@ -1,9 +1,8 @@
-#ifndef OPERATION_INCLUDE_GUARD
-#define OPERATION_INCLUDE_GUARD
+#ifndef OPERATION_HPP
+#define OPERATION_HPP
 
-#include "../dependencies.h"
-#include "../variable.h"
-#include "../tensor.h"
+#include "../variable.hpp"
+#include "../tensor.hpp"
 
 class Variable;
 
@@ -68,4 +67,4 @@ std::shared_ptr<Variable> Operation::get_variable()
     return __variable;
 }
 
-#endif // Operation_INCLUDE_GUARD
+#endif // OPERATION_HPP

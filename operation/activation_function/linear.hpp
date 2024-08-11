@@ -1,7 +1,7 @@
-#ifndef LINEAR_INCLUDE_GUARD
-#define LINEAR_INCLUDE_GUARD
+#ifndef LINEAR_HPP
+#define LINEAR_HPP
 
-#include "activation_function.h"
+#include "activation_function.hpp"
 
 /**
  * @brief Linear function class, representing the linear function f(x) = x.
@@ -25,4 +25,4 @@ double Linear::activation_function_derivative(double input)
     return 1;
 }
 
-#endif // LINEAR_INCLUDE_GUARD
+#endif // LINEAR_HPP

@@ -1,7 +1,7 @@
-#ifndef ACTIVATIONFUNCTION_INCLUDE_GUARD
-#define ACTIVATIONFUNCTION_INCLUDE_GUARD
+#ifndef ACTIVATIONFUNCTION_HPP
+#define ACTIVATIONFUNCTION_HPP
 
-#include"../operation.h"
+#include"../operation.hpp"
 
 /**
  * @brief Base class for operation functions. Template class to create an activation function that executes elementwise.
@@ -71,14 +71,14 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
 
 // include all the activation functions to create an ActivationFunction_VARIANT
 
-#include "rectified_linear_unit.h"
-#include "hyperbolic_tangent.h"
-#include "linear.h"
-#include "heavyside_step.h"
-#include "sigmoid.h"
-#include "softmax.h"
+#include "rectified_linear_unit.hpp"
+#include "hyperbolic_tangent.hpp"
+#include "linear.hpp"
+#include "heavyside_step.hpp"
+#include "sigmoid.hpp"
+#include "softmax.hpp"
 
 using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Linear, HeavysideStep, Sigmoid, Softmax>; // this can be used from the user side and should move to a different location at some point
 
 
-#endif // ActivationFunction_INCLUDE_GUARD
+#endif // ACTIVATIONFUNCTION_HPP
