@@ -2,7 +2,7 @@
 #define DENSE_HPP
 
 #include "./module.hpp"
-#include "../operation/linear_algebra/matmul.hpp"
+#include "../operation/matmul.hpp"
 #include "../operation/processing/padding.hpp"
 #include "../operation/activation_function/activation_function.hpp"
 #include "../operation/norm/norm.hpp"
@@ -54,7 +54,7 @@ public:
         }
         
         // +1 for the weight
-        _weight_matrix_variable->get_data() = std::make_shared<Tensor<double>>(Tensor<double>({input_units+1,__units}, 1, 1)); // we now know the size of the input (make own function for better use maybe)
+        _weight_matrix_variable->get_data() = std::make_shared<Tensor<double>>(Tensor<double>({input_units+1,__units})); // initialize the weights randomly
         
         if (_norm != nullptr) // adding norm to activation function
         {
