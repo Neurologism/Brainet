@@ -1,5 +1,5 @@
-#ifndef DEPENDENCIES_INCLUDE_GUARD
-#define DEPENDENCIES_INCLUDE_GUARD
+#ifndef DEPENDENCIES_HPP
+#define DEPENDENCIES_HPP
 
 // all external libraries are included here
 #include <vector>
@@ -20,4 +20,4 @@
 #include <bitset>
 #include <map>
 
-#endif // DEPENDENCIES_INCLUDE_GUARD
+#endif // DEPENDENCIES_HPP

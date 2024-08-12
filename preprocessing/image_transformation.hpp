@@ -1,12 +1,12 @@
-#ifndef IMAGE_TRANSFORMATION_INCLUDE_GUARD
-#define IMAGE_TRANSFORMATION_INCLUDE_GUARD
+#ifndef IMAGETRANSFORMATION_HPP
+#define IMAGETRANSFORMATION_HPP
 
-#include "../dependencies.h"
+#include "../dependencies.hpp"
 
 /**
  * @brief Used to apply various transformations to an image. This is used to augment the dataset.
  */
-class IMAGE_TRANSFORMATION
+class ImageTransformation
 {
     typedef std::vector<std::vector<double>> data_type;
 
@@ -78,4 +78,4 @@ public:
      */
 };
 
-#endif // IMAGE_TRANSFORMATION_INCLUDE_GUARD
+#endif // IMAGETRANSFORMATION_HPP

@@ -1,12 +1,12 @@
-#ifndef PADDING_INCLUDE_GUARD
-#define PADDING_INCLUDE_GUARD
+#ifndef PADDING_HPP
+#define PADDING_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 /**
  * @brief Padding class, used to add padding in positive x and y direction to the input tensor in shape (x, y). Should be extended to work for any amount of dimensions and in both directions.
 */
-class Padding : public OPERATION
+class Padding : public Operation
 {
     // store data
     std::uint32_t _x_padding;
@@ -26,11 +26,11 @@ public:
     /**
      * @brief Add padding to the input tensor.
      */
-    virtual void f(std::vector<std::shared_ptr<VARIABLE>>& inputs)override;
+    virtual void f(std::vector<std::shared_ptr<Variable>>& inputs)override;
     /**
      * @brief Remove padding from the gradient tensor.
      */
-    virtual std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)override;
+    virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)override;
 };
 
 Padding::Padding(std::uint32_t x_padding, std::uint32_t y_padding, double padding_value)
@@ -41,7 +41,7 @@ Padding::Padding(std::uint32_t x_padding, std::uint32_t y_padding, double paddin
     __dbg_name = "PADDING";
 }
 
-void Padding::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
+void Padding::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
     if (inputs.size() != 1)
     {
@@ -49,7 +49,7 @@ void Padding::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     }
 
     // create a new tensor with the new size and copy the data from the input tensor
-    std::shared_ptr<TENSOR<double>> _data = std::make_shared<TENSOR<double>>(TENSOR<double>({inputs.front()->get_data()->shape(0) + _x_padding, inputs.front()->get_data()->shape(1) + _y_padding}, _padding_value));
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(Tensor<double>({inputs.front()->get_data()->shape(0) + _x_padding, inputs.front()->get_data()->shape(1) + _y_padding}, _padding_value));
 
     for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape(0); i++)
     {
@@ -61,7 +61,7 @@ void Padding::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     this->get_variable()->get_data() = _data;
 };
 
-std::shared_ptr<TENSOR<double>> Padding::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)
+std::shared_ptr<Tensor<double>> Padding::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
     if (inputs.size() != 1)
     {
@@ -69,7 +69,7 @@ std::shared_ptr<TENSOR<double>> Padding::bprop(std::vector<std::shared_ptr<VARIA
     }
 
     // create a new tensor with the new size and copy the selected data from the gradient tensor
-    std::shared_ptr<TENSOR<double>> _data = std::make_shared<TENSOR<double>>(inputs.front()->get_data()->shape());
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->get_data()->shape());
 
     for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape(0); i++)
     {
@@ -82,4 +82,4 @@ std::shared_ptr<TENSOR<double>> Padding::bprop(std::vector<std::shared_ptr<VARIA
     return _data;
 };
 
-#endif // PADDING_INCLUDE_GUARD
+#endif // PADDING_HPP

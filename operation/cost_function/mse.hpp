@@ -1,23 +1,23 @@
-#ifndef MSE_INCLUDE_GUARD
-#define MSE_INCLUDE_GUARD
+#ifndef MSE_HPP
+#define MSE_HPP
 
-#include"../operation.h"
+#include"../operation.hpp"
 
 
 /**
  * @brief Mean squared error class, representing the function f(x, y) = (1/n) * sum((x_i - y_i)^2) for i = 1 to n.
 */
-class MSE : public OPERATION
+class MSE : public Operation
 {
 public:
     MSE() { __dbg_name = "MSE"; }
-    void f(std::vector<std::shared_ptr<VARIABLE>>& inputs) override;
-    std::shared_ptr<TENSOR<double>> bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient) override;
+    void f(std::vector<std::shared_ptr<Variable>>& inputs) override;
+    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
 };
 
 
 
-void MSE::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
+void MSE::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
     // security checks
     if(inputs.size() != 2)
@@ -36,11 +36,11 @@ void MSE::f(std::vector<std::shared_ptr<VARIABLE>>& inputs)
     }
     sum /= inputs[0]->get_data()->size();
     // store the result
-    this->get_variable()->get_data() = std::make_shared<TENSOR<double>>(TENSOR<double>({1},sum));
+    this->get_variable()->get_data() = std::make_shared<Tensor<double>>(Tensor<double>({1},sum));
 }
 
 
-std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>>& inputs, std::shared_ptr<VARIABLE> & focus, std::shared_ptr<TENSOR<double>> & gradient)
+std::shared_ptr<Tensor<double>> MSE::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
     // security checks
     if(inputs.size() != 2)
@@ -57,7 +57,7 @@ std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>
     }
 
     // calculate the gradient of the mean squared error function
-    std::shared_ptr<TENSOR<double>> _gradient = std::make_shared<TENSOR<double>>(TENSOR<double>(inputs[0]->get_data()->shape()));
+    std::shared_ptr<Tensor<double>> _gradient = std::make_shared<Tensor<double>>(Tensor<double>(inputs[0]->get_data()->shape()));
     for(std::uint32_t i = 0; i < inputs[0]->get_data()->size(); i++)
     {
         _gradient->data()[i] = -(inputs[0]->get_data()->data()[i] - inputs[1]->get_data()->data()[i]) * gradient->data()[0] / inputs[0]->get_data()->shape(1); // only divide by the size of 1 training example
@@ -66,4 +66,4 @@ std::shared_ptr<TENSOR<double>> MSE::bprop(std::vector<std::shared_ptr<VARIABLE>
     return _gradient;
 }
 
-#endif // MSE_INCLUDE_GUARD
+#endif // MSE_HPP

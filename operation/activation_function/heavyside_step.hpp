@@ -1,12 +1,12 @@
-#ifndef HEAVYSIDE_STEP_INCLUDE_GUARD
-#define HEAVYSIDE_STEP_INCLUDE_GUARD
+#ifndef HEAVYSIDESTEP_HPP
+#define HEAVYSIDESTEP_HPP
 
-#include "activation_function.h"
+#include "activation_function.hpp"
 
 /**
  * @brief Heavyside step function class, representing the Heavyside step function f(x) = 1 if x >= 0, 0 otherwise.
 */
-class HeavysideStep : public ACTIVATION_FUNCTION
+class HeavysideStep : public ActivationFunction
 {   
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
@@ -25,4 +25,4 @@ double HeavysideStep::activation_function_derivative(double input)
     return 0;
 }
 
-#endif // HEAVYSIDE_STEP_INCLUDE_GUARD
+#endif // HEAVYSIDESTEP_HPP
