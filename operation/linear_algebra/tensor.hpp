@@ -18,11 +18,6 @@ protected:
     DataVector mData; // the data of the tensor
     ShapeVector mShape; // the shape of the tensor
 
-    {
-        if (mData.size() != std::accumulate(mShape.begin(),mShape.end(),1, std::multiplies<ShapeType>()))
-            throw std::invalid_argument("Tensor::data: DataVector size does not match the dimensionality of the tensor");
-    }
-
 public:
     /**
      * @brief Construct an empty new Tensor object.

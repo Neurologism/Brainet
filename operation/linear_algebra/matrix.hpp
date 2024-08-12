@@ -58,6 +58,13 @@ public:
      * @return A new matrix that is the transposed version of the original matrix.
      */
     std::shared_ptr<Matrix<T>> transpose();
+
+    /**
+     * @brief Calculate the dot product of two matrices.
+     * @param other The other matrix to calculate the dot product with.
+     * @return The dot product of the two matrices.
+     */
+    std::shared_ptr<Matrix<T>> dot(const Matrix<T> & other);
 };
 
 template <typename T>
@@ -91,7 +98,7 @@ T Matrix<T>::at(const std::uint32_t & i, const std::uint32_t & j)
 {
     if (i >= mShape[0] || j >= mShape[1])
         throw std::out_of_range("Matrix::at: Index out of range.");
-
+    
     return mData[i * mShape[1] + j];
 }
 
@@ -122,6 +129,13 @@ std::shared_ptr<Matrix<T>> Matrix<T>::transpose()
     }
     _tensor->data() = _data; // set the data of the new tensor
     return _tensor; // return the new tensor
+}
+
+template <class T>
+std::shared_ptr<Matrix<T>> Matrix<T>::dot(const Matrix<T> & other) // move from matmul to here
+{
+    throw std::invalid_argument("Matrix::dot: Not implemented.");
+    return nullptr;
 }
 
 #endif // MATRIX_HPP
