@@ -2,7 +2,6 @@
 #define IDXREADER_HPP
 
 #include "../dependencies.hpp"
-#include "../tensor.hpp"
 
 std::vector<std::vector<double>> read_idx(const std::string path)
 {

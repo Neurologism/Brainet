@@ -2,7 +2,9 @@
 #define OPERATION_HPP
 
 #include "../variable.hpp"
-#include "../tensor.hpp"
+#include "../datatypes/tensor.hpp"
+#include "../datatypes/matrix.hpp"
+#include "../datatypes/vector.hpp"
 
 class Variable;
 

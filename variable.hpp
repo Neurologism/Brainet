@@ -1,7 +1,9 @@
 #ifndef VARIABLE_HPP
 #define VARIABLE_HPP
 
-#include "tensor.hpp"
+#include "datatypes/tensor.hpp"
+#include "datatypes/matrix.hpp"
+#include "datatypes/vector.hpp"
 #include "operation/operation.hpp"
 
 class Operation;

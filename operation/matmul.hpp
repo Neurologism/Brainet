@@ -1,7 +1,7 @@
 #ifndef MATMUL_HPP
 #define MATMUL_HPP
 
-#include "../operation.hpp"
+#include "operation.hpp"
 
 
 /**
@@ -103,16 +103,17 @@ std::shared_ptr<Tensor<double>> Matmul::bprop(std::vector<std::shared_ptr<Variab
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid shapes of input matrices.");
     }
+    
 
     // return the gradient multiplied by the input != focus
     if (inputs[0]->get_id() == focus->get_id())
     {
-        std::shared_ptr<Tensor<double>> right_matrix_transposed = inputs[1]->get_data()->transpose(); // transposed version needed to output the correct shape
+        std::shared_ptr<Tensor<double>> right_matrix_transposed = static_cast<Matrix<double>*>(inputs[1]->get_data().get())->transpose(); // transposed version needed to output the correct shape
         return matmul(gradient, right_matrix_transposed);
     }
     else 
     {
-        std::shared_ptr<Tensor<double>> left_matrix_transposed = inputs[0]->get_data()->transpose(); // transposed version needed to output the correct shape
+        std::shared_ptr<Tensor<double>> left_matrix_transposed = static_cast<Matrix<double>*>(inputs[0]->get_data().get())->transpose(); // transposed version needed to output the correct shape
         return matmul(left_matrix_transposed, gradient);
     }
 }
