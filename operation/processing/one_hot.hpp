@@ -1,7 +1,7 @@
-#ifndef ONE_HOT_INCLUDE_GUARD
-#define ONE_HOT_INCLUDE_GUARD
+#ifndef ONEHOT_HPP
+#define ONEHOT_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 /**
  * @brief One hot encoding class, used to perform one hot encoding on the input tensor. Only supporting forward pass.
@@ -68,5 +68,5 @@ std::shared_ptr<Tensor<double>> OneHot::bprop(std::vector<std::shared_ptr<Variab
     throw std::invalid_argument("OneHot::bprop: Backward pass is not supported for one hot encoding.");
 }
 
-#endif // ONE_HOT_INCLUDE_GUARD
+#endif // ONEHOT_HPP
     

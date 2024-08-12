@@ -75,9 +75,9 @@ public:
 
 Cost::Cost(CostVariant cost_function, std::uint32_t one_hot_encoding_size, double label_smoothing)
 {
-    if (label_smoothing <= 0)
+    if (label_smoothing < 0)
     {
-        throw std::invalid_argument("Cost::Cost: label_smoothing must be greater than 0");
+        throw std::invalid_argument("Cost::Cost: label_smoothing must be at least 0");
     }
     if (label_smoothing >= 1)
     {
@@ -95,7 +95,7 @@ Cost::Cost(CostVariant cost_function, std::uint32_t one_hot_encoding_size, doubl
 
     
     // variable performing one hot encoding; no backward pass is supported
-    _one_hot_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(10, 1-label_smoothing, label_smoothing/(one_hot_encoding_size-1))), {_target_variable}, {}))); 
+    _one_hot_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(one_hot_encoding_size, 1-label_smoothing, label_smoothing/(one_hot_encoding_size-1))), {_target_variable}, {}))); 
 
     // conversion of the CostVariant to an operation pointer
     _output_variable = __graph->add_variable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {

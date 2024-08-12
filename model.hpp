@@ -1,10 +1,10 @@
-#ifndef MODEL_INCLUDE_GUARD
-#define MODEL_INCLUDE_GUARD
+#ifndef MODEL_HPP
+#define MODEL_HPP
 
-#include "graph.h"
-#include "module/module.h"
-#include "operation/activation_function/activation_function.h"
-#include "optimizers/Optimizer.hpp"
+#include "graph.hpp"
+#include "module/module.hpp"
+#include "operation/activation_function/activation_function.hpp"
+#include "optimizers/optimizer.hpp"
 
 /**
  * @brief The model class is the main interface for the user to create a neural network. It is used to build the network and to train it.
@@ -226,4 +226,4 @@ void Model::test(data_type const data, label_type const label, std::uint32_t con
     test(data_label_pairs, max_test_size);
 }
 
-#endif // Model_INCLUDE_GUARD
+#endif // MODEL_HPP

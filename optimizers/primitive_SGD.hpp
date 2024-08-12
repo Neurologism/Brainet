@@ -1,8 +1,8 @@
-#ifndef PRIMITIVE_SGD_HPP
-#define PRIMITIVE_SGD_HPP
+#ifndef PRIMITIVESGD_HPP
+#define PRIMITIVESGD_HPP
 
-#include "Optimizer.hpp"
-#include "../module/module.h"
+#include "optimizer.hpp"
+#include "../module/module.hpp"
 
 /**
  * @brief The PrimitiveSGD class is a simple implementation of the stochastic gradient descent algorithm.
@@ -27,14 +27,14 @@ PrimitiveSGD::PrimitiveSGD(double initial_learning_rate, double decay_rate)
 
 void PrimitiveSGD::update(const std::vector<std::shared_ptr<Tensor<double>>> & gradients, std::uint32_t batch_size)
 {
-    for(std::uint32_t i = 0; i < MODULE::get_learnable_parameters().size(); i++)
+    for(std::uint32_t i = 0; i < Module::get_learnable_parameters().size(); i++)
     {
-        for(std::uint32_t j = 0; j < MODULE::get_learnable_parameters()[i]->get_data()->size(); j++)
+        for(std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->size(); j++)
         {
-            MODULE::get_learnable_parameters()[i]->get_data()->data()[j] -= _initial_learning_rate * gradients[i]->data()[j] / batch_size;
+            Module::get_learnable_parameters()[i]->get_data()->data()[j] -= _initial_learning_rate * gradients[i]->data()[j] / batch_size;
         }
     }
     _initial_learning_rate *= _decay_rate; // primitive learning rate decay
 }
 
-#endif // PrimitiveSGD_HPP
+#endif // PRIMITIVESGD_HPP

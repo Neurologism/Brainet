@@ -1,6 +1,6 @@
 #pragma GCC optimize("O3")
 
-#include "brainet.h"
+#include "brainet.hpp"
 
 using namespace std;
 
@@ -32,9 +32,9 @@ std::int32_t main()
     // feel free to contact me via email : samsun2006@outlook.com if you have any questions, suggestions or if you want to know how the project works
 
     Model model;
-    model.sequential({INPUT(input[0].size()), DENSE(ReLU(),300), DENSE(Sigmoid(),10), COST(MSE(),10)});   
+    model.sequential({Input(input[0].size()), Dense(ReLU(),300), Dense(Sigmoid(),10), Cost(MSE(),10)});   
 
-    model.train(input,target,100,200,0.01,0.99);
+    model.train(input,target,100,200,PrimitiveSGD(0.01,0.99));
 
     model.test(test_input,test_target);
     return 0; 

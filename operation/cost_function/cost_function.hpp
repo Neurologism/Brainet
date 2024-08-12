@@ -1,5 +1,5 @@
-#ifndef COST_HPP
-#define COST_HPP
+#ifndef COSTFUNCTION_HPP
+#define COSTFUNCTION_HPP
 
 // this might turn into something simliar to the activation function header
 

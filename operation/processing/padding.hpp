@@ -1,7 +1,7 @@
-#ifndef PADDING_INCLUDE_GUARD
-#define PADDING_INCLUDE_GUARD
+#ifndef PADDING_HPP
+#define PADDING_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 /**
  * @brief Padding class, used to add padding in positive x and y direction to the input tensor in shape (x, y). Should be extended to work for any amount of dimensions and in both directions.
@@ -82,4 +82,4 @@ std::shared_ptr<Tensor<double>> Padding::bprop(std::vector<std::shared_ptr<Varia
     return _data;
 };
 
-#endif // PADDING_INCLUDE_GUARD
+#endif // PADDING_HPP

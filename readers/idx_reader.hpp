@@ -1,8 +1,8 @@
-#ifndef IDX_READER_INCLUDE_GUARD
-#define IDX_READER_INCLUDE_GUARD
+#ifndef IDXREADER_HPP
+#define IDXREADER_HPP
 
-#include "../dependencies.h"
-#include "../tensor.h"
+#include "../dependencies.hpp"
+#include "../tensor.hpp"
 
 std::vector<std::vector<double>> read_idx(const std::string path)
 {
@@ -49,4 +49,4 @@ std::vector<std::vector<double>> read_idx(const std::string path)
 }
 
 
-#endif // IDX_READER_INCLUDE_GUARD
+#endif // IDXREADER_HPP

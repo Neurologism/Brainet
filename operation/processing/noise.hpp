@@ -1,7 +1,7 @@
 #ifndef NOISE_HPP
 #define NOISE_HPP
 
-#include "../operation.h"
+#include "../operation.hpp"
 
 /**
  * @brief Used to add random noise to an input tensor. This is used to augment the dataset.
@@ -59,4 +59,4 @@ std::shared_ptr<Tensor<double>> Noise::bprop(std::vector<std::shared_ptr<Variabl
     throw std::runtime_error("Noise: backward pass is not supported");
 }
 
-#endif // NOISE_INCLUDE_GUARD
+#endif // NOISE_HPP

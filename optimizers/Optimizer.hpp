@@ -1,8 +1,8 @@
 #ifndef OPTIMIZER_HPP
 #define OPTIMIZER_HPP
 
-#include "../dependencies.h"
-#include "../graph.h"
+#include "../dependencies.hpp"
+#include "../graph.hpp"
 
 /**
  * @brief The abstract class Optimizer is intended to be used as a base class for all optimization algorithms used to train the models.
@@ -19,7 +19,7 @@ public:
 
 #include "primitive_SGD.hpp"
 
-using Optimizer_Variant = std::variant<PrimitiveSGD>;
+using OptimizerVariant = std::variant<PrimitiveSGD>;
 
 
-#endif // Optimizer_HPP
+#endif // OPTIMIZER_HPP

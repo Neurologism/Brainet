@@ -1,9 +1,9 @@
-#ifndef GRAPH_INCLUDE_GUARD
-#define GRAPH_INCLUDE_GUARD
+#ifndef GRAPH_HPP
+#define GRAPH_HPP
 
-#include "dependencies.h"
-#include "variable.h"
-#include "operation/operation.h"
+#include "dependencies.hpp"
+#include "variable.hpp"
+#include "operation/operation.hpp"
 
 /**
  * @brief The graph class is a implementation of a computational graph. It is used to store the variables and operations and to execute the forward and backward pass.
@@ -201,4 +201,4 @@ std::vector<std::shared_ptr<Variable>> Graph::get_variables()
 }
 
 
-#endif // Graph_INCLUDE_GUARD
+#endif // GRAPH_HPP
