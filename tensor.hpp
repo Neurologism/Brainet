@@ -9,8 +9,11 @@
 template <class T>
 class Tensor
 {
-    std::vector<T> __data; // the data of the tensor
-    std::vector<std::uint32_t> __shape; // the shape of the tensor
+    typedef std::vector<T> data_type;
+    typedef std::vector<std::uint32_t> shape_type;
+
+    data_type __data; // the data of the tensor
+    shape_type __shape; // the shape of the tensor
 
     /**
      * @brief This function performs error checks that should be done at the beginning of each function.
@@ -32,7 +35,7 @@ public:
      * @param value The value used to initialize all elements of the tensor.
      * @param random If true the tensor is initialized with random values.
      */
-    Tensor(std::vector<std::uint32_t> dimensionality, double value = 0, bool random = false);
+    Tensor(shape_type dimensionality, double value = 0, bool random = false);
     /**
      * @brief Copy constructor not allowed.
      */
@@ -56,7 +59,7 @@ public:
      * @param index The indices of the element.
      * @return T The element at the given indices.
      */
-    T at(std::vector<std::uint32_t> index);
+    T at(shape_type index);
 
     /**
      * @brief This function is used to access the data of the tensor. To do so it uses a single index.
@@ -70,13 +73,13 @@ public:
      * @param index The indices of the element.
      * @param value The value to be set.
      */
-    void set(std::vector<std::uint32_t> index, T value);
+    void set(shape_type index, T value);
 
     /**
      * @brief This function returns the shape of the tensor.
-     * @return std::vector<std::uint32_t> The shape of the tensor.
+     * @return shape_type The shape of the tensor.
      */
-    std::vector<std::uint32_t> shape(){return __shape;};
+    shape_type shape(){return __shape;};
 
     /**
      * @brief This function returns the shape of the tensor at a given index.
@@ -101,13 +104,13 @@ public:
      * @brief This function resizes the tensor.
      * @param dimensionality The new dimensionality of the tensor.
      */
-    void resize(std::vector<std::uint32_t> dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
+    void resize(shape_type dimensionality){__shape = dimensionality; __data.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<double>()));};
 
     /**
      * @brief This function returns the data of the tensor.
-     * @return std::vector<T> The data of the tensor.
+     * @return data_type The data of the tensor.
      */
-    std::vector<T> & data(){error_check();return __data;};
+    data_type & data(){error_check();return __data;};
 
     /**
      * @brief This function returns a transposed version of the tensor if the tensor is 2D.
@@ -119,11 +122,11 @@ public:
      * @brief This function reshapes the tensor.
      * @param dimensionality The new dimensionality of the tensor.
      */
-    void reshape(std::vector<std::uint32_t> dimensionality);
+    void reshape(shape_type dimensionality);
 };
 
 template <class T>
-T Tensor<T>::at(std::vector<std::uint32_t> index)
+T Tensor<T>::at(shape_type index)
 {
     if(index.size() != __shape.size())
         throw std::invalid_argument("Tensor::at: Index size does not match the dimensionality of the tensor");
@@ -150,9 +153,9 @@ T Tensor<T>::at(std::uint32_t index)
 
 
 template <class T>
-Tensor<T>::Tensor(std::vector<std::uint32_t> dimensionality, double value, bool random)
+Tensor<T>::Tensor(shape_type dimensionality, double value, bool random)
 {
-    __data = std::vector<T>(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<std::uint32_t>()), value); // initialize the data vector
+    __data = data_type(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<std::uint32_t>()), value); // initialize the data vector
     if(random) // if random is true, initialize the tensor with random values
     {
         std::random_device rd;
@@ -167,7 +170,7 @@ Tensor<T>::Tensor(std::vector<std::uint32_t> dimensionality, double value, bool 
 }
 
 template <class T>
-void Tensor<T>::set(std::vector<std::uint32_t> index, T value)
+void Tensor<T>::set(shape_type index, T value)
 {
     if(index.size() != __shape.size())
         throw std::invalid_argument("Tensor::set: Index size does not match the dimensionality of the tensor");
@@ -190,7 +193,7 @@ std::shared_ptr<Tensor<T>> Tensor<T>::transpose()
     if(__shape.size() != 2)
         throw std::invalid_argument("Tensor::transpose: Tensor must be 2D");
     std::shared_ptr<Tensor<T>> _tensor = std::make_shared<Tensor<T>>(Tensor<T>({__shape[1],__shape[0]})); // create a new tensor with the transposed shape
-    std::vector<T> _data(__data.size());
+    data_type _data(__data.size());
     // create a vector with the transposed data
     for(std::uint32_t i = 0; i < __shape[0]; i++)
     {
@@ -204,7 +207,7 @@ std::shared_ptr<Tensor<T>> Tensor<T>::transpose()
 }
 
 template <class T>
-void Tensor<T>::reshape(std::vector<std::uint32_t> dimensionality)
+void Tensor<T>::reshape(shape_type dimensionality)
 {
     if(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<std::uint32_t>()) != __data.size())
         throw std::invalid_argument("Tensor::reshape: New dimensionality does not match the size of the tensor");
