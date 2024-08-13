@@ -12,14 +12,13 @@
  */
 class Model
 {
-    typedef std::vector<std::vector<double>> data_type;
-    typedef std::vector<std::vector<double>> label_type;
+    typedef std::vector<std::vector<double>> Vector2D;
 
-    std::uint32_t __loss_index; // the index of the loss function in the graph
+    std::uint32_t mLossIndex; // the index of the loss function in the graph
 
 
-    std::shared_ptr<Graph> __graph = std::make_shared<Graph>(); // the computational graph
-    std::map<std::uint32_t, std::pair<std::shared_ptr<Variable>, std::shared_ptr<Variable>>> __data_label_pairs; // the data/label pairs
+    std::shared_ptr<Graph> mpGraph = std::make_shared<Graph>(); // the computational graph
+    std::map<std::uint32_t, std::pair<std::shared_ptr<Variable>, std::shared_ptr<Variable>>> mDataPairs; // the data/label pairs
 
 
 public:
@@ -28,7 +27,7 @@ public:
      */
     Model()
     {
-        Module::set_graph(__graph); // set the static graph pointer in the module class
+        Module::set_graph(mpGraph); // set the static graph pointer in the module class
     };
     ~Model(){};
     /**
@@ -38,93 +37,92 @@ public:
     /**
      * @brief This function creates a sequential neural network.
      * @param layers The layers of the neural network.
-     * @param ID The ID of the data/label pair.
+     * @param id The id of the data/label pair.
      */
-    void sequential(std::vector<Module_VARIANT> layers, std::uint32_t ID = 0);
+    void sequential(std::vector<Module_VARIANT> layers, std::uint32_t id = 0);
 
     /**
      * @brief This function creates a sequential neural network.
      * @param layers The layers of the neural network.
      * @param norm The norm to use for regularization.
-     * @param ID The ID of the data/label pair.
+     * @param id The id of the data/label pair.
      */
-    void sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t ID = 0);
+    void sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t id = 0);
 
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
-     * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
+     * @param dataPairs Map distributing the data/label pairs to the input/output nodes according to their id. id : (data, label)
      * @param epochs The number of epochs.
-     * @param batch_size The batch size.
+     * @param batchSize The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer);
+    void train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer);
     /**
-     * @brief Shortcut for training a model with only one data/label pair. Assumes the ID is 0.
+     * @brief Shortcut for training a model with only one data/label pair. Assumes the id is 0.
      * @param data The data.
      * @param label The label.
      * @param epochs The number of epochs.
-     * @param batch_size The batch size.
+     * @param batchSize The batch size.
      * @param learning_rate The learning rate.
      */
-    void train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer);
+    void train(Vector2D const data, Vector2D const label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer);
 
     /**
      * @brief This function gets the test error of the model.
-     * @param data_label_pairs Map distributing the data/label pairs to the input/output nodes according to their ID. ID : (data, label)
-     * @param max_test_size takes the first test_size elements of the data/label pairs, if max_test_size is default, it takes all elements
+     * @param dataPairs Map distributing the data/label pairs to the input/output nodes according to their id. id : (data, label)
      */
-    void test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const max_test_size = std::numeric_limits<std::uint32_t>::max());
+    void test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs);
     /**
-     * @brief Shortcut for testing a model with only one data/label pair. Assumes the ID is 0.
+     * @brief Shortcut for testing a model with only one data/label pair. Assumes the id is 0.
      * @param data The data.
      * @param label The label.
-     * @param max_test_size takes the first test_size elements of the data/label pairs, if max_test_size is default, it takes all elements
      */
-    void test(data_type const data, label_type const label, std::uint32_t const max_test_size = std::numeric_limits<std::uint32_t>::max());
+    void test(Vector2D const data, Vector2D const label);
 };
 
 void Model::load()
 {
-    Module::set_graph(__graph);
+    Module::set_graph(mpGraph);
 }
 
-void Model::sequential(std::vector<Module_VARIANT> layers, std::uint32_t ID)
+void Model::sequential(std::vector<Module_VARIANT> layers, std::uint32_t id)
 {
-    std::vector<std::shared_ptr<Module>> clusters;
+    std::vector<std::shared_ptr<Module>> modules;
+
     for (Module_VARIANT& layer : layers) {
         std::shared_ptr<Module> cluster_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
         return std::shared_ptr<Module>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, Module_VARIANT{layer});
-        clusters.push_back(cluster_ptr);
+        modules.push_back(cluster_ptr);
     }
     
     for(std::uint32_t i = 0; i < layers.size() - 1; i++)
     {
-        clusters[i]->add_output(clusters[i+1]->input());
-        clusters[i+1]->add_input(clusters[i]->output(),clusters[i]->getUnits());
+        modules[i]->add_output(modules[i+1]->input());
+        modules[i+1]->add_input(modules[i]->output(),modules[i]->getUnits());
     }
 
-    __loss_index = __graph->add_output(clusters.back()->output());
-    if (__data_label_pairs.find(ID) != __data_label_pairs.end())
+    mLossIndex = mpGraph->add_output(modules.back()->output());
+    if (mDataPairs.find(id) != mDataPairs.end())
     {
-        throw std::runtime_error("ID already exists");
+        throw std::runtime_error("id already exists");
     }
     // add error checks in the future
-    std::shared_ptr<Input> input = std::dynamic_pointer_cast<Input>(clusters.front());
-    std::shared_ptr<Cost> output = std::dynamic_pointer_cast<Cost>(clusters.back());
-    __data_label_pairs[ID] = std::make_pair(input->data(), output->target());
+    std::shared_ptr<Input> input = std::dynamic_pointer_cast<Input>(modules.front());
+    std::shared_ptr<Cost> output = std::dynamic_pointer_cast<Cost>(modules.back());
+    mDataPairs[id] = std::make_pair(input->data(), output->target());
 }
 
-void Model::sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t ID)
+void Model::sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t id)
 {
     Dense::set_default_norm(norm);
-    sequential(layers, ID);
+    sequential(layers, id);
 }
 
 
-void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer)
+void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer)
 {
-    if ( data_label_pairs.size() != 1)
+    if ( dataPairs.size() != 1)
     {
         throw std::runtime_error("Only one data/label pair is currently supported");
     }
@@ -134,72 +132,73 @@ void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
     // this should be replaced by a more sophisticated training algorithm
     for(std::uint32_t iteration = 0; iteration < trainingIterations; iteration++)
     {
-        std::vector<std::vector<double>> batch_data;
-        std::vector<std::vector<double>> batch_label;
+        Vector2D batchData;
+        Vector2D batchLabel;
 
-        data_type data = data_label_pairs.at(0).first;
-        label_type label = data_label_pairs.at(0).second;
+        Vector2D data = dataPairs.at(0).first;
+        Vector2D label = dataPairs.at(0).second;
+
+        // generate random batch
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(0, data.size() - 1);
-        for (std::uint32_t i = 0; i < batch_size; i++)
+        for (std::uint32_t i = 0; i < batchSize; i++)
         {
-            std::uint32_t random_index = dis(gen);
-            batch_data.push_back(data[random_index]);
-            batch_label.push_back(label[random_index]);
-            // Use batch_data and batch_label for training
+            std::uint32_t randomIndex = dis(gen);
+            batchData.push_back(data[randomIndex]);
+            batchLabel.push_back(label[randomIndex]);
         }
         
 
-        __data_label_pairs[0].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batch_data));
-        __data_label_pairs[0].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batch_label));
+        mDataPairs[0].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
+        mDataPairs[0].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel));
 
-        __graph->forward();
-        std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
+        mpGraph->forward();
+        std::shared_ptr<Tensor<double>> loss = mpGraph->get_output(mLossIndex);
         std::cout << "Batch: " << iteration << " Loss: " << loss->at(0) << std::endl; // print loss
-        std::vector<std::shared_ptr<Tensor<double>>> __gradients = __graph->backprop(Module::get_learnable_parameters()); // backpropagation
+        std::vector<std::shared_ptr<Tensor<double>>> gradientTable = mpGraph->backprop(Module::get_learnable_parameters()); // backpropagation
         
-        std::visit([__gradients, batch_size](auto&& arg) {
-            arg.update(__gradients, batch_size);}, optimizer);
+        std::visit([gradientTable, batchSize](auto&& arg) {
+            arg.update(gradientTable, batchSize);}, optimizer);
     }
 }
 
 
-void Model::train(data_type const data, label_type const label, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer)
+void Model::train(Vector2D const data, Vector2D const label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer)
 {
-    std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
-    if (__data_label_pairs.find(0) == __data_label_pairs.end())
+    std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> dataPairs;
+    if (mDataPairs.find(0) == mDataPairs.end())
     {
-        throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
+        throw std::runtime_error("Assumed id 0, but no data/label pair with id 0 found");
     }
-    data_label_pairs[0] = std::make_pair(data, label);
-    train(data_label_pairs, epochs, batch_size, optimizer);
+    dataPairs[0] = std::make_pair(data, label);
+    train(dataPairs, epochs, batchSize, optimizer);
 }
 
 
-void Model::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const max_test_size)
+void Model::test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs)
 {
-    for (auto const & data_label_pair : data_label_pairs)
+    for (auto const & dataPair : dataPairs)
     {
-        __data_label_pairs[data_label_pair.first].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(data_label_pair.second.first));
-        __data_label_pairs[data_label_pair.first].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(data_label_pair.second.second));
+        mDataPairs[dataPair.first].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.first));
+        mDataPairs[dataPair.first].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.second));
 
-        __graph->forward();
-        std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
+        mpGraph->forward();
+        std::shared_ptr<Tensor<double>> loss = mpGraph->get_output(mLossIndex);
         std::cout << "Test Loss: " << loss->at(0) << std::endl; // print loss
     }
 }
 
 
-void Model::test(data_type const data, label_type const label, std::uint32_t const max_test_size)
+void Model::test(Vector2D const data, Vector2D const label)
 {
-    std::map<std::uint32_t, std::pair<data_type, label_type>> data_label_pairs;
-    if (__data_label_pairs.find(0) == __data_label_pairs.end())
+    std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> dataPairs;
+    if (mDataPairs.find(0) == mDataPairs.end())
     {
-        throw std::runtime_error("Assumed ID 0, but no data/label pair with ID 0 found");
+        throw std::runtime_error("Assumed id 0, but no data/label pair with id 0 found");
     }
-    data_label_pairs[0] = std::make_pair(data, label);
-    test(data_label_pairs, max_test_size);
+    dataPairs[0] = std::make_pair(data, label);
+    test(dataPairs);
 }
 
 #endif // MODEL_HPP

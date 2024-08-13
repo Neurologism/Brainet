@@ -163,7 +163,7 @@ Tensor<T>::Tensor(const ShapeVector & dimensionality)
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<T> dis(0, 1.0E-8);
+    std::normal_distribution<T> dis(0, 1.0);
     for(std::uint32_t i = 0; i < mData.size(); i++)
     {
         mData[i] = dis(gen);
