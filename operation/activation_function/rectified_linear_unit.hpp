@@ -23,7 +23,7 @@ public:
 ReLU::ReLU(double gradient)
 {
     __gradient = gradient; // gradient of (-inf, 0)
-    __dbg_name = "RELU";
+    mName = "RELU";
 }
 
 double ReLU::activation_function(double input)

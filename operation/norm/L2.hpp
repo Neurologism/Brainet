@@ -13,7 +13,7 @@ public:
      * @brief add a L2 norm penalty to the graph
      * @param lambda the lambda value to be used
      */
-    L2(double lambda) : Norm(lambda) {__dbg_name = "L2";};
+    L2(double lambda) : Norm(lambda) {mName = "L2";};
     /**
      * @brief compute the L2 norm of the input tensor
     */
@@ -34,7 +34,7 @@ void L2::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::runtime_error("L2: number of inputs is not 1");
     }
 
-    auto input = inputs[0]->get_data();
+    auto input = inputs[0]->getData();
     auto result = std::make_shared<Tensor<double>>(Tensor<double>({1}));
 
     double sum = 0;
@@ -49,7 +49,7 @@ void L2::f(std::vector<std::shared_ptr<Variable>>& inputs)
 
     result->set({0}, 0.5 * _lambda * sum);
 
-    this->get_variable()->get_data() = result;
+    this->getVariable()->getData() = result;
 }
 
 
@@ -64,7 +64,7 @@ std::shared_ptr<Tensor<double>> L2::bprop(std::vector<std::shared_ptr<Variable>>
         throw std::runtime_error("L2: gradient shape is not {1}");
     }
 
-    auto input = inputs[0]->get_data();
+    auto input = inputs[0]->getData();
     auto result = std::make_shared<Tensor<double>>(input->shape());
 
     for (std::uint32_t i = 0; i < input->capacity(); i++)

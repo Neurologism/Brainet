@@ -38,7 +38,7 @@ public:
      */
     void addInput(std::shared_ptr<Variable> input, std::uint32_t units) override
     {
-        mOutputVariable->get_inputs().push_back(input);
+        mOutputVariable->getInputs().push_back(input);
     }
     /**
      * @brief used to mark variables as output for the module.

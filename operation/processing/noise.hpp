@@ -18,7 +18,7 @@ public:
      * @param mean the mean of the noise
      * @param stddev the standard deviation of the noise
      */
-    Noise(double mean, double stddev) : _mean(mean), _stddev(stddev) { __dbg_name = "NOISE"; };
+    Noise(double mean, double stddev) : _mean(mean), _stddev(stddev) { mName = "NOISE"; };
     ~Noise() = default;
 
     /**
@@ -39,7 +39,7 @@ void Noise::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::runtime_error("Noise: number of inputs is not 1");
     }
 
-    auto input = inputs[0]->get_data();
+    auto input = inputs[0]->getData();
     auto result = std::make_shared<Tensor<double>>(Tensor<double>(input->shape()));
 
     std::random_device rd;
@@ -51,7 +51,7 @@ void Noise::f(std::vector<std::shared_ptr<Variable>>& inputs)
         result->set({i}, input->at({i}) + dist(gen));
     }
 
-    this->get_variable()->get_data() = result;
+    this->getVariable()->getData() = result;
 }
 
 std::shared_ptr<Tensor<double>> Noise::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)

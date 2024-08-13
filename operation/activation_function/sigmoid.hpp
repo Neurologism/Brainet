@@ -11,7 +11,7 @@ class Sigmoid : public ActivationFunction
     double activation_function(double input)override;
     double activation_function_derivative(double input)override;
 public:
-    Sigmoid() { __dbg_name = "SIGMOID"; };
+    Sigmoid() { mName = "SIGMOID"; };
     ~Sigmoid() = default;
 };
 
