@@ -27,7 +27,7 @@ public:
      */
     Model()
     {
-        Module::set_graph(mpGraph); // set the static graph pointer in the module class
+        Module::setGraph(mpGraph); // set the static graph pointer in the module class
     };
     ~Model(){};
     /**
@@ -39,7 +39,7 @@ public:
      * @param layers The layers of the neural network.
      * @param id The id of the data/label pair.
      */
-    void sequential(std::vector<Module_VARIANT> layers, std::uint32_t id = 0);
+    void sequential(std::vector<ModuleVariant> layers, std::uint32_t id = 0);
 
     /**
      * @brief This function creates a sequential neural network.
@@ -47,7 +47,7 @@ public:
      * @param norm The norm to use for regularization.
      * @param id The id of the data/label pair.
      */
-    void sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t id = 0);
+    void sequential(std::vector<ModuleVariant> layers, NormVariant norm, std::uint32_t id = 0);
 
 private:
     /**
@@ -98,27 +98,27 @@ public:
 
 void Model::load()
 {
-    Module::set_graph(mpGraph);
+    Module::setGraph(mpGraph);
 }
 
-void Model::sequential(std::vector<Module_VARIANT> layers, std::uint32_t id)
+void Model::sequential(std::vector<ModuleVariant> layers, std::uint32_t id)
 {
     std::vector<std::shared_ptr<Module>> modules;
 
-    for (Module_VARIANT& layer : layers) {
+    for (ModuleVariant& layer : layers) {
         std::shared_ptr<Module> cluster_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to OPERATION*
-        return std::shared_ptr<Module>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, Module_VARIANT{layer});
+        return std::shared_ptr<Module>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, ModuleVariant{layer});
         modules.push_back(cluster_ptr);
     }
     
     for(std::uint32_t i = 0; i < layers.size() - 1; i++)
     {
-        modules[i]->add_output(modules[i+1]->input());
-        modules[i+1]->add_input(modules[i]->output(),modules[i]->getUnits());
+        modules[i]->addOutput(modules[i+1]->input());
+        modules[i+1]->addInput(modules[i]->output(),modules[i]->getUnits());
     }
 
-    mLossIndex = mpGraph->add_output(modules.back()->output());
+    mLossIndex = mpGraph->addOutput(modules.back()->output());
     if (mDataPairs.find(id) != mDataPairs.end())
     {
         throw std::runtime_error("id already exists");
@@ -129,9 +129,9 @@ void Model::sequential(std::vector<Module_VARIANT> layers, std::uint32_t id)
     mDataPairs[id] = std::make_pair(input->data(), output->target());
 }
 
-void Model::sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std::uint32_t id)
+void Model::sequential(std::vector<ModuleVariant> layers, NormVariant norm, std::uint32_t id)
 {
-    Dense::set_default_norm(norm);
+    Dense::setDefaultNorm(norm);
     sequential(layers, id);
 }
 
@@ -179,26 +179,26 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
             batchLabel.push_back(trainLabel[randomIndex]);
         }
 
-        mDataPairs[0].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
-        mDataPairs[0].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel));
+        mDataPairs[0].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
+        mDataPairs[0].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel));
 
         mpGraph->forward();
-        std::shared_ptr<Tensor<double>> loss = mpGraph->get_output(mLossIndex);
+        std::shared_ptr<Tensor<double>> loss = mpGraph->getOutput(mLossIndex);
         
         std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
 
-        std::vector<std::shared_ptr<Tensor<double>>> gradientTable = mpGraph->backprop(Module::get_learnable_parameters()); // backpropagation
+        std::vector<std::shared_ptr<Tensor<double>>> gradientTable = mpGraph->backprop(Module::getLearnableParameters()); // backpropagation
         
         std::visit([gradientTable, batchSize](auto&& arg) {
             arg.update(gradientTable, batchSize);}, optimizer);
 
         if ( dataPairs.find(validationDataId) != dataPairs.end())
         {
-            mDataPairs[0].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
-            mDataPairs[0].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel));
+            mDataPairs[0].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
+            mDataPairs[0].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel));
 
             mpGraph->forward();
-            std::shared_ptr<Tensor<double>> validationLoss = mpGraph->get_output(mLossIndex);
+            std::shared_ptr<Tensor<double>> validationLoss = mpGraph->getOutput(mLossIndex);
             std::cout << " Validation-error: " << validationLoss->at(0) << std::endl;
 
             if (earlyStopping)
@@ -210,12 +210,12 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
                     bestLoss = currentLoss;
                     
                     bestParameters.clear();
-                    for (std::shared_ptr<Variable> parameter : Module::get_learnable_parameters())
+                    for (std::shared_ptr<Variable> parameter : Module::getLearnableParameters())
                     {
                         bestParameters.push_back({});
-                        for (std::uint32_t i = 0; i < parameter->get_data()->capacity(); i++)
+                        for (std::uint32_t i = 0; i < parameter->getData()->capacity(); i++)
                         {
-                            bestParameters.back().push_back(parameter->get_data()->at(i));
+                            bestParameters.back().push_back(parameter->getData()->at(i));
                         }
                     }
                     lastImprovement = iteration;
@@ -224,11 +224,11 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
                 {
                     std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
                     std::cout << "Best validation loss: " << bestLoss << std::endl;
-                    for (std::uint32_t i = 0; i < Module::get_learnable_parameters().size(); i++)
+                    for (std::uint32_t i = 0; i < Module::getLearnableParameters().size(); i++)
                     {
-                        for (std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->capacity(); j++)
+                        for (std::uint32_t j = 0; j < Module::getLearnableParameters()[i]->getData()->capacity(); j++)
                         {
-                            Module::get_learnable_parameters()[i]->get_data()->set(j, bestParameters[i][j]);
+                            Module::getLearnableParameters()[i]->getData()->set(j, bestParameters[i][j]);
                         }
                     }
                     break;
@@ -270,11 +270,11 @@ void Model::test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & 
 {
     for (auto const & dataPair : dataPairs)
     {
-        mDataPairs[dataPair.first].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.first));
-        mDataPairs[dataPair.first].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.second));
+        mDataPairs[dataPair.first].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.first));
+        mDataPairs[dataPair.first].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.second));
 
         mpGraph->forward();
-        std::shared_ptr<Tensor<double>> loss = mpGraph->get_output(mLossIndex);
+        std::shared_ptr<Tensor<double>> loss = mpGraph->getOutput(mLossIndex);
         std::cout << "Test Loss: " << loss->at(0) << std::endl; // print loss
     }
 }

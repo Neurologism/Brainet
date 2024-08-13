@@ -29,7 +29,7 @@ protected:
      */
     std::shared_ptr<Tensor<double>> matmul(std::shared_ptr<Tensor<double>> & left_matrix, std::shared_ptr<Tensor<double>> & right_matrix);
 public:    
-    Matmul(){__dbg_name = "Matmul";};
+    Matmul(){mName = "Matmul";};
     ~Matmul(){};
     /**
      * @brief wrapper function for matmul. Does error checking and handles inputs and outputs.
@@ -85,12 +85,12 @@ void Matmul::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::invalid_argument("MATRIX_MULTIPLY::f: Invalid number of input variables.");
     }
     ;
-    if (inputs[0]->get_data()->shape(1)!= inputs[1]->get_data()->shape(0))
+    if (inputs[0]->getData()->shape(1)!= inputs[1]->getData()->shape(0))
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::f: Invalid shapes of input matrices.");
     }
     // perform the matrix multiplication
-    this->get_variable()->get_data() = matmul(inputs[0]->get_data(), inputs[1]->get_data());
+    this->getVariable()->getData() = matmul(inputs[0]->getData(), inputs[1]->getData());
 }
 
 std::shared_ptr<Tensor<double>> Matmul::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
@@ -99,21 +99,21 @@ std::shared_ptr<Tensor<double>> Matmul::bprop(std::vector<std::shared_ptr<Variab
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid number of input variables.");
     }
-    if(inputs[0]->get_data()->shape(1) != inputs[1]->get_data()->shape(0))
+    if(inputs[0]->getData()->shape(1) != inputs[1]->getData()->shape(0))
     {
         throw std::invalid_argument("MATRIX_MULTIPLY::bprop: Invalid shapes of input matrices.");
     }
     
 
     // return the gradient multiplied by the input != focus
-    if (inputs[0]->get_id() == focus->get_id())
+    if (inputs[0]->getId() == focus->getId())
     {
-        std::shared_ptr<Tensor<double>> right_matrix_transposed = static_cast<Matrix<double>*>(inputs[1]->get_data().get())->transpose(); // transposed version needed to output the correct shape
+        std::shared_ptr<Tensor<double>> right_matrix_transposed = static_cast<Matrix<double>*>(inputs[1]->getData().get())->transpose(); // transposed version needed to output the correct shape
         return matmul(gradient, right_matrix_transposed);
     }
     else 
     {
-        std::shared_ptr<Tensor<double>> left_matrix_transposed = static_cast<Matrix<double>*>(inputs[0]->get_data().get())->transpose(); // transposed version needed to output the correct shape
+        std::shared_ptr<Tensor<double>> left_matrix_transposed = static_cast<Matrix<double>*>(inputs[0]->getData().get())->transpose(); // transposed version needed to output the correct shape
         return matmul(left_matrix_transposed, gradient);
     }
 }

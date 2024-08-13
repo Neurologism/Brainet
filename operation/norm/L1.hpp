@@ -13,7 +13,7 @@ public:
     * @brief add a L1 norm penalty to the graph
     * @param lambda the lambda value to be used
     */
-    L1(double lambda) : Norm(lambda) { __dbg_name = "L1"; };
+    L1(double lambda) : Norm(lambda) { mName = "L1"; };
     ~L1() = default;
     /**
     * @brief compute the L1 norm of the input tensor
@@ -35,7 +35,7 @@ void L1::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::runtime_error("L1: number of inputs is not 1");
     }
 
-    auto input = inputs[0]->get_data();
+    auto input = inputs[0]->getData();
     auto result = std::make_shared<Tensor<double>>(Tensor<double>({1}));
 
     double sum = 0;
@@ -50,7 +50,7 @@ void L1::f(std::vector<std::shared_ptr<Variable>>& inputs)
 
     result->set({0}, _lambda * sum);
 
-    this->get_variable()->get_data() = result;
+    this->getVariable()->getData() = result;
 }
 
 std::shared_ptr<Tensor<double>> L1::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
@@ -64,7 +64,7 @@ std::shared_ptr<Tensor<double>> L1::bprop(std::vector<std::shared_ptr<Variable>>
         throw std::runtime_error("L1: gradient shape is not 1");
     }
 
-    auto input = inputs[0]->get_data();
+    auto input = inputs[0]->getData();
     auto result = std::make_shared<Tensor<double>>(Tensor<double>(input->shape()));
 
     for (std::uint32_t i = 0; i < input->capacity(); i++)

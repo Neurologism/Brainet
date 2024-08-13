@@ -8,19 +8,19 @@
 */
 class Linear : public ActivationFunction
 {   
-    double activation_function(double input)override;
-    double activation_function_derivative(double input)override;
+    double activationFunction(double input)override;
+    double activationFunctionDerivative(double input)override;
 public:
-    Linear() { __dbg_name = "LINEAR"; };
+    Linear() { mName = "LINEAR"; };
     ~Linear() = default;
 };
 
-double Linear::activation_function(double input)
+double Linear::activationFunction(double input)
 {
     return input;
 }
 
-double Linear::activation_function_derivative(double input)
+double Linear::activationFunctionDerivative(double input)
 {
     return 1;
 }

@@ -38,7 +38,7 @@ Padding::Padding(std::uint32_t x_padding, std::uint32_t y_padding, double paddin
     _x_padding = x_padding;
     _y_padding = y_padding;
     _padding_value = padding_value;
-    __dbg_name = "PADDING";
+    mName = "PADDING";
 }
 
 void Padding::f(std::vector<std::shared_ptr<Variable>>& inputs)
@@ -49,16 +49,16 @@ void Padding::f(std::vector<std::shared_ptr<Variable>>& inputs)
     }
 
     // create a new tensor with the new size and copy the data from the input tensor
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(Tensor<double>({inputs.front()->get_data()->shape(0) + _x_padding, inputs.front()->get_data()->shape(1) + _y_padding}, _padding_value));
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(Tensor<double>({inputs.front()->getData()->shape(0) + _x_padding, inputs.front()->getData()->shape(1) + _y_padding}, _padding_value));
 
-    for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape(0); i++)
+    for (std::uint32_t i = 0; i < inputs.front()->getData()->shape(0); i++)
     {
-        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape(1); j++)
+        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape(1); j++)
         {
-            _data->set({i, j}, inputs.front()->get_data()->at({i, j}));
+            _data->set({i, j}, inputs.front()->getData()->at({i, j}));
         }
     }
-    this->get_variable()->get_data() = _data;
+    this->getVariable()->getData() = _data;
 };
 
 std::shared_ptr<Tensor<double>> Padding::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
@@ -69,11 +69,11 @@ std::shared_ptr<Tensor<double>> Padding::bprop(std::vector<std::shared_ptr<Varia
     }
 
     // create a new tensor with the new size and copy the selected data from the gradient tensor
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->get_data()->shape());
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape());
 
-    for (std::uint32_t i = 0; i < inputs.front()->get_data()->shape(0); i++)
+    for (std::uint32_t i = 0; i < inputs.front()->getData()->shape(0); i++)
     {
-        for (std::uint32_t j = 0; j < inputs.front()->get_data()->shape(1); j++)
+        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape(1); j++)
         {
             _data->set({i, j}, gradient->at({i, j}));
         }

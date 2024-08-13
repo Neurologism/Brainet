@@ -12,19 +12,19 @@
 class Module
 {
 protected:
-    static std::shared_ptr<Graph> __graph; // shared by all clusters , points to the graph into which the module should add its variables
-    static std::vector<std::shared_ptr<Variable>> __learnable_parameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
-    std::uint32_t __units = -1; // stores the input size of the module (could be moved to respective derived classes)
+    static std::shared_ptr<Graph> sGraph; // shared by all clusters , points to the graph into which the module should add its variables
+    static std::vector<std::shared_ptr<Variable>> sLearnableParameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
+    std::uint32_t mUnits = -1; // stores the input size of the module (could be moved to respective derived classes)
 public:
     virtual ~Module() = default;
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as input for the module. 
      */
-    virtual void add_input(std::shared_ptr<Variable> input, std::uint32_t units){};
+    virtual void addInput(std::shared_ptr<Variable> input, std::uint32_t units){};
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as output for the module.
      */
-    virtual void add_output(std::shared_ptr<Variable> output){};
+    virtual void addOutput(std::shared_ptr<Variable> output){};
     /**
      * @brief virtual function that is supposed to be implemented by the derived classes. It is used to get the input variables of the module specified by the index.
      */
@@ -36,26 +36,26 @@ public:
     /**
      * @brief wrapper class used to set the graph for all module objects manually. Manly intended for use with multiple graphs.
      */
-    static void set_graph(std::shared_ptr<Graph> graph){__graph = graph;}
+    static void setGraph(std::shared_ptr<Graph> graph){sGraph = graph;}
     /**
-     * @brief used to get the private variable __units, could be moved to the respective derived classes.
+     * @brief used to get the private variable mUnits, could be moved to the respective derived classes.
      */
     std::uint32_t getUnits()
     {
-        if(__units == -1)throw std::runtime_error("units not set");
-        return __units;
+        if(mUnits == -1)throw std::runtime_error("units not set");
+        return mUnits;
     }
     /**
      * @brief used to get all learnable parameters declared by the module objects.
      */
-    static std::vector<std::shared_ptr<Variable>> & get_learnable_parameters(){return __learnable_parameters;}
+    static std::vector<std::shared_ptr<Variable>> & getLearnableParameters(){return sLearnableParameters;}
 };
 
 
 // this is mainly for interface purposes
 
-std::shared_ptr<Graph> Module::__graph = nullptr;
-std::vector<std::shared_ptr<Variable>> Module::__learnable_parameters = {};
+std::shared_ptr<Graph> Module::sGraph = nullptr;
+std::vector<std::shared_ptr<Variable>> Module::sLearnableParameters = {};
 
 
 // code of all child classes
@@ -63,6 +63,6 @@ std::vector<std::shared_ptr<Variable>> Module::__learnable_parameters = {};
 #include "dense.hpp"
 #include "cost.hpp"
 
-using Module_VARIANT = std::variant<Input, Dense, Cost>;
+using ModuleVariant = std::variant<Input, Dense, Cost>;
 
 #endif // MODULE_HPP

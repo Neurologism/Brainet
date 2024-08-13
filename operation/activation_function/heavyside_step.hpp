@@ -8,19 +8,19 @@
 */
 class HeavysideStep : public ActivationFunction
 {   
-    double activation_function(double input)override;
-    double activation_function_derivative(double input)override;
+    double activationFunction(double input)override;
+    double activationFunctionDerivative(double input)override;
 public:
-    HeavysideStep() { __dbg_name = "HEAVYSIDE_STEP"; };
+    HeavysideStep() { mName = "HEAVYSIDE_STEP"; };
     ~HeavysideStep() = default;
 };
 
-double HeavysideStep::activation_function(double input)
+double HeavysideStep::activationFunction(double input)
 {
     return input >= 0 ? 1 : 0;
 }
 
-double HeavysideStep::activation_function_derivative(double input)
+double HeavysideStep::activationFunctionDerivative(double input)
 {
     return 0;
 }

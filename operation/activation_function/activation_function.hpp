@@ -12,7 +12,7 @@ public:
     /**
      * @brief Construct a new ActivationFunction object
      */
-    ActivationFunction() { __dbg_name = "ActivationFunction"; }
+    ActivationFunction() { mName = "ActivationFunction"; }
     /**
      * @brief Forward pass is similar for all activation functions. It applies the activation function to each element of the input tensor.
      */
@@ -25,11 +25,11 @@ public:
     /**
      * @brief Activation function to be implemented by the derived class.
      */
-    virtual double activation_function(double x) = 0;
+    virtual double activationFunction(double x) = 0;
     /**
      * @brief Derivative of the activation function to be implemented by the derived class.
      */
-    virtual double activation_function_derivative(double x) = 0;
+    virtual double activationFunctionDerivative(double x) = 0;
 };
 
 void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
@@ -40,14 +40,14 @@ void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::invalid_argument("ActivationFunction::f: Invalid number of input variables.");
     }
 
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->get_data()->shape()); // create a new tensor to store the result
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape()); // create a new tensor to store the result
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply activation function to all elements
     {
-        _data->set(i, activation_function(inputs.front()->get_data()->at(i))); // apply activation function
+        _data->set(i, activationFunction(inputs.front()->getData()->at(i))); // apply activation function
     }
 
-    this->get_variable()->get_data() = _data; // store the result in the variable
+    this->getVariable()->getData() = _data; // store the result in the variable
 }
 
 std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
@@ -59,11 +59,11 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
     }
 
     // load derivative of activation into data 
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(focus->get_data()->shape());
+    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(focus->getData()->shape());
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply derivative of activation function to all elements
     {
-        _data->set(i, activation_function_derivative(inputs.front()->get_data()->at(i))); // apply derivative of activation function
+        _data->set(i, activationFunctionDerivative(inputs.front()->getData()->at(i))); // apply derivative of activation function
     }
 
     return _data;
