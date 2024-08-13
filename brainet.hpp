@@ -6,6 +6,7 @@
 #include "model.hpp"
 #include "readers/idx_reader.hpp"
 #include "optimizers/optimizer.hpp"
+#include "preprocessing/split.hpp"
 
 
 #endif // BRAINET_HPP
