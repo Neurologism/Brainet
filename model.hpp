@@ -223,23 +223,20 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
                 else if ( lastImprovement + earlyStopping <= iteration)
                 {
                     std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
+                    std::cout << "Best validation loss: " << bestLoss << std::endl;
+                    for (std::uint32_t i = 0; i < Module::get_learnable_parameters().size(); i++)
+                    {
+                        for (std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->capacity(); j++)
+                        {
+                            Module::get_learnable_parameters()[i]->get_data()->set(j, bestParameters[i][j]);
+                        }
+                    }
                     break;
                 }
             }
         }
         else std::cout << std::endl;
     }
-
-    if (earlyStopping)
-    {
-        for (std::uint32_t i = 0; i < Module::get_learnable_parameters().size(); i++)
-        {
-            for (std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->capacity(); j++)
-            {
-                Module::get_learnable_parameters()[i]->get_data()->set(j, bestParameters[i][j]);
-            }
-        }
-    }   
 
     std::cout<< "Training finished." << std::endl;
 }
