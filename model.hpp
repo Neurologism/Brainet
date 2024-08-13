@@ -56,9 +56,9 @@ private:
      * @param epochs The number of epochs.
      * @param batchSize The batch size.
      * @param optimizer The optimizer to use.
-     * @param earlyStopping Whether to use early stopping.
+     * @param earlyStopping The number of epochs without improvement after which to stop training. If 0, no early stopping is used.
      */
-    void train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, bool earlyStopping);
+    void train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping);
 
 public:
     /**
@@ -79,9 +79,9 @@ public:
      * @param validationLabel The validation label.
      * @param epochs The number of epochs.
      * @param batchSize The batch size.
-     * @param earlyStopping Whether to use early stopping.
+     * @param earlyStopping The number of epochs without improvement after which to stop training. If 0, no early stopping is used.
      */
-    void train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, bool earlyStopping = true);
+    void train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping = 0);
 
     /**
      * @brief This function gets the test error of the model.
@@ -136,7 +136,7 @@ void Model::sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std
 }
 
 
-void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, bool earlyStopping)
+void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping)
 {
     std::uint32_t const trainDataId = 0;
     std::uint32_t const validationDataId = 1;
@@ -146,9 +146,10 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
     Vector2D trainData = dataPairs.at(trainDataId).first;
     Vector2D trainLabel = dataPairs.at(trainDataId).second;
 
-
     Vector2D validationData;
     Vector2D validationLabel;
+
+    std::cout << std::setprecision(5) << std::fixed;
 
     if(dataPairs.find(validationDataId) != dataPairs.end())
     {
@@ -156,6 +157,10 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
         validationLabel = dataPairs.at(validationDataId).second;
     }
     else std::cout << "No validation data found. Training without validation." << std::endl;
+
+    double bestLoss = std::numeric_limits<double>::max();
+    std::vector<std::vector<double>> bestParameters;
+    std::uint32_t lastImprovement = 0;
 
     for(std::uint32_t iteration = 0; iteration < trainingIterations; iteration++)
     {
@@ -179,6 +184,7 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
 
         mpGraph->forward();
         std::shared_ptr<Tensor<double>> loss = mpGraph->get_output(mLossIndex);
+        
         std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
 
         std::vector<std::shared_ptr<Tensor<double>>> gradientTable = mpGraph->backprop(Module::get_learnable_parameters()); // backpropagation
@@ -188,8 +194,8 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
 
         if ( dataPairs.find(validationDataId) != dataPairs.end())
         {
-            mDataPairs[validationDataId].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
-            mDataPairs[validationDataId].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel));
+            mDataPairs[0].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
+            mDataPairs[0].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel));
 
             mpGraph->forward();
             std::shared_ptr<Tensor<double>> validationLoss = mpGraph->get_output(mLossIndex);
@@ -197,11 +203,45 @@ void Model::train(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const &
 
             if (earlyStopping)
             {
-                // implement early stopping
+                double currentLoss = validationLoss->at(0);
+
+                if (currentLoss < bestLoss)
+                {
+                    bestLoss = currentLoss;
+                    
+                    bestParameters.clear();
+                    for (std::shared_ptr<Variable> parameter : Module::get_learnable_parameters())
+                    {
+                        bestParameters.push_back({});
+                        for (std::uint32_t i = 0; i < parameter->get_data()->capacity(); i++)
+                        {
+                            bestParameters.back().push_back(parameter->get_data()->at(i));
+                        }
+                    }
+                    lastImprovement = iteration;
+                }
+                else if ( lastImprovement + earlyStopping <= iteration)
+                {
+                    std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
+                    break;
+                }
             }
         }
         else std::cout << std::endl;
     }
+
+    if (earlyStopping)
+    {
+        for (std::uint32_t i = 0; i < Module::get_learnable_parameters().size(); i++)
+        {
+            for (std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->capacity(); j++)
+            {
+                Module::get_learnable_parameters()[i]->get_data()->set(j, bestParameters[i][j]);
+            }
+        }
+    }   
+
+    std::cout<< "Training finished." << std::endl;
 }
 
 
@@ -216,7 +256,7 @@ void Model::train(Vector2D const trainData, Vector2D const trainLabel, std::uint
     train(dataPairs, epochs, batchSize, optimizer, false);
 }
 
-void Model::train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, bool earlyStopping)
+void Model::train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping)
 {
     std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> dataPairs;
     if (mDataPairs.find(0) == mDataPairs.end())
