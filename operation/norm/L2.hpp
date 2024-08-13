@@ -38,7 +38,7 @@ void L2::f(std::vector<std::shared_ptr<Variable>>& inputs)
     auto result = std::make_shared<Tensor<double>>(Tensor<double>({1}));
 
     double sum = 0;
-    for (std::uint32_t i = 0; i < input->size(); i++)
+    for (std::uint32_t i = 0; i < input->capacity(); i++)
     {
         if ((i-1) % input->shape(0) == 0) // no penalty on the bias
         {
@@ -59,18 +59,24 @@ std::shared_ptr<Tensor<double>> L2::bprop(std::vector<std::shared_ptr<Variable>>
     {
         throw std::runtime_error("L2: number of inputs is not 1");
     }
+    if (gradient->shape() != std::vector<std::uint32_t>({1}))
+    {
+        throw std::runtime_error("L2: gradient shape is not {1}");
+    }
 
     auto input = inputs[0]->get_data();
     auto result = std::make_shared<Tensor<double>>(input->shape());
 
-    for (std::uint32_t i = 0; i < input->size(); i++)
+    for (std::uint32_t i = 0; i < input->capacity(); i++)
     {
         if ((i-1) % input->shape(0) == 0) // no penalty on the bias
         {
-            result->data()[i] = 0;
-            continue;
+            result->set(i, 0);
         }
-        result->data()[i] = _lambda * input->data()[i] * gradient->data()[0];
+        else
+        {
+            result->set(i, _lambda * input->at(i));
+        }
     }
 
     return result;

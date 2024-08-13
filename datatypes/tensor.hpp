@@ -18,6 +18,8 @@ protected:
     DataVector mData; // the data of the tensor
     ShapeVector mShape; // the shape of the tensor
 
+    std::uint32_t calculateIndex(const ShapeVector & index);
+
 public:
     /**
      * @brief Construct an empty new Tensor object.
@@ -61,6 +63,41 @@ public:
     void set(const ShapeVector & index, const T & value);
 
     /**
+     * @brief This function is used to set the value of an element in the tensor with a single index.
+     * @param index The index of the element.
+     * @param value The value to be set.
+     */
+    void set(const ShapeType & index, const T & value);
+
+    /**
+     * @brief This function is used to add a value to the tensor. To do so it uses a vector of indices.
+     * @param index The indices of the element.
+     * @param value The value to be added.
+     */
+    void add(const ShapeVector & index, const T & value);
+
+    /**
+     * @brief This function is used to add a value to the tensor with a single index.
+     * @param index The index of the element.
+     * @param value The value to be added.
+     */
+    void add(const ShapeType & index, const T & value);
+
+    /**
+     * @brief This function is used to subtract a value from the tensor. To do so it uses a vector of indices.
+     * @param index The indices of the element.
+     * @param value The value to be subtracted.
+     */
+    void subtract(const ShapeVector & index, const T & value);
+
+    /**
+     * @brief This function is used to subtract a value from the tensor with a single index.
+     * @param index The index of the element.
+     * @param value The value to be subtracted.
+     */
+    void subtract(const ShapeType & index, const T & value);
+
+    /**
      * @brief This function returns the shape of the tensor.
      * @return The shape of the tensor.
      */
@@ -99,6 +136,27 @@ public:
 };
 
 template <class T>
+std::uint32_t Tensor<T>::calculateIndex(const ShapeVector & index)
+{
+    if(index.size() != mShape.size())
+        throw std::invalid_argument("Tensor::calculateIndex: Index size does not match the dimensionality of the tensor");
+
+    ShapeType _block_size = std::accumulate(mShape.begin(), mShape.end(), 1, std::multiplies<ShapeType>()); // product of all dimensions
+    ShapeType _index = 0;
+
+    // calculate the index of the element
+    for (std::uint32_t i = 0; i < index.size(); i++)
+    {
+        _block_size /= mShape[i];
+        _index += index[i] * _block_size;
+    }
+
+    if(_index >= mData.size())
+        throw std::out_of_range("Index out of range");
+    return _index;
+}
+
+template <class T>
 Tensor<T>::Tensor(const ShapeVector & dimensionality)
 {
     mData = {};
@@ -124,20 +182,7 @@ Tensor<T>::Tensor(const ShapeVector & dimensionality, const T & value)
 template <class T>
 T Tensor<T>::at(const ShapeVector & index)
 {
-    if(index.size() != mShape.size())
-        throw std::invalid_argument("Tensor::at: Index size does not match the dimensionality of the tensor");
-
-    ShapeType _block_size = std::accumulate(mShape.begin(), mShape.end(), 1, std::multiplies<ShapeType>()); // product of all dimensions
-    ShapeType _index = 0;
-    // calculate the index of the element
-    for (std::uint32_t i = 0; i < index.size(); i++)
-    {
-        _block_size /= mShape[i];
-        _index += index[i] * _block_size;
-    }
-    if(_index >= mData.size())
-        throw std::out_of_range("Index out of range");
-    return mData[_index]; // return the element
+    return mData[calculateIndex(index)];
 }
 
 template <class T>
@@ -145,32 +190,48 @@ T Tensor<T>::at(const ShapeType & index)
 {
     if(index >= mData.size())
         throw std::out_of_range("Index out of range");
-    return mData[index]; // return the element
+    return mData[index];
 }
 
 
 template <class T>
 void Tensor<T>::set(const ShapeVector & index, const T & value)
 {
-    if(index.size() != mShape.size())
-        throw std::invalid_argument("Tensor::set: Index size does not match the dimensionality of the tensor");
-    ShapeType _block_size = std::accumulate(mShape.begin(), mShape.end(), 1, std::multiplies<ShapeType>()); // product of all dimensions
-    ShapeType _index = 0;
-    // calculate the index of the element
-    for (std::uint32_t i = 0; i < index.size(); i++)
-    {
-        _block_size /= mShape[i];
-        _index += index[i] * _block_size;
-    }
-    if(_index >= mData.size())
+    mData[calculateIndex(index)] = value;
+}
+
+template <class T>
+void Tensor<T>::set(const ShapeType & index, const T & value)
+{
+    if(index >= mData.size())
         throw std::out_of_range("Index out of range");
-    mData[_index] = value; // set the element
+    mData[index] = value;
+}
+
+template <class T>
+void Tensor<T>::add(const ShapeVector & index, const T & value)
+{
+    mData[calculateIndex(index)] += value;
+}
+
+template <class T>
+void Tensor<T>::add(const ShapeType & index, const T & value)
+{
+    if(index >= mData.size())
+        throw std::out_of_range("Index out of range");
+    mData[index] += value;
+}
+
+template <class T>
+void Tensor<T>::subtract(const ShapeVector & index, const T & value)
+{
+    mData[calculateIndex(index)] -= value;
 }
 
 template <class T>
 Tensor<T>::ShapeVector Tensor<T>::shape()
 {
-    return mShape; // return the shape
+    return mShape;
 }
 
 template <class T>

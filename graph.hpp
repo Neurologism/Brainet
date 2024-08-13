@@ -128,9 +128,9 @@ std::vector<std::shared_ptr<Tensor<double>>> Graph::backprop(std::vector<std::sh
     for(std::shared_ptr<Variable> var : __outputs) // initialize the gradient table with the output variables
     {
         grad_table[var->get_id()] = std::make_shared<Tensor<double>>(Tensor<double>(var->get_data()->shape())); // initialize the gradient table with the differentiate variables
-        for(std::uint32_t i = 0; i < var->get_data()->size(); i++)
+        for(std::uint32_t i = 0; i < var->get_data()->capacity(); i++)
         {
-            grad_table[var->get_id()]->data()[i] = 1; // differentiate variables have a gradient of 1 and are considered as leaf nodes
+            grad_table[var->get_id()]->set(i, 1); // differentiate variables have a gradient of 1 and are considered as leaf nodes
         }
     }
 
@@ -185,9 +185,9 @@ void Graph::build_grad(std::shared_ptr<Variable> focus, std::vector<std::shared_
         }
         else
         {
-            for (std::uint32_t j = 0; j < gradient->size(); j++) // add the gradient to the gradient table
+            for (std::uint32_t j = 0; j < gradient->capacity(); j++) // add the gradient to the gradient table
             {
-                _gradient->data()[j] += gradient->data()[j];
+                _gradient->add(j, gradient->at(j));
             }
         }
         

@@ -124,8 +124,15 @@ void Model::sequential(std::vector<Module_VARIANT> layers, NormVariant norm, std
 
 void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> const & data_label_pairs, std::uint32_t const epochs, std::uint32_t const batch_size, OptimizerVariant optimizer)
 {
+    if ( data_label_pairs.size() != 1)
+    {
+        throw std::runtime_error("Only one data/label pair is currently supported");
+    }
+
+    const std::uint32_t trainingIterations = epochs; // adjust this value later to train for epochs
+
     // this should be replaced by a more sophisticated training algorithm
-    for(std::uint32_t epoch = 0; epoch < epochs; epoch++)
+    for(std::uint32_t iteration = 0; iteration < trainingIterations; iteration++)
     {
         std::vector<std::vector<double>> batch_data;
         std::vector<std::vector<double>> batch_label;
@@ -142,30 +149,14 @@ void Model::train(std::map<std::uint32_t, std::pair<data_type, label_type>> cons
             batch_label.push_back(label[random_index]);
             // Use batch_data and batch_label for training
         }
-        std::shared_ptr<Tensor<double>> data_tensor = std::make_shared<Tensor<double>>(Tensor<double>({(std::uint32_t) batch_data.size(), (std::uint32_t) batch_data[0].size()}, 0.0, false));
-        std::shared_ptr<Tensor<double>> label_tensor = std::make_shared<Tensor<double>>(Tensor<double>({(std::uint32_t) batch_label.size(),(std::uint32_t) batch_label[0].size()}, 0.0, false));
+        
 
-        for (std::uint32_t i = 0; i < batch_data.size(); i++)
-        {
-            for (std::uint32_t j = 0; j < batch_data[i].size(); j++)
-            {
-                data_tensor->data()[i * batch_data[i].size() + j] = batch_data[i][j];
-            }
-            for (std::uint32_t j = 0; j < batch_label[i].size(); j++)
-            {
-                label_tensor->data()[i * batch_label[i].size() + j] = batch_label[i][j];
-            }
-        }
-
-        __data_label_pairs[0].first->get_data() = data_tensor;
-        __data_label_pairs[0].second->get_data() = label_tensor;
-
-
-
+        __data_label_pairs[0].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batch_data));
+        __data_label_pairs[0].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(batch_label));
 
         __graph->forward();
         std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
-        std::cout << "Batch: " << epoch << " Loss: " << loss->data()[0] << std::endl; // print loss
+        std::cout << "Batch: " << iteration << " Loss: " << loss->at(0) << std::endl; // print loss
         std::vector<std::shared_ptr<Tensor<double>>> __gradients = __graph->backprop(Module::get_learnable_parameters()); // backpropagation
         
         std::visit([__gradients, batch_size](auto&& arg) {
@@ -190,27 +181,12 @@ void Model::test(std::map<std::uint32_t, std::pair<data_type, label_type>> const
 {
     for (auto const & data_label_pair : data_label_pairs)
     {
-        std::shared_ptr<Tensor<double>> data_tensor = std::make_shared<Tensor<double>>(Tensor<double>({std::min((std::uint32_t)data_label_pair.second.first.size(), max_test_size), (std::uint32_t) data_label_pair.second.first[0].size()}, 0.0, false));
-        std::shared_ptr<Tensor<double>> label_tensor = std::make_shared<Tensor<double>>(Tensor<double>({std::min((std::uint32_t)data_label_pair.second.second.size(), max_test_size), (std::uint32_t) data_label_pair.second.second[0].size()}, 0.0, false));
-
-        for (std::uint32_t i = 0; i < std::min((std::uint32_t)data_label_pair.second.first.size(), max_test_size); i++)
-        {
-            for (std::uint32_t j = 0; j < data_label_pair.second.first[i].size(); j++)
-            {
-                data_tensor->data()[i * data_label_pair.second.first[i].size() + j] = data_label_pair.second.first[i][j];
-            }
-            for (std::uint32_t j = 0; j < data_label_pair.second.second[i].size(); j++)
-            {
-                label_tensor->data()[i * data_label_pair.second.second[i].size() + j] = data_label_pair.second.second[i][j];
-            }
-        }
-
-        __data_label_pairs[data_label_pair.first].first->get_data() = data_tensor;
-        __data_label_pairs[data_label_pair.first].second->get_data() = label_tensor;
+        __data_label_pairs[data_label_pair.first].first->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(data_label_pair.second.first));
+        __data_label_pairs[data_label_pair.first].second->get_data() = std::make_shared<Tensor<double>>(Matrix<double>(data_label_pair.second.second));
 
         __graph->forward();
         std::shared_ptr<Tensor<double>> loss = __graph->get_output(__loss_index);
-        std::cout << "Test Loss: " << loss->data()[0] << std::endl; // print loss
+        std::cout << "Test Loss: " << loss->at(0) << std::endl; // print loss
     }
 }
 
