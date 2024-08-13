@@ -46,7 +46,7 @@ void Noise::f(std::vector<std::shared_ptr<Variable>>& inputs)
     std::mt19937 gen(rd());
     std::normal_distribution<double> dist(_mean, _stddev);
 
-    for (std::uint32_t i = 0; i < input->size(); i++)
+    for (std::uint32_t i = 0; i < input->capacity(); i++)
     {
         result->set({i}, input->at({i}) + dist(gen));
     }

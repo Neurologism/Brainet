@@ -10,8 +10,7 @@ template <typename T>
 class Matrix : public Tensor<T>
 {
     typedef std::vector<T> DataVector;
-    typedef std::uint32_t ShapeType;
-    typedef std::vector<ShapeType> ShapeVector;
+    typedef std::vector<size_t> ShapeVector;
 
 public:
     Matrix() = default;
@@ -20,20 +19,20 @@ public:
      * @brief Construct a new Matrix object. The matrix is initialized with random values.
      * @param dimensionality The dimensionality of the matrix.
      */
-    Matrix(const ShapeVector & dimensionality) : Tensor<T>(dimensionality);
+    Matrix(const ShapeVector & dimensionality);
 
     /**
      * @brief Construct a new Matrix object. The matrix is initialized with a given value.
      * @param dimensionality The dimensionality of the matrix.
      * @param value The value to initialize the matrix with.
      */
-    Matrix(const ShapeVector & dimensionality, const T & value) : Tensor<T>(dimensionality, value);
+    Matrix(const ShapeVector & dimensionality, const T & value);
 
     /**
      * @brief Construct a new Matrix object.
      * @param data The data to initialize the matrix with.
      */
-    Matrix(const std::vector<std::vector<T>> & data) : Tensor<T>({data.size(), data[0].size()}, 0);
+    Matrix(const std::vector<std::vector<T>> & data);
 
     ~Matrix() = default;
 
@@ -88,7 +87,7 @@ Matrix<T>::Matrix(const std::vector<std::vector<T>> & data) : Tensor<T>({data.si
     {
         for (std::uint32_t j = 0; j < data[0].size(); j++)
         {
-            mData[i * mShape[1] + j] = data[i][j];
+            this->mData[i * this->mShape[1] + j] = data[i][j];
         }
     }
 }
@@ -96,39 +95,38 @@ Matrix<T>::Matrix(const std::vector<std::vector<T>> & data) : Tensor<T>({data.si
 template <typename T>
 T Matrix<T>::at(const std::uint32_t & i, const std::uint32_t & j)
 {
-    if (i >= mShape[0] || j >= mShape[1])
+    if (i >= this->mShape[0] || j >= this->mShape[1])
         throw std::out_of_range("Matrix::at: Index out of range.");
     
-    return mData[i * mShape[1] + j];
+    return this->mData[i * this->mShape[1] + j];
 }
 
 template <typename T>
 void Matrix<T>::set(const std::uint32_t & i, const std::uint32_t & j, const T & value)
 {
-    if (i >= mShape[0] || j >= mShape[1])
+    if (i >= this->mShape[0] || j >= this->mShape[1])
         throw std::out_of_range("Matrix::set: Index out of range.");
 
-    mData[i * mShape[1] + j] = value;
+    this->mData[i * this->mShape[1] + j] = value;
 }
 
 template <class T>
 std::shared_ptr<Matrix<T>> Matrix<T>::transpose()
 {
-    if(mShape.size() != 2)
+    if(this->mShape.size() != 2)
         throw std::invalid_argument("Matrix::transpose: Matrix must have exactly two dimensions.");
 
-    std::shared_ptr<Tensor<T>> _tensor = std::make_shared<Tensor<T>>(Tensor<T>({mShape[1],mShape[0]})); // create a new tensor with the transposed shape
-    DataVector _data(mData.size());
-    // create a vector with the transposed data
-    for(ShapeType i = 0; i < mShape[0]; i++)
+    std::shared_ptr<Matrix<T>> transposedMatrix = std::make_shared<Matrix<T>>(Matrix<T>({this->mShape[1], this->mShape[0]}, 0)); 
+
+    for (std::uint32_t i = 0; i < this->mShape[0]; i++)
     {
-        for(ShapeType j = 0; j < mShape[1]; j++)
+        for (std::uint32_t j = 0; j < this->mShape[1]; j++)
         {
-            _data[j*mShape[0] + i] = mData[i*mShape[1] + j];
+            transposedMatrix->set(j, i, this->at(i, j));
         }
     }
-    _tensor->data() = _data; // set the data of the new tensor
-    return _tensor; // return the new tensor
+
+    return transposedMatrix;
 }
 
 template <class T>

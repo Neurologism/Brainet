@@ -18,15 +18,15 @@ std::vector<std::vector<double>> read_idx(const std::string path)
 
     if (magic[2] == 0x08)
     {
-        std::uint32_t dimensions = magic[3];
-        std::vector<std::uint32_t> shape(dimensions);
+        size_t dimensions = magic[3];
+        std::vector<size_t> shape(dimensions);
         for (std::uint32_t i = 0; i < dimensions; i++)
         {
             unsigned char dimension[4];
             file.read((char *)dimension, 4);
-            shape[i] = (std::uint32_t)dimension[0] << 24 | (std::uint32_t)dimension[1] << 16 | (std::uint32_t)dimension[2] << 8 | (std::uint32_t)dimension[3];
+            shape[i] = (size_t)dimension[0] << 24 | (size_t)dimension[1] << 16 | (size_t)dimension[2] << 8 | (size_t)dimension[3];
         }
-        tensor.resize(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<std::uint32_t>())));
+        tensor.resize(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<size_t>())));
         for (std::uint32_t i = 0; i < tensor.size(); i++)
         {
             unsigned char pixel;

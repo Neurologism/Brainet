@@ -29,9 +29,9 @@ void PrimitiveSGD::update(const std::vector<std::shared_ptr<Tensor<double>>> & g
 {
     for(std::uint32_t i = 0; i < Module::get_learnable_parameters().size(); i++)
     {
-        for(std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->size(); j++)
+        for(std::uint32_t j = 0; j < Module::get_learnable_parameters()[i]->get_data()->capacity(); j++)
         {
-            Module::get_learnable_parameters()[i]->get_data()->data()[j] -= _initial_learning_rate * gradients[i]->data()[j] / batch_size;
+            Module::get_learnable_parameters()[i]->get_data()->subtract(j, _initial_learning_rate * gradients[i]->at(j) / batch_size);
         }
     }
     _initial_learning_rate *= _decay_rate; // primitive learning rate decay
