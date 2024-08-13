@@ -8,21 +8,21 @@
 */
 class Sigmoid : public ActivationFunction
 {   
-    double activation_function(double input)override;
-    double activation_function_derivative(double input)override;
+    double activationFunction(double input)override;
+    double activationFunctionDerivative(double input)override;
 public:
     Sigmoid() { mName = "SIGMOID"; };
     ~Sigmoid() = default;
 };
 
-double Sigmoid::activation_function(double input)
+double Sigmoid::activationFunction(double input)
 {
     return 1 / (1 + exp(-input));
 }
 
-double Sigmoid::activation_function_derivative(double input)
+double Sigmoid::activationFunctionDerivative(double input)
 {
-    return activation_function(input) * (1 - activation_function(input));
+    return activationFunction(input) * (1 - activationFunction(input));
 }
 
 #endif // SIGMOID_HPP

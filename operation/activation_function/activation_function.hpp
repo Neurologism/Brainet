@@ -25,11 +25,11 @@ public:
     /**
      * @brief Activation function to be implemented by the derived class.
      */
-    virtual double activation_function(double x) = 0;
+    virtual double activationFunction(double x) = 0;
     /**
      * @brief Derivative of the activation function to be implemented by the derived class.
      */
-    virtual double activation_function_derivative(double x) = 0;
+    virtual double activationFunctionDerivative(double x) = 0;
 };
 
 void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
@@ -44,7 +44,7 @@ void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply activation function to all elements
     {
-        _data->set(i, activation_function(inputs.front()->getData()->at(i))); // apply activation function
+        _data->set(i, activationFunction(inputs.front()->getData()->at(i))); // apply activation function
     }
 
     this->getVariable()->getData() = _data; // store the result in the variable
@@ -63,7 +63,7 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply derivative of activation function to all elements
     {
-        _data->set(i, activation_function_derivative(inputs.front()->getData()->at(i))); // apply derivative of activation function
+        _data->set(i, activationFunctionDerivative(inputs.front()->getData()->at(i))); // apply derivative of activation function
     }
 
     return _data;

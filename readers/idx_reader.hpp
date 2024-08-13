@@ -3,6 +3,11 @@
 
 #include "../dependencies.hpp"
 
+/**
+ * @brief This function reads an IDX file and returns the data as a 2D vector.
+ * @param path The path to the IDX file.
+ * @return The data as a 2D vector.
+ */
 std::vector<std::vector<double>> read_idx(const std::string path)
 {
     typedef std::vector<std::vector<double>> data_type;
@@ -11,6 +16,8 @@ std::vector<std::vector<double>> read_idx(const std::string path)
     if (!file.is_open())
         throw std::invalid_argument("IDX_READER::read_idx: Could not open file");
 
+
+    // to understand the IDX file format see: http://yann.lecun.com/exdb/mnist/
     char magic[4];
     file.read(magic, 4);
 

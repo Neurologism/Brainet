@@ -8,21 +8,21 @@
 */
 class HyperbolicTangent : public ActivationFunction
 {   
-    double activation_function(double input)override;
-    double activation_function_derivative(double input)override;
+    double activationFunction(double input)override;
+    double activationFunctionDerivative(double input)override;
 public:
     HyperbolicTangent() { mName = "HYPERBOLIC_TANGENT"; };
     ~HyperbolicTangent() = default;
 };
 
-double HyperbolicTangent::activation_function(double input)
+double HyperbolicTangent::activationFunction(double input)
 {
     return tanh(input);
 }
 
-double HyperbolicTangent::activation_function_derivative(double input)
+double HyperbolicTangent::activationFunctionDerivative(double input)
 {
-    return 1 - pow(activation_function(input), 2);
+    return 1 - pow(activationFunction(input), 2);
 }
 
 #endif // HYPERBOLICTANGENT_HPP

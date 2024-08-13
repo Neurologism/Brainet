@@ -10,8 +10,8 @@ class ReLU : public ActivationFunction
 {
     double __gradient; // gradient of left part of the function
 
-    double activation_function(double input)override;
-    double activation_function_derivative(double input)override;
+    double activationFunction(double input)override;
+    double activationFunctionDerivative(double input)override;
 public:
     ReLU(double gradient = 0);
     ~ReLU() = default;
@@ -26,12 +26,12 @@ ReLU::ReLU(double gradient)
     mName = "RELU";
 }
 
-double ReLU::activation_function(double input)
+double ReLU::activationFunction(double input)
 {
     return input >= 0 ? input : __gradient * input;
 }
 
-double ReLU::activation_function_derivative(double input)
+double ReLU::activationFunctionDerivative(double input)
 {
     return input >= 0 ? 1 : __gradient;
 }
