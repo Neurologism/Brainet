@@ -56,7 +56,7 @@ std::shared_ptr<Tensor<double>> MSE::bprop(std::vector<std::shared_ptr<Variable>
     {
         throw std::runtime_error("MSE operation requires inputs to have the same shape");
     }
-    if(gradient->shape() != std::vector<std::uint32_t>({1}))
+    if(gradient->shape() != std::vector<size_t>({1}))
     {
         throw std::runtime_error("MSE operation requires gradient to have shape {1}");
     }

@@ -59,7 +59,7 @@ std::shared_ptr<Tensor<double>> L2::bprop(std::vector<std::shared_ptr<Variable>>
     {
         throw std::runtime_error("L2: number of inputs is not 1");
     }
-    if (gradient->shape() != std::vector<std::uint32_t>({1}))
+    if (gradient->shape() != std::vector<size_t>({1}))
     {
         throw std::runtime_error("L2: gradient shape is not {1}");
     }

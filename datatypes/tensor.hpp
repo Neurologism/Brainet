@@ -12,8 +12,7 @@ class Tensor
 protected:
 
     typedef std::vector<T> DataVector;
-    typedef std::uint32_t ShapeType;
-    typedef std::vector<ShapeType> ShapeVector;
+    typedef std::vector<size_t> ShapeVector;
 
     DataVector mData; // the data of the tensor
     ShapeVector mShape; // the shape of the tensor
@@ -53,7 +52,7 @@ public:
      * @param index The index of the element.
      * @return The element at the given index.
      */
-    T at(const ShapeType & index);
+    T at(const size_t & index);
 
     /**
      * @brief This function is used to set the value of an element in the tensor. To do so it uses a vector of indices.
@@ -67,7 +66,7 @@ public:
      * @param index The index of the element.
      * @param value The value to be set.
      */
-    void set(const ShapeType & index, const T & value);
+    void set(const size_t & index, const T & value);
 
     /**
      * @brief This function is used to add a value to the tensor. To do so it uses a vector of indices.
@@ -81,7 +80,7 @@ public:
      * @param index The index of the element.
      * @param value The value to be added.
      */
-    void add(const ShapeType & index, const T & value);
+    void add(const size_t & index, const T & value);
 
     /**
      * @brief This function is used to subtract a value from the tensor. To do so it uses a vector of indices.
@@ -95,7 +94,7 @@ public:
      * @param index The index of the element.
      * @param value The value to be subtracted.
      */
-    void subtract(const ShapeType & index, const T & value);
+    void subtract(const size_t & index, const T & value);
 
     /**
      * @brief This function returns the shape of the tensor.
@@ -108,7 +107,7 @@ public:
      * @param index The index of the shape.
      * @return The shape at the given index.
      */
-    ShapeType shape(const ShapeType & index);
+    size_t shape(const size_t & index);
 
     /**
      * @brief This function returns the dimensionality of the tensor.
@@ -141,8 +140,8 @@ std::uint32_t Tensor<T>::calculateIndex(const ShapeVector & index)
     if(index.size() != mShape.size())
         throw std::invalid_argument("Tensor::calculateIndex: Index size does not match the dimensionality of the tensor");
 
-    ShapeType _block_size = std::accumulate(mShape.begin(), mShape.end(), 1, std::multiplies<ShapeType>()); // product of all dimensions
-    ShapeType _index = 0;
+    size_t _block_size = std::accumulate(mShape.begin(), mShape.end(), 1, std::multiplies<size_t>()); // product of all dimensions
+    size_t _index = 0;
 
     // calculate the index of the element
     for (std::uint32_t i = 0; i < index.size(); i++)
@@ -159,7 +158,7 @@ std::uint32_t Tensor<T>::calculateIndex(const ShapeVector & index)
 template <class T>
 Tensor<T>::Tensor(const ShapeVector & dimensionality)
 {
-    mData = {};
+    mData = DataVector(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<size_t>())); // initialize the data vector
     mShape = dimensionality;
 
     std::random_device rd;
@@ -167,14 +166,14 @@ Tensor<T>::Tensor(const ShapeVector & dimensionality)
     std::normal_distribution<T> dis(0, 1.0E-8);
     for(std::uint32_t i = 0; i < mData.size(); i++)
     {
-        mData.push_back(dis(gen));
+        mData[i] = dis(gen);
     }
 }
 
 template <class T>
 Tensor<T>::Tensor(const ShapeVector & dimensionality, const T & value)
 {
-    mData = DataVector(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<ShapeType>()), value); // initialize the data vector
+    mData = DataVector(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<size_t>()), value); // initialize the data vector
     mShape = dimensionality; // set the shape of the tensor
 }
 
@@ -186,7 +185,7 @@ T Tensor<T>::at(const ShapeVector & index)
 }
 
 template <class T>
-T Tensor<T>::at(const ShapeType & index)
+T Tensor<T>::at(const size_t & index)
 {
     if(index >= mData.size())
         throw std::out_of_range("Index out of range");
@@ -201,7 +200,7 @@ void Tensor<T>::set(const ShapeVector & index, const T & value)
 }
 
 template <class T>
-void Tensor<T>::set(const ShapeType & index, const T & value)
+void Tensor<T>::set(const size_t & index, const T & value)
 {
     if(index >= mData.size())
         throw std::out_of_range("Index out of range");
@@ -215,7 +214,7 @@ void Tensor<T>::add(const ShapeVector & index, const T & value)
 }
 
 template <class T>
-void Tensor<T>::add(const ShapeType & index, const T & value)
+void Tensor<T>::add(const size_t & index, const T & value)
 {
     if(index >= mData.size())
         throw std::out_of_range("Index out of range");
@@ -229,13 +228,21 @@ void Tensor<T>::subtract(const ShapeVector & index, const T & value)
 }
 
 template <class T>
-Tensor<T>::ShapeVector Tensor<T>::shape()
+void Tensor<T>::subtract(const size_t & index, const T & value)
+{
+    if(index >= mData.size())
+        throw std::out_of_range("Index out of range");
+    mData[index] -= value;
+}
+
+template <class T>
+typename Tensor<T>::ShapeVector Tensor<T>::shape()
 {
     return mShape;
 }
 
 template <class T>
-Tensor<T>::ShapeType Tensor<T>::shape(const ShapeType & index)
+size_t Tensor<T>::shape(const size_t & index)
 {
     if(index >= mShape.size())
         throw std::out_of_range("Tensor::shape: Index out of range");
@@ -257,14 +264,14 @@ std::uint32_t Tensor<T>::capacity()
 template <class T>
 void Tensor<T>::resize(const ShapeVector & dimensionality)
 {
-    mData.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<ShapeType>())); // resize the data vector
+    mData.resize(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<size_t>())); // resize the data vector
     mShape = dimensionality; // set the new shape
 }
 
 template <class T>
 void Tensor<T>::reshape(const ShapeVector & dimensionality)
 {
-    if(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<ShapeType>()) != mData.size())
+    if(std::accumulate(dimensionality.begin(),dimensionality.end(),1, std::multiplies<size_t>()) != mData.size())
         throw std::invalid_argument("Tensor::reshape: New dimensionality does not match the capacity of the tensor");
     mShape = dimensionality; // set the new shape
 }

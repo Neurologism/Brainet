@@ -10,8 +10,7 @@ template <typename T>
 class Vector : public Tensor<T>
 {
     typedef std::vector<T> DataVector;
-    typedef std::uint32_t ShapeType;
-    typedef std::vector<ShapeType> ShapeVector;
+    typedef std::vector<size_t> ShapeVector;
 
 public:
     Vector() = default;
@@ -20,20 +19,20 @@ public:
      * @brief Construct a new Vector object. The vector is initialized with random values.
      * @param dimensionality The dimensionality of the vector.
      */
-    Vector(const ShapeVector & dimensionality) : Tensor<T>(dimensionality);
+    Vector(const ShapeVector & dimensionality);
 
     /**
      * @brief Construct a new Vector object. The vector is initialized with a given value.
      * @param dimensionality The dimensionality of the vector.
      * @param value The value to initialize the vector with.
      */
-    Vector(const ShapeVector & dimensionality, const T & value) : Tensor<T>(dimensionality, value);
+    Vector(const ShapeVector & dimensionality, const T & value);
 
     /**
      * @brief Construct a new Vector object.
      * @param data The data to initialize the vector with.
      */
-    Vector(const std::vector<T> & data) : Tensor<T>({data.size()}, 0);
+    Vector(const std::vector<T> & data);
 
     ~Vector() = default;
 
@@ -60,12 +59,32 @@ public:
 };
 
 template <typename T>
+Vector<T>::Vector(const ShapeVector & dimensionality) : Tensor<T>(dimensionality)
+{
+    if (dimensionality.size() != 1)
+        throw std::invalid_argument("Vector::Vector: Dimensionality must be 1.");
+}
+
+template <typename T>
+Vector<T>::Vector(const ShapeVector & dimensionality, const T & value) : Tensor<T>(dimensionality, value)
+{
+    if (dimensionality.size() != 1)
+        throw std::invalid_argument("Vector::Vector: Dimensionality must be 1.");
+}
+
+template <typename T>
+Vector<T>::Vector(const std::vector<T> & data) : Tensor<T>({data.size()})
+{
+    this->mData = data;
+}
+
+template <typename T>
 T Vector<T>::at(const std::uint32_t & i)
 {
     if (i >= this->mData.size())
         throw std::invalid_argument("Vector::at: Index out of range.");
     
-    return mData[i];
+    return this->mData[i];
 }
 
 template <typename T>
@@ -74,7 +93,7 @@ void Vector<T>::set(const std::uint32_t & i, const T & value)
     if (i >= this->mData.size())
         throw std::invalid_argument("Vector::set: Index out of range.");
     
-    mData[i] = value;
+    this->mData[i] = value;
 }
 
 template <typename T>
