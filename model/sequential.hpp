@@ -11,9 +11,7 @@ class SequentialModel : public Model
     typedef std::vector<std::vector<double>> Vector2D;
 
     std::vector<std::shared_ptr<Module>> mModules; // storing the hiddenModules in the order they were added
-    std::shared_ptr<Variable> mpDataInputVariable; // storing the input variable
-    std::shared_ptr<Variable> mpLabelInputVariable; // storing the label input variable
-    std::shared_ptr<Variable> mpOutputVariable; // storing the output variable
+
 
 
 protected:
@@ -25,10 +23,10 @@ protected:
 SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> hidden_layers, Output output_layer, Cost cost_function)
 {
     // convert modules to shared pointers
-    std::shared_ptr<Module> inputLayer = std::make_shared<Input>(input_layer);
+    std::shared_ptr<Input> inputLayer = std::make_shared<Input>(input_layer);
     std::vector<std::shared_ptr<Module>> hiddenModules;
-    std::shared_ptr<Module> outputLayer = std::make_shared<Output>(output_layer);
-    std::shared_ptr<Module> costFunction = std::make_shared<Cost>(cost_function);
+    std::shared_ptr<Output> outputLayer = std::make_shared<Output>(output_layer);
+    std::shared_ptr<Cost> costFunction = std::make_shared<Cost>(cost_function);
 
     for (ModuleVariant& layer : hidden_layers) {
         std::shared_ptr<Module> modulePtr = std::visit([](auto&& arg) {
@@ -61,7 +59,13 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     mModules.push_back(costFunction);
 
     // store special variables
-    mInputVariables = inputLayer->input();
+
+    for
+    mInputVariables.push_back(inputLayer->input());
+    mOutputVariables.push_back(outputLayer->output(0));
+    mLossVariables.push_back(costFunction->output(0));
+    mTargetVariables.push_back(costFunction->input(1));
+    
 
 }
 

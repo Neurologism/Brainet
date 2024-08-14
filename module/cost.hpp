@@ -50,14 +50,14 @@ public:
     /**
      * @brief used to get the input variables of the module specified by the index.
      */
-    std::shared_ptr<Variable> input(std::uint32_t index) override
+    std::shared_ptr<Variable> input(std::uint32_t index = 0 ) override
     {
         return mOutputVariable;
     }
     /**
      * @brief used to get the output variables of the module specified by the index.
      */
-    std::shared_ptr<Variable> output(std::uint32_t index) override
+    std::shared_ptr<Variable> output(std::uint32_t index = 0) override
     {
         return mOutputVariable;
     }

@@ -55,8 +55,7 @@ public:
         
         if (mpNorm != nullptr) // adding norm to activation function
         {
-            mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));
-            GRAPH->addOutput(mpNormVariable);    
+            mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));   
             mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
         }
     }
@@ -66,20 +65,6 @@ public:
     void addOutput(std::shared_ptr<Variable> output) override
     {
         mpActivationVariable->getConsumers().push_back(output);
-    }
-    /**
-     * @brief used to get the input variables of the module specified by the index.
-     */
-    std::shared_ptr<Variable> input(std::uint32_t index) override
-    {
-        return mpPaddingVariable;
-    }
-    /**
-     * @brief used to get the output variables of the module specified by the index.
-     */
-    std::shared_ptr<Variable> output(std::uint32_t index) override
-    {
-        return mpActivationVariable;
     }
     /**
      * @brief used to set the default norm to use for regularization.

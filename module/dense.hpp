@@ -30,6 +30,7 @@ public:
      * @param units the number of neurons in the layer.
      */
     Dense(HiddenVariant activationFunction, std::uint32_t units);
+
     /**
      * @brief add a dense layer to the graph
      * @param activationFunction the operation representing the activation function.
@@ -37,31 +38,19 @@ public:
      * @param norm the norm to use for regularization.
      */
     Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant norm);
+
     ~Dense() = default;
+
+    void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
+
+    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
+
     /**
      * @brief used to mark variables as input for the module.
      */
     void addInput(std::shared_ptr<Variable> input, std::uint32_t inputUnits) override
     {
-        mpPaddingVariable->getInputs().push_back(input);
         
-        // init default norm
-        if(mpNorm == nullptr && mpsDefaultNorm != nullptr)
-        {
-            mpNorm = std::visit([](auto&& arg) {
-                // Assuming all types in the variant can be dynamically casted to Operation*
-                return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *mpsDefaultNorm);
-        }
-        
-        // +1 for the weight
-        mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
-        
-        if (mpNorm != nullptr) // adding norm to activation function
-        {
-            mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));
-            GRAPH->addOutput(mpNormVariable);    
-            mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
-        }
     }
     /**
      * @brief used to mark variables as output for the module.
@@ -136,6 +125,39 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant 
     Dense(activationFunction, units);
 }
 
+
+void Dense::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs)
+{
+    if (initialInpus.size() != 1)
+    {
+        throw std::invalid_argument("Dense::__init__: the number of input variables must be 1");
+    }
+    if (initialOutputs.size() != 1)
+    {
+        throw std::invalid_argument("Dense::__init__: the number of output variables must be 1");
+    }
+
+    mpPaddingVariable->getInputs().push_back(initialInpus[0]);
+        
+    // init default norm
+    if(mpNorm == nullptr && mpsDefaultNorm != nullptr)
+    {
+        mpNorm = std::visit([](auto&& arg) {
+            // Assuming all types in the variant can be dynamically casted to Operation*
+            return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *mpsDefaultNorm);
+    }
+    
+    // +1 for the weight
+    mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
+    
+    if (mpNorm != nullptr) // adding norm to activation function
+    {
+        mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));
+        GRAPH->addOutput(mpNormVariable);    
+        mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
+    }
+
+}
 std::shared_ptr<NormVariant> Dense::mpsDefaultNorm = nullptr;
 
 #endif // DENSE_HPP

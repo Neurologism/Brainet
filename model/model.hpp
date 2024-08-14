@@ -16,7 +16,7 @@ protected:
     // everything needed for the graph
     std::vector<std::shared_ptr<Variable>> mLearnableVariables; // all variables that can be learned by the learning algorithm
     std::vector<std::shared_ptr<Variable>> mInputVariables;     // all variables that are used as input for the data
-    std::vector<std::shared_ptr<Variable>> mLabelVariables;     // all variables that are used as input for the labels
+    std::vector<std::shared_ptr<Variable>> mTargetVariables;     // all variables that are used as input for the labels
     std::vector<std::shared_ptr<Variable>> mOutputVariables;    // all variables that are used as output 
     std::vector<std::shared_ptr<Variable>> mLossVariables;      // all variables that are used as output for the loss
     std::vector<std::shared_ptr<Variable>> mBackpropVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
