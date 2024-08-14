@@ -2,6 +2,9 @@
 #define OUTPUT_HPP
 
 #include "./module.hpp"
+#include "../operation/processing/padding.hpp"
+#include "../operation/activation_function/activation_function.hpp"
+#include "../operation/norm/norm.hpp"
 
 class Output : public Module
 {
@@ -19,19 +22,19 @@ class Output : public Module
 
 public:
     /**
-     * @brief add a dense layer to the graph
+     * @brief add a output layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
      */
-    Dense(OutputVariant activationFunction, std::uint32_t units);
+    Output(OutputVariant activationFunction, std::uint32_t units);
     /**
-     * @brief add a dense layer to the graph
+     * @brief add a output layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
      */
-    Dense(OutputVariant activationFunction, std::uint32_t units, NormVariant norm);
-    ~Dense() = default;
+    Output(OutputVariant activationFunction, std::uint32_t units, NormVariant norm);
+    ~Output() = default;
     /**
      * @brief used to mark variables as input for the module.
      */
@@ -87,7 +90,7 @@ public:
     }
 };
 
-Dense::Dense(OutputVariant activationFunction, std::uint32_t units)
+Output::Output(OutputVariant activationFunction, std::uint32_t units)
 {
     // error checks
     if(sGraph == nullptr)
@@ -122,12 +125,14 @@ Dense::Dense(OutputVariant activationFunction, std::uint32_t units)
     
 }
 
-Dense::Dense(OutputVariant activationFunction, std::uint32_t units, NormVariant norm)
+Output::Output(OutputVariant activationFunction, std::uint32_t units, NormVariant norm)
 {
     mpNorm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, norm);
-    Dense(activationFunction, units);
+    Output(activationFunction, units);
 }
 
-std::shared_ptr<NormVariant> Dense::mpsDefaultNorm = nullptr;
+std::shared_ptr<NormVariant> Output::mpsDefaultNorm = nullptr;
+
+#endif // OUTPUT_HPP
