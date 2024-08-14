@@ -29,14 +29,14 @@ public:
     ~Input() = default;
 
     
-    void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
+    void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
 
     /**
      * @brief gives access to all variables of the module.
      * @param index the index of the variable
      * @return the variable specified by the index
-     * @note 0: input variable
-     * @note 1: output variable (NoiseVariable if added else InputVariable)
+     * @note 0: InputVariable
+     * @note 1: NoiseVariable if added else InputVariable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;    
 };

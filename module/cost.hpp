@@ -33,41 +33,18 @@ public:
 
     ~Cost() = default;
 
+    void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
+
     /**
-     * @brief used to mark variables as input for the module.
+     * @brief function to get access to specific variables of the module.
+     * @param index the index of the variable
+     * @return the variable specified by the index
+     * @note 0: output variable
+     * @note 1: output variable
+     * @note 2: target variable
      */
-    void addInput(std::shared_ptr<Variable> input, std::uint32_t units) override
-    {
-        mOutputVariable->getInputs().push_back(input);
-    }
-    /**
-     * @brief used to mark variables as output for the module.
-     */
-    void addOutput(std::shared_ptr<Variable> output) override
-    {
-        mOutputVariable->getConsumers().push_back(output);
-    }
-    /**
-     * @brief used to get the input variables of the module specified by the index.
-     */
-    std::shared_ptr<Variable> input(std::uint32_t index = 0 ) override
-    {
-        return mOutputVariable;
-    }
-    /**
-     * @brief used to get the output variables of the module specified by the index.
-     */
-    std::shared_ptr<Variable> output(std::uint32_t index = 0) override
-    {
-        return mOutputVariable;
-    }
-    /**
-     * @brief used to get the target variable of the module.
-     */
-    std::shared_ptr<Variable> target()
-    {
-        return mTargetVariable;
-    }
+    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
+    
 };
 
 Cost::Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmoothing)
@@ -126,4 +103,41 @@ Cost::Cost(CostVariant costFunction)
     // connections within the module
     mTargetVariable->getConsumers().push_back(mOutputVariable);
 }
+
+void Cost::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs )
+{
+    if (initialInpus.size() != 1)
+    {
+        throw std::invalid_argument("Cost::__init__: the number of input variables must be 1");
+    }
+    if (initialOutputs.size() != 1)
+    {
+        throw std::invalid_argument("Cost::__init__: the number of output variables must be 1");
+    }
+
+    mOutputVariable->getInputs().push_back(initialInpus[0]);
+    mOutputVariable->getConsumers().push_back(initialOutputs[0]);
+}
+
+std::shared_ptr<Variable> Cost::getVariable(std::uint32_t index)
+{
+    switch (index)
+    {
+    case 0:
+        return mOutputVariable;
+        break;
+    case 1:
+        return mOutputVariable;
+        break;
+    case 2:
+        return mTargetVariable;
+        break;
+    default:
+        throw std::invalid_argument("Cost::getVariable: index out of range");
+        break;
+    }
+}
+
+
+
 #endif // COST_HPP

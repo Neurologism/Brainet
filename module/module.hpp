@@ -19,7 +19,7 @@ public:
     /**
      * @brief used to initialize the module. This is used to add initial connections to other modules.
      */
-    virtual void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) = 0;
+    virtual void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) = 0;
 
     /**
      * @brief function to get access to specific variables of the module.
@@ -42,9 +42,9 @@ public:
 
 // code of all child classes
 #include "input.hpp"
-#include "dense.hpp"
+#include "fullyconnected/dense.hpp"
 #include "cost.hpp"
-#include "output.hpp"
+#include "fullyconnected/output.hpp"
 
 using ModuleVariant = std::variant<Dense>;
 
