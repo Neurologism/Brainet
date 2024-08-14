@@ -32,7 +32,7 @@ public:
 
     void train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, double split, std::uint32_t const earlyStopping);
 
-    
+
     void test(Vector2D const & data, Vector2D const & label);
 };
 
@@ -111,6 +111,11 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
 void SequentialModel::train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, double split, std::uint32_t const earlyStopping)
 {
     train({input}, {label}, epochs, batchSize, optimizer, split, earlyStopping);
+}
+
+void SequentialModel::test(Vector2D const & data, Vector2D const & label)
+{
+    test({data}, {label});
 }
 
 #endif // SEQUENTIAL_HPP

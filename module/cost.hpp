@@ -109,7 +109,6 @@ void Cost::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::v
     }
 
     mOutputVariable->getInputs().push_back(initialInpus[0]);
-    mOutputVariable->getConsumers().push_back(initialOutputs[0]);
 }
 
 std::shared_ptr<Variable> Cost::getVariable(std::uint32_t index)

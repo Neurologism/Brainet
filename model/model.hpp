@@ -1,11 +1,11 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include "graph.hpp"
-#include "module/module.hpp"
-#include "operation/activation_function/activation_function.hpp"
-#include "optimizers/optimizer.hpp"
-#include "preprocessing/split.hpp"
+#include "../graph.hpp"
+#include "../module/module.hpp"
+#include "../operation/activation_function/activation_function.hpp"
+#include "../optimizers/optimizer.hpp"
+#include "../preprocessing/split.hpp"
 
 class Model
 {
@@ -57,7 +57,8 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
     const std::uint32_t trainingIterations = epochs * dataSamples / batchSize;
 
-    
+    std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
+    graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
 
     Vector2D trainData;
     Vector2D trainLabel;
@@ -95,105 +96,104 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
         mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel)); // support multiple inputs and labels in the future
 
-        std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
-        graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+        
         GRAPH->forward(graphInputs); // forward pass
 
 
-        std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
+        std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
         
         std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
 
-        std::vector<std::shared_ptr<Tensor<double>>> gradientTable = GRAPH->backprop(Module::getLearnableParameters()); // backpropagation
+        GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
         
-        std::visit([gradientTable, batchSize](auto&& arg) {
-            arg.update(gradientTable, batchSize);}, optimizer);
+        std::visit([&](auto&& arg) {
+            arg.update(mLearnableVariables, batchSize); }, optimizer); // update weights
 
-        if ( dataPairs[pairId][2].size() )
+
+        // validation
+        mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
+        mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel)); // support multiple inputs and labels in the future
+
+        GRAPH->forward(graphInputs); // forward pass
+
+        std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
+
+        std::cout << " Validation-error: " << validationLoss->at(0) << std::endl;
+
+        
+        // early stopping
+        double currentLoss = validationLoss->at(0);
+
+        if (currentLoss < bestLoss)
         {
-            mDataPairs[pairId].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
-            mDataPairs[pairId].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel));
-
-            GRAPH->forward();
-            std::shared_ptr<Tensor<double>> validationLoss = GRAPH->getOutput(mLossIndex);
-            std::cout << " Validation-error: " << validationLoss->at(0) << std::endl;
-
-            if (earlyStopping)
+            bestLoss = currentLoss;
+            
+            bestParameters.clear();
+            for (std::shared_ptr<Variable> parameter : mLearnableVariables)
             {
-                double currentLoss = validationLoss->at(0);
-
-                if (currentLoss < bestLoss)
+                bestParameters.push_back({});
+                for (std::uint32_t i = 0; i < parameter->getData()->capacity(); i++)
                 {
-                    bestLoss = currentLoss;
-                    
-                    bestParameters.clear();
-                    for (std::shared_ptr<Variable> parameter : Module::getLearnableParameters())
-                    {
-                        bestParameters.push_back({});
-                        for (std::uint32_t i = 0; i < parameter->getData()->capacity(); i++)
-                        {
-                            bestParameters.back().push_back(parameter->getData()->at(i));
-                        }
-                    }
-                    lastImprovement = iteration;
-                }
-                else if ( lastImprovement + earlyStopping <= iteration)
-                {
-                    std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
-                    std::cout << "Best validation loss: " << bestLoss << std::endl;
-                    for (std::uint32_t i = 0; i < Module::getLearnableParameters().size(); i++)
-                    {
-                        for (std::uint32_t j = 0; j < Module::getLearnableParameters()[i]->getData()->capacity(); j++)
-                        {
-                            Module::getLearnableParameters()[i]->getData()->set(j, bestParameters[i][j]);
-                        }
-                    }
-                    break;
+                    bestParameters.back().push_back(parameter->getData()->at(i));
                 }
             }
+            lastImprovement = iteration;
         }
-        else std::cout << std::endl;
+        else if ( lastImprovement + earlyStoppingIteration <= iteration)
+        {
+            std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
+            std::cout << "Best validation loss: " << bestLoss << std::endl;
+            for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
+            {
+                for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
+                {
+                    mLearnableVariables[i]->getData()->set(j, bestParameters[i][j]);
+                }
+            }
+            break;
+        }
+        
     }
 
     std::cout<< "Training finished." << std::endl;
 }
 
-void Model::train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping)
+void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels)
 {
-    std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> dataPairs;
-    if (mDataPairs.find(0) == mDataPairs.end())
+    for (std::uint32_t i = 1; i < inputs.size(); i++)
     {
-        throw std::runtime_error("Assumed id 0, but no data/label pair with id 0 found");
+        if (inputs[i].size() != inputs[0].size())
+        {
+            throw std::invalid_argument("Model::test: the size of all inputs and labels must be the same");
+        }
     }
-    dataPairs[0] = std::make_pair(trainData, trainLabel);
-    dataPairs[1] = std::make_pair(validationData, validationLabel);
-    train(dataPairs, epochs, batchSize, optimizer, earlyStopping);
-}
-        
-
-void Model::test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs)
-{
-    for (auto const & dataPair : dataPairs)
+    for (std::uint32_t i = 1; i < labels.size(); i++)
     {
-        mDataPairs[dataPair.first].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.first));
-        mDataPairs[dataPair.first].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.second));
-
-        GRAPH->forward();
-        std::shared_ptr<Tensor<double>> loss = GRAPH->getOutput(mLossIndex);
-        std::cout << "Test Loss: " << loss->at(0) << std::endl; // print loss
+        if (labels[i].size() != labels[0].size())
+        {
+            throw std::invalid_argument("Model::test: the size of all inputs and labels must be the same");
+        }
     }
-}
-
-
-void Model::test(Vector2D const testData, Vector2D const testLabel)
-{
-    std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> dataPairs;
-    if (mDataPairs.find(0) == mDataPairs.end())
+    if ( inputs[0].size() != labels[0].size())
     {
-        throw std::runtime_error("Assumed id 0, but no data/label pair with id 0 found");
+        throw std::invalid_argument("Model::test: the size of all inputs and labels must be the same");
     }
-    dataPairs[0] = std::make_pair(testData, testLabel);
-    test(dataPairs);
+
+    const std::uint32_t dataSamples = inputs[0].size();
+
+    std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
+    graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+
+    mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[0]));
+    mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[0])); // support multiple inputs and labels in the future
+
+    GRAPH->forward(graphInputs); // forward pass
+
+    std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
+    
+    std::cout << "Test-error: " << loss->at(0) << std::endl;
 }
+
+    
 
 #endif // MODEL_HPP

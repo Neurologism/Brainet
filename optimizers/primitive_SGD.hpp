@@ -16,7 +16,7 @@ public:
     PrimitiveSGD(double initialLearningRate, double decayRate);
     ~PrimitiveSGD() = default;
 
-    void update(const std::vector<std::shared_ptr<Tensor<double>>> & gradients, std::uint32_t batchSize) override;
+    void update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters, std::uint32_t batchSize) override;
 };
 
 PrimitiveSGD::PrimitiveSGD(double initialLearningRate, double decayRate)
@@ -25,13 +25,13 @@ PrimitiveSGD::PrimitiveSGD(double initialLearningRate, double decayRate)
     mDecayRate = decayRate;
 }
 
-void PrimitiveSGD::update(const std::vector<std::shared_ptr<Tensor<double>>> & gradients, std::uint32_t batchSize)
+void PrimitiveSGD::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters, std::uint32_t batchSize)
 {
-    for(std::uint32_t i = 0; i < Module::getLearnableParameters().size(); i++)
+    for(std::uint32_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        for(std::uint32_t j = 0; j < Module::getLearnableParameters()[i]->getData()->capacity(); j++)
+        for(std::uint32_t j = 0; j < rLearnableParameters[i]->getData()->capacity(); j++)
         {
-            Module::getLearnableParameters()[i]->getData()->subtract(j, mInitialLearningRate * gradients[i]->at(j) / batchSize);
+            rLearnableParameters[i]->getData()->subtract(j, mInitialLearningRate * GRAPH->getGradient(rLearnableParameters[i])->at(j) / batchSize);
         }
     }
     mInitialLearningRate *= mDecayRate; // decay the learning rate

@@ -43,22 +43,19 @@ using namespace std;
 std::int32_t main()
 {
     typedef std::vector<std::vector<double>> dataType;
-    dataType input = read_idx("datasets/mnist/train-images.idx3-ubyte"); // read the data from the file
-    dataType target = read_idx("datasets/mnist/train-labels.idx1-ubyte"); // read the target from the file
+    dataType input = read_idx("datasets/mnist/train-images.idx3-ubyte");
+    dataType target = read_idx("datasets/mnist/train-labels.idx1-ubyte");
 
     dataType train_input, validation_input;
     dataType train_target, validation_target;
 
-    preprocessing::split(input, target, 0.98, train_input, validation_input, train_target, validation_target); // split the data into training and validation data with a ratio of 0.98
+    dataType test_input = read_idx("datasets/mnist/t10k-images.idx3-ubyte");
+    dataType test_target = read_idx("datasets/mnist/t10k-labels.idx1-ubyte");
 
-    dataType test_input = read_idx("datasets/mnist/t10k-images.idx3-ubyte"); // read the test data from the file
-    dataType test_target = read_idx("datasets/mnist/t10k-labels.idx1-ubyte"); // read the test target from the file
+    SequentialModel model(Input(input[0].size()), {Dense(ReLU(),300)}, Output(Sigmoid(),10), Cost(MSE(),10));
 
-    Model model; // interface to Brainet
-    model.sequential({Input(input[0].size()), Dense(ReLU(),300), Dense(Sigmoid(),10), Cost(MSE(),10)}); // simple sequential model with 2 Dense Layers and a Mean Squared Error Cost Function   
+    model.train( train_input, train_target, 1500, 200, PrimitiveSGD(0.1,0.99), 0.98, 20 );
 
-    model.train( train_input, train_target, validation_input, validation_target, 1500, 200, PrimitiveSGD(1,0.995), 20); // train the model with the training data and validate it with the validation data. Console output will be shown.
-
-    model.test(test_input,test_target); // test the model with the test data and the test target. Console output will be shown.
+    model.test(test_input,test_target);
     return 0; 
 }
