@@ -6,40 +6,23 @@
 #include "operation/activation_function/activation_function.hpp"
 #include "optimizers/optimizer.hpp"
 
-/**
- * @brief The model class is the main interface for the user to create a neural network. It is used to build the network and to train it.
- * The model class combines the graph, the module and the operation classes to create a neural network.
- */
+
 class Model
 {
 protected:
 
     typedef std::vector<std::vector<double>> Vector2D;
 
-    std::uint32_t mLossIndex; // the index of the loss function in the graph
+    // everything needed for the graph
+    std::vector<std::shared_ptr<Variable>> mLearnableVariables; // all variables that can be learned by the learning algorithm
+    std::vector<std::shared_ptr<Variable>> mInputVariables;     // all variables that are used as input for the data
+    std::vector<std::shared_ptr<Variable>> mLabelVariables;     // all variables that are used as input for the labels
+    std::vector<std::shared_ptr<Variable>> mOutputVariables;    // all variables that are used as output 
+    std::vector<std::shared_ptr<Variable>> mLossVariables;      // all variables that are used as output for the loss
+    std::vector<std::shared_ptr<Variable>> mBackpropVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
 
-    std::map<std::uint32_t, std::pair<std::shared_ptr<Variable>, std::shared_ptr<Variable>>> mDataPairs; // the data/label pairs
+    virtual ~Model(){};
 
-
-public:
-    ~Model(){};
-
-    /**
-     * @brief This function creates a sequential neural network.
-     * @param layers The layers of the neural network.
-     * @param id The id of the data/label pair.
-     */
-    void sequential(std::vector<ModuleVariant> layers, std::uint32_t id = 0);
-
-    /**
-     * @brief This function creates a sequential neural network.
-     * @param layers The layers of the neural network.
-     * @param norm The norm to use for regularization.
-     * @param id The id of the data/label pair.
-     */
-    void sequential(std::vector<ModuleVariant> layers, NormVariant norm, std::uint32_t id = 0);
-
-private:
     /**
      * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
      * @param dataPairs Vector giving sets of {trainData, trainLabel, validationData, validationLabel}. Each set index needs to have input and output points in mDataPairs.
@@ -48,9 +31,8 @@ private:
      * @param optimizer The optimizer to use.
      * @param earlyStopping The number of epochs without improvement after which to stop training. If 0, no early stopping is used.
      */
-    void train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping);
+    void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, double split = 0.8, std::uint32_t const earlyStopping = 0);
 
-public:
     /**
      * @brief Shortcut for training a model without validation data.
      * @param data The data.
@@ -86,13 +68,6 @@ public:
      */
     void test(Vector2D const data, Vector2D const label);
 };
-
-void Model::sequential(std::vector<ModuleVariant> layers, NormVariant norm, std::uint32_t id)
-{
-    Dense::setDefaultNorm(norm);
-    sequential(layers, id);
-}
-
 
 void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping)
 {
@@ -201,18 +176,6 @@ void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::u
     }
 
     std::cout<< "Training finished." << std::endl;
-}
-
-
-void Model::train(Vector2D const trainData, Vector2D const trainLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer)
-{
-    std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> dataPairs;
-    if (mDataPairs.find(0) == mDataPairs.end())
-    { // check if graph has an input pair for id 0
-        throw std::runtime_error("no access point for data/label pair with id 0 found");
-    }
-    dataPairs[0] = std::make_pair(trainData, trainLabel);
-    train(dataPairs, epochs, batchSize, optimizer, false);
 }
 
 void Model::train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping)

@@ -12,7 +12,6 @@
 class Module
 {
 protected:
-    static std::vector<std::shared_ptr<Variable>> sLearnableParameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
     std::uint32_t mUnits = -1; // stores the input size of the module (could be moved to respective derived classes)
 public:
     virtual ~Module() = default;
@@ -44,23 +43,18 @@ public:
         if(mUnits == -1)throw std::runtime_error("units not set");
         return mUnits;
     }
-    /**
-     * @brief used to get all learnable parameters declared by the module objects.
-     */
-    static std::vector<std::shared_ptr<Variable>> & getLearnableParameters(){return sLearnableParameters;}
 };
 
 
 // this is mainly for interface purposes
-
-std::vector<std::shared_ptr<Variable>> Module::sLearnableParameters = {};
 
 
 // code of all child classes
 #include "input.hpp"
 #include "dense.hpp"
 #include "cost.hpp"
+#include "output.hpp"
 
-using ModuleVariant = std::variant<Input, Dense, Cost>;
+using ModuleVariant = std::variant<Dense>;
 
 #endif // MODULE_HPP

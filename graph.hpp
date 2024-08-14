@@ -219,7 +219,7 @@ std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
     return mVariableVec;
 }
 
-std::shared_ptr<Graph> GRAPH = std::make_shared<Graph>(); // the computational is a global graph
+std::shared_ptr<Graph> GRAPH = std::make_shared<Graph>(); // global graph object
 
 
 #endif // GRAPH_HPP
