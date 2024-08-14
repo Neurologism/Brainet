@@ -51,13 +51,13 @@ public:
 Input::Input(std::uint32_t units)
 {
     // error checks
-    if(sGraph == nullptr)
+    if(GRAPH == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
     
     // create the input variable
-    mInputVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
+    mInputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
     mUnits = units; // set the number of neurons in the layer
 
     mNoiseVariable = nullptr; // no noise is added
@@ -66,17 +66,17 @@ Input::Input(std::uint32_t units)
 Input::Input(std::uint32_t units, Noise noise)
 {
     // error checks
-    if(sGraph == nullptr)
+    if(GRAPH == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
     
     // create the input variable
-    mInputVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
+    mInputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
     mUnits = units; // set the number of neurons in the layer
 
     // create the noise variable
-    mNoiseVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Noise>(noise), {mInputVariable})));
+    mNoiseVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Noise>(noise), {mInputVariable})));
     
     mInputVariable->getConsumers().push_back(mNoiseVariable); // add the noise variable as a consumer of the input variable
 }

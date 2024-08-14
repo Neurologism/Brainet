@@ -58,8 +58,8 @@ public:
         
         if (mpNorm != nullptr) // adding norm to activation function
         {
-            mpNormVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));
-            sGraph->addOutput(mpNormVariable);    
+            mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));
+            GRAPH->addOutput(mpNormVariable);    
             mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
         }
     }
@@ -96,7 +96,7 @@ public:
 Dense::Dense(HiddenVariant activationFunction, std::uint32_t units)
 {
     // error checks
-    if(sGraph == nullptr)
+    if(GRAPH == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
@@ -104,12 +104,12 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units)
 
     // create the variables
 
-    mpPaddingVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Padding>(Padding(0,1,1)), {}, {}))); // pad for weights
+    mpPaddingVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Padding>(Padding(0,1,1)), {}, {}))); // pad for weights
     
-    mpWeightMatrixVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {}))); // nullptr because there is no operation
+    mpWeightMatrixVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {}))); // nullptr because there is no operation
     sLearnableParameters.push_back(mpWeightMatrixVariable);
 
-    mpMatmulVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Matmul>(Matmul()), {mpPaddingVariable,mpWeightMatrixVariable}, {})));
+    mpMatmulVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Matmul>(Matmul()), {mpPaddingVariable,mpWeightMatrixVariable}, {})));
 
     // turning the variant into a shared pointer to the operation class
     // Use std::visit to handle the variant
@@ -117,7 +117,7 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units)
         // Assuming all types in the variant can be dynamically casted to Operation*
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, HiddenVariant{activationFunction});
 
-    mpActivationVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(operation_ptr, {mpMatmulVariable}, {})));
+    mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(operation_ptr, {mpMatmulVariable}, {})));
 
     // conections within the module
     mpPaddingVariable->getConsumers().push_back(mpMatmulVariable);

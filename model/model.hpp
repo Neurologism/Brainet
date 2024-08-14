@@ -12,28 +12,18 @@
  */
 class Model
 {
+protected:
+
     typedef std::vector<std::vector<double>> Vector2D;
 
     std::uint32_t mLossIndex; // the index of the loss function in the graph
 
-
-    std::shared_ptr<Graph> mpGraph = std::make_shared<Graph>(); // the computational graph
     std::map<std::uint32_t, std::pair<std::shared_ptr<Variable>, std::shared_ptr<Variable>>> mDataPairs; // the data/label pairs
 
 
 public:
-    /**
-     * @brief Construct a new Model object.
-     */
-    Model()
-    {
-        Module::setGraph(mpGraph); // set the static graph pointer in the module class
-    };
     ~Model(){};
-    /**
-     * @brief This function loads the graph of the model into the module class.
-     */
-    void load();
+
     /**
      * @brief This function creates a sequential neural network.
      * @param layers The layers of the neural network.
@@ -87,6 +77,7 @@ public:
      * @brief This function gets the test error of the model.
      * @param dataPairs Map distributing the data/label pairs to the input/output nodes according to their id. id : (data, label)
      */
+
     void test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs);
     /**
      * @brief Shortcut for testing a model with only one data/label pair. Assumes the id is 0.
@@ -95,11 +86,6 @@ public:
      */
     void test(Vector2D const data, Vector2D const label);
 };
-
-void Model::load()
-{
-    Module::setGraph(mpGraph);
-}
 
 void Model::sequential(std::vector<ModuleVariant> layers, std::uint32_t id)
 {
@@ -118,7 +104,7 @@ void Model::sequential(std::vector<ModuleVariant> layers, std::uint32_t id)
         modules[i+1]->addInput(modules[i]->output(),modules[i]->getUnits());
     }
 
-    mLossIndex = mpGraph->addOutput(modules.back()->output());
+    mLossIndex = GRAPH->addOutput(modules.back()->output());
     if (mDataPairs.find(id) != mDataPairs.end())
     {
         throw std::runtime_error("id already exists");
@@ -145,7 +131,7 @@ void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::u
         throw std::runtime_error("no access point for data/label pair with id 0 found");
     }
 
-    const std::uint32_t trainingIterations = epochs * dataPairs.[pairId][0].size() / batchSize;
+    const std::uint32_t trainingIterations = epochs * dataPairs[pairId][0].size() / batchSize;
 
     Vector2D trainData = dataPairs[pairId][0];
     Vector2D trainLabel = dataPairs[pairId][1];
@@ -186,12 +172,12 @@ void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::u
         mDataPairs[0].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
         mDataPairs[0].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel));
 
-        mpGraph->forward();
-        std::shared_ptr<Tensor<double>> loss = mpGraph->getOutput(mLossIndex);
+        GRAPH->forward();
+        std::shared_ptr<Tensor<double>> loss = GRAPH->getOutput(mLossIndex);
         
         std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
 
-        std::vector<std::shared_ptr<Tensor<double>>> gradientTable = mpGraph->backprop(Module::getLearnableParameters()); // backpropagation
+        std::vector<std::shared_ptr<Tensor<double>>> gradientTable = GRAPH->backprop(Module::getLearnableParameters()); // backpropagation
         
         std::visit([gradientTable, batchSize](auto&& arg) {
             arg.update(gradientTable, batchSize);}, optimizer);
@@ -201,8 +187,8 @@ void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::u
             mDataPairs[pairId].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
             mDataPairs[pairId].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel));
 
-            mpGraph->forward();
-            std::shared_ptr<Tensor<double>> validationLoss = mpGraph->getOutput(mLossIndex);
+            GRAPH->forward();
+            std::shared_ptr<Tensor<double>> validationLoss = GRAPH->getOutput(mLossIndex);
             std::cout << " Validation-error: " << validationLoss->at(0) << std::endl;
 
             if (earlyStopping)
@@ -277,8 +263,8 @@ void Model::test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & 
         mDataPairs[dataPair.first].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.first));
         mDataPairs[dataPair.first].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(dataPair.second.second));
 
-        mpGraph->forward();
-        std::shared_ptr<Tensor<double>> loss = mpGraph->getOutput(mLossIndex);
+        GRAPH->forward();
+        std::shared_ptr<Tensor<double>> loss = GRAPH->getOutput(mLossIndex);
         std::cout << "Test Loss: " << loss->at(0) << std::endl; // print loss
     }
 }

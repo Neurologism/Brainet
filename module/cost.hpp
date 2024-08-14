@@ -82,20 +82,20 @@ Cost::Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmo
     }
     
     // error checks
-    if(sGraph == nullptr)
+    if(GRAPH == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
 
     // add variables to the graph
-    mTargetVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
+    mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     
     // variable performing one hot encoding; no backward pass is supported
-    mOneHotVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(encodingSize, 1-labelSmoothing, labelSmoothing/(encodingSize-1))), {mTargetVariable}, {}))); 
+    mOneHotVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(encodingSize, 1-labelSmoothing, labelSmoothing/(encodingSize-1))), {mTargetVariable}, {}))); 
 
     // conversion of the CostVariant to an operation pointer
-    mOutputVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+    mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{costFunction}), {mOneHotVariable}, {})));
     
     // connections within the module
@@ -106,21 +106,21 @@ Cost::Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmo
 Cost::Cost(CostVariant costFunction)
 {
     // error checks
-    if(sGraph == nullptr)
+    if(GRAPH == nullptr)
     {
         throw std::runtime_error("graph is not set");
     }
 
 
     // add variables to the graph
-    mTargetVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
+    mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     mOneHotVariable = nullptr;
         
     // add variables to the graph
-    mTargetVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
+    mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
-    mOutputVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+    mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{costFunction}), {mTargetVariable}, {})));
     
     // connections within the module

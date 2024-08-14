@@ -12,7 +12,6 @@
 class Module
 {
 protected:
-    static std::shared_ptr<Graph> sGraph; // shared by all clusters , points to the graph into which the module should add its variables
     static std::vector<std::shared_ptr<Variable>> sLearnableParameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
     std::uint32_t mUnits = -1; // stores the input size of the module (could be moved to respective derived classes)
 public:
@@ -36,7 +35,7 @@ public:
     /**
      * @brief wrapper class used to set the graph for all module objects manually. Manly intended for use with multiple graphs.
      */
-    static void setGraph(std::shared_ptr<Graph> graph){sGraph = graph;}
+    static void setGraph(std::shared_ptr<Graph> graph){GRAPH = graph;}
     /**
      * @brief used to get the private variable mUnits, could be moved to the respective derived classes.
      */
@@ -54,7 +53,6 @@ public:
 
 // this is mainly for interface purposes
 
-std::shared_ptr<Graph> Module::sGraph = nullptr;
 std::vector<std::shared_ptr<Variable>> Module::sLearnableParameters = {};
 
 
