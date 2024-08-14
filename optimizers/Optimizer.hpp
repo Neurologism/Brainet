@@ -13,7 +13,7 @@ public:
     Optimizer() = default;
     virtual ~Optimizer() = default;
 
-    virtual void update(const std::vector<std::shared_ptr<Tensor<double>>> & gradients, std::uint32_t batch_size) = 0;
+    virtual void update(const std::vector<std::shared_ptr<Tensor<double>>> & gradients, std::uint32_t batchSize) = 0;
 };
 
 

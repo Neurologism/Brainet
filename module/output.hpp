@@ -1,16 +1,9 @@
-#ifndef DENSE_HPP
-#define DENSE_HPP
+#ifndef OUTPUT_HPP
+#define OUTPUT_HPP
 
 #include "./module.hpp"
-#include "../operation/matmul.hpp"
-#include "../operation/processing/padding.hpp"
-#include "../operation/activation_function/activation_function.hpp"
-#include "../operation/norm/norm.hpp"
 
-/**
- * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
- */
-class Dense : public Module
+class Output : public Module
 {
     // storing index of the variables in the graph
     std::shared_ptr<Variable> mpWeightMatrixVariable; // learnable parameters of the layer (weights + bias)
@@ -23,20 +16,21 @@ class Dense : public Module
     std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization
 
 
+
 public:
     /**
      * @brief add a dense layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
      */
-    Dense(HiddenVariant activationFunction, std::uint32_t units);
+    Dense(OutputVariant activationFunction, std::uint32_t units);
     /**
      * @brief add a dense layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
      */
-    Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant norm);
+    Dense(OutputVariant activationFunction, std::uint32_t units, NormVariant norm);
     ~Dense() = default;
     /**
      * @brief used to mark variables as input for the module.
@@ -93,7 +87,7 @@ public:
     }
 };
 
-Dense::Dense(HiddenVariant activationFunction, std::uint32_t units)
+Dense::Dense(OutputVariant activationFunction, std::uint32_t units)
 {
     // error checks
     if(sGraph == nullptr)
@@ -115,7 +109,7 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units)
     // Use std::visit to handle the variant
     std::shared_ptr<Operation> operation_ptr = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, HiddenVariant{activationFunction});
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, OutputVariant{activationFunction});
 
     mpActivationVariable = sGraph->addVariable(std::make_shared<Variable>(Variable(operation_ptr, {mpMatmulVariable}, {})));
 
@@ -128,7 +122,7 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units)
     
 }
 
-Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant norm)
+Dense::Dense(OutputVariant activationFunction, std::uint32_t units, NormVariant norm)
 {
     mpNorm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
@@ -137,5 +131,3 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant 
 }
 
 std::shared_ptr<NormVariant> Dense::mpsDefaultNorm = nullptr;
-
-#endif // DENSE_HPP
