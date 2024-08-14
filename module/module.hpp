@@ -23,8 +23,10 @@ public:
 
     /**
      * @brief function to get access to specific variables of the module.
+     * @param index the index of the variable
+     * @return the variable specified by the index
      */
-    virtual std::shared_ptr<Variable> getVariable(std::uint32_t) = 0;
+    virtual std::shared_ptr<Variable> getVariable(std::uint32_t index) = 0;
 
     /**
      * @brief used to get the private variable mUnits

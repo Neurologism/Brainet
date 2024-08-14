@@ -82,13 +82,6 @@ Cost::Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmo
 
 Cost::Cost(CostVariant costFunction)
 {
-    // error checks
-    if(GRAPH == nullptr)
-    {
-        throw std::runtime_error("graph is not set");
-    }
-
-
     // add variables to the graph
     mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
@@ -110,9 +103,9 @@ void Cost::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::v
     {
         throw std::invalid_argument("Cost::__init__: the number of input variables must be 1");
     }
-    if (initialOutputs.size() != 1)
+    if (initialOutputs.size() != 0)
     {
-        throw std::invalid_argument("Cost::__init__: the number of output variables must be 1");
+        throw std::invalid_argument("Cost::__init__: the number of output variables must be 0");
     }
 
     mOutputVariable->getInputs().push_back(initialInpus[0]);

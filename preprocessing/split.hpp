@@ -13,7 +13,7 @@ namespace preprocessing
      * @param data The data to split.
      * @param ratio The ratio of the training set.
      */
-    void split(dataType const & input, dataType const & target, double const & ratio, dataType & trainInput, dataType & validationInput, dataType & trainTarget, dataType & validationTarget)
+    void splitData(dataType const & input, dataType const & target, double const & ratio, dataType & trainInput, dataType & validationInput, dataType & trainTarget, dataType & validationTarget)
     {
         if (ratio < 0.0 || ratio > 1.0)
         {

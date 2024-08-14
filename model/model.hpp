@@ -5,7 +5,7 @@
 #include "module/module.hpp"
 #include "operation/activation_function/activation_function.hpp"
 #include "optimizers/optimizer.hpp"
-
+#include "preprocessing/split.hpp"
 
 class Model
 {
@@ -16,7 +16,7 @@ protected:
     // everything needed for the graph
     std::vector<std::shared_ptr<Variable>> mLearnableVariables; // all variables that can be learned by the learning algorithm
     std::vector<std::shared_ptr<Variable>> mInputVariables;     // all variables that are used as input for the data
-    std::vector<std::shared_ptr<Variable>> mTargetVariables;     // all variables that are used as input for the labels
+    std::vector<std::shared_ptr<Variable>> mTargetVariables;    // all variables that are used as input for the labels
     std::vector<std::shared_ptr<Variable>> mOutputVariables;    // all variables that are used as output 
     std::vector<std::shared_ptr<Variable>> mLossVariables;      // all variables that are used as output for the loss
     std::vector<std::shared_ptr<Variable>> mBackpropVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
@@ -24,76 +24,52 @@ protected:
     virtual ~Model(){};
 
     /**
-     * @brief This function trains the model. It uses the backpropagation algorithm to update the learnable parameters. 
-     * @param dataPairs Vector giving sets of {trainData, trainLabel, validationData, validationLabel}. Each set index needs to have input and output points in mDataPairs.
-     * @param epochs The number of epochs.
-     * @param batchSize The batch size.
-     * @param optimizer The optimizer to use.
-     * @param earlyStopping The number of epochs without improvement after which to stop training. If 0, no early stopping is used.
+     * @brief 
      */
-    void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, double split = 0.8, std::uint32_t const earlyStopping = 0);
+    void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration = 20, double split = 0.8 );
 
-    /**
-     * @brief Shortcut for training a model without validation data.
-     * @param data The data.
-     * @param label The label.
-     * @param epochs The number of epochs.
-     * @param batchSize The batch size.
-     * @param learning_rate The learning rate.
-     */
-    void train(Vector2D const data, Vector2D const label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer);
 
-    /**
-     * @brief This function trains the model with the given data and label. It uses the backpropagation algorithm to update the learnable parameters.
-     * @param trainData The training data.
-     * @param trainLabel The training label.
-     * @param validationData The validation data.
-     * @param validationLabel The validation label.
-     * @param epochs The number of epochs.
-     * @param batchSize The batch size.
-     * @param earlyStopping The number of epochs without improvement after which to stop training. If 0, no early stopping is used.
-     */
-    void train(Vector2D const trainData, Vector2D const trainLabel, Vector2D const validationData, Vector2D const validationLabel, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t earlyStopping = 0);
-
-    /**
-     * @brief This function gets the test error of the model.
-     * @param dataPairs Map distributing the data/label pairs to the input/output nodes according to their id. id : (data, label)
-     */
-
-    void test(std::map<std::uint32_t, std::pair<Vector2D, Vector2D>> const & dataPairs);
-    /**
-     * @brief Shortcut for testing a model with only one data/label pair. Assumes the id is 0.
-     * @param data The data.
-     * @param label The label.
-     */
-    void test(Vector2D const data, Vector2D const label);
+    void test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels);
 };
 
-void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping)
+void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration, double split)
 {
-    std::uint32_t const pairId = 0;
-
-    if ( mDataPairs.find(pairId) == mDataPairs.end() )
+    for (std::uint32_t i = 1; i < inputs.size(); i++)
     {
-        throw std::runtime_error("no access point for data/label pair with id 0 found");
+        if (inputs[i].size() != inputs[0].size())
+        {
+            throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
+        }
+    }
+    for (std::uint32_t i = 1; i < labels.size(); i++)
+    {
+        if (labels[i].size() != labels[0].size())
+        {
+            throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
+        }
+    }
+    if ( inputs[0].size() != labels[0].size())
+    {
+        throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
     }
 
-    const std::uint32_t trainingIterations = epochs * dataPairs[pairId][0].size() / batchSize;
+    const std::uint32_t dataSamples = inputs[0].size();
 
-    Vector2D trainData = dataPairs[pairId][0];
-    Vector2D trainLabel = dataPairs[pairId][1];
+    const std::uint32_t trainingIterations = epochs * dataSamples / batchSize;
+
+    
+
+    Vector2D trainData;
+    Vector2D trainLabel;
 
     Vector2D validationData;
     Vector2D validationLabel;
 
-    std::cout << std::setprecision(5) << std::fixed;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    preprocessing::splitData(inputs[0], labels[0], split, trainData, validationData, trainLabel, validationLabel); // support multiple inputs and labels in the future 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    if(dataPairs[pairId][2].size())
-    {
-        validationData = dataPairs[pairId][2];
-        validationLabel = dataPairs[pairId][3];
-    }
-    else std::cout << "No validation data found. Training without validation." << std::endl;
+    std::cout << std::setprecision(5) << std::fixed;
 
     double bestLoss = std::numeric_limits<double>::max();
     std::vector<std::vector<double>> bestParameters;
@@ -116,11 +92,15 @@ void Model::train(std::vector<std::array<Vector2D, 4>> const & dataPairs, std::u
             batchLabel.push_back(trainLabel[randomIndex]);
         }
 
-        mDataPairs[0].first->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
-        mDataPairs[0].second->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel));
+        mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchData));
+        mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(batchLabel)); // support multiple inputs and labels in the future
 
-        GRAPH->forward();
-        std::shared_ptr<Tensor<double>> loss = GRAPH->getOutput(mLossIndex);
+        std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
+        graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+        GRAPH->forward(graphInputs); // forward pass
+
+
+        std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
         
         std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
 

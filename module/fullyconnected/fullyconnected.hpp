@@ -41,6 +41,7 @@ public:
      * @note 0: padding variable
      * @note 1: activation variable
      * @note 2: weight matrix variable
+     * @note 3: norm variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 
@@ -120,6 +121,9 @@ std::shared_ptr<Variable> FullyConnected::getVariable(std::uint32_t index)
         break;
     case 2:
         return mpWeightMatrixVariable;
+        break;
+    case 3:
+        return mpNormVariable;
         break;
     default:
         throw std::invalid_argument("FullyConnected::getVariable: index out of range");
