@@ -30,7 +30,7 @@ public:
 
     ~SequentialModel() = default;
 
-    void train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, double split, std::uint32_t const earlyStopping);
+    void train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping = 20, double split = 0.8);
 
 
     void test(Vector2D const & data, Vector2D const & label);
@@ -56,7 +56,7 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
 
     inputLayer->__init__({}, {hiddenModules.front()->getVariable(0)});
     
-    for(std::uint32_t i = 0; i < hiddenModules.size() - 1; i++)
+    for(std::uint32_t i = 0; i < hiddenModules.size(); i++)
     {
         if ( i == 0)
         {
@@ -77,6 +77,31 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     costFunction->__init__({outputLayer->getVariable(1)}, {});
 
 
+    // load weight matrices
+
+    for (std::uint32_t i = 0; i < hiddenModules.size(); i++)  
+    {
+        FullyConnected* dense = dynamic_cast<FullyConnected*>(hiddenModules[i].get());
+        if (dense != nullptr) 
+        {
+            if (i == 0)
+            {
+                dense->createWeightMatrix(inputLayer->getUnits());
+            }
+            else
+            {
+                dense->createWeightMatrix(hiddenModules[i-1]->getUnits());
+            }
+        }
+    }
+
+    FullyConnected* output = dynamic_cast<FullyConnected*>(outputLayer.get());
+    if (output != nullptr) 
+    {
+        output->createWeightMatrix(hiddenModules.back()->getUnits());
+    }
+
+
     // store modules
     mModules.push_back(inputLayer);
     mModules.insert(mModules.end(), hiddenModules.begin(), hiddenModules.end());
@@ -87,7 +112,8 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     // store special variables
     for (auto & module : hiddenModules)
     {
-        if (dynamic_cast<Dense*>(module.get()) != nullptr) {
+        if (dynamic_cast<Dense*>(module.get()) != nullptr) 
+        {
             // module is an object of class Dense
             mLearnableVariables.push_back(module->getVariable(2));      // weight matrix
             mBackpropVariables.push_back(module->getVariable(3));       // norm
@@ -108,9 +134,9 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
 
 }
 
-void SequentialModel::train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, double split, std::uint32_t const earlyStopping)
+void SequentialModel::train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping, double split)
 {
-    train({input}, {label}, epochs, batchSize, optimizer, split, earlyStopping);
+    Model::train({input}, {label}, epochs, batchSize, optimizer, earlyStopping, split);
 }
 
 void SequentialModel::test(Vector2D const & data, Vector2D const & label)

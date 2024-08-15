@@ -54,7 +54,7 @@ std::int32_t main()
 
     SequentialModel model(Input(input[0].size()), {Dense(ReLU(),300)}, Output(Sigmoid(),10), Cost(MSE(),10));
 
-    model.train( train_input, train_target, 1500, 200, PrimitiveSGD(0.1,0.99), 0.98, 20 );
+    model.train( train_input, train_target, 1500, 200, PrimitiveSGD(0.1,0.99), 20, 0.98 );
 
     model.test(test_input,test_target);
     return 0; 
