@@ -13,7 +13,7 @@ class Ensemble : public Model
     std::shared_ptr<EnsembleModule> mEnsembleModule;    // the module that averages the output of the models
 
 public:
-    Ensemble(std::vector<ModelVariant> models);
+    Ensemble(std::vector<ModelVariant> models, CostVariant costFunction);
 
     ~Ensemble() = default;
 
@@ -22,11 +22,12 @@ public:
     // should be supported in the future, need a rewrite of the train function
     void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration = 20, double split = 0.8){};
 
-    void test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels);
+    void test(Vector2D const & input, Vector2D const & label);
 };
 
-Ensemble::Ensemble(std::vector<ModelVariant> models)
+Ensemble::Ensemble(std::vector<ModelVariant> models, CostVariant costFunction)
 {
+    std::vector<std::shared_ptr<Variable>> ensembleInputs;
     for ( std::uint32_t i = 0; i < models.size(); i++)
     {
         std::shared_ptr<Model> modelPtr = std::visit([](auto&& arg) {
@@ -34,8 +35,18 @@ Ensemble::Ensemble(std::vector<ModelVariant> models)
 
         mModels.push_back(modelPtr);
 
-        // create mInputVariables, mTargetVariables, mOutputVariables, mLossVariables, mBackpropVariables
+        
+        mInputVariables.insert(mInputVariables.end(), modelPtr->mInputVariables.begin(), modelPtr->mInputVariables.end());
+        mLearnableVariables.insert(mLearnableVariables.end(), modelPtr->mLearnableVariables.begin(), modelPtr->mLearnableVariables.end());
+        ensembleInputs.insert(ensembleInputs.end(), modelPtr->mOutputVariables.begin(), modelPtr->mOutputVariables.end());
+        // mBackpropVariables and mLearnableVariables to support backpropagation
     }
+
+    mEnsembleModule = std::make_shared<EnsembleModule>(ensembleInputs, costFunction);
+
+    mTargetVariables.push_back(mEnsembleModule->getVariable(2));
+    mOutputVariables.push_back(mEnsembleModule->getVariable(0));
+    mLossVariables.push_back(mEnsembleModule->getVariable(1));
 }
 
 void Ensemble::addModel(ModelVariant model)
@@ -48,9 +59,15 @@ void Ensemble::addModel(ModelVariant model)
     throw std::runtime_error("Ensemble::addModel: not implemented yet");
 }
 
-void Ensemble::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels)
+void Ensemble::test(Vector2D const & input, Vector2D const & label)
 {
-    Model::test(inputs, labels);
+    std::vector<Vector2D> inputs;
+    for ( std::uint32_t i = 0; i < mModels.size(); i++)
+    {
+        inputs.push_back(input);
+    }
+
+    Model::test(inputs, {label});
 }
 
 

@@ -12,7 +12,7 @@
 class EnsembleModule : private Module
 {
     std::shared_ptr<Variable> mOutputVariable; 
-    std::shared_ptr<Variable> mCostVariable; 
+    std::shared_ptr<Module> mCostModule; 
     
     void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override {};
 
@@ -35,6 +35,7 @@ public:
      * @return the variable specified by the index
      * @note 0: output variable
      * @note 1: cost variable
+     * @note 2: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 };
@@ -43,11 +44,11 @@ EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVaria
 {
     mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Average>(), inputVariables, {})));
 
-    mCostVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{costFunction}), {mOutputVariable}, {})));
+    mCostModule = std::make_shared<Cost>(Cost(costFunction));
 
     // connections within the module
-    mOutputVariable->getConsumers().push_back(mCostVariable);
+    mOutputVariable->getConsumers().push_back(mCostModule->getVariable(0));
+    mCostModule->__init__({mOutputVariable}, {});
 
     // other connections
     for(auto inputVariable : inputVariables)
@@ -66,7 +67,6 @@ EnsembleModule::~EnsembleModule()
 
     // delete the variables
     GRAPH->removeVariable(mOutputVariable);
-    GRAPH->removeVariable(mCostVariable);
 }
 
 std::shared_ptr<Variable> EnsembleModule::getVariable(std::uint32_t index)
@@ -77,7 +77,10 @@ std::shared_ptr<Variable> EnsembleModule::getVariable(std::uint32_t index)
         return mOutputVariable;
         break;
     case 1:
-        return mCostVariable;
+        return mCostModule->getVariable(1);
+        break;
+    case 2:
+        return mCostModule->getVariable(2);
         break;
     default:
         throw std::invalid_argument("EnsembleModule::getVariable: index out of range");

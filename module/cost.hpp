@@ -31,7 +31,7 @@ public:
      */
     Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmoothing = 0);
 
-    ~Cost() = default;
+    ~Cost();
 
     void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
 
@@ -96,6 +96,24 @@ Cost::Cost(CostVariant costFunction)
     // connections within the module
     mTargetVariable->getConsumers().push_back(mCostVariable);
 }
+
+Cost::~Cost()
+{
+    // delete other connections
+    for(auto input : mCostVariable->getInputs())
+    {
+        input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mCostVariable));
+    }
+
+    // delete the variables
+    GRAPH->removeVariable(mTargetVariable);
+    if (mOneHotVariable != nullptr)
+    {
+        GRAPH->removeVariable(mOneHotVariable);
+    }
+    GRAPH->removeVariable(mCostVariable);
+}
+
 
 void Cost::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs )
 {

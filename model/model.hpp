@@ -43,6 +43,8 @@ protected:
      * @note the function will print the error of the model
      */
     void test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels);
+
+    friend class Ensemble;
 };
 
 void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration, double split)

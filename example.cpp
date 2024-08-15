@@ -52,7 +52,7 @@ std::int32_t main()
     dataType test_input = read_idx("datasets/mnist/t10k-images.idx3-ubyte");
     dataType test_target = read_idx("datasets/mnist/t10k-labels.idx1-ubyte");
 
-    SequentialModel model(Input(input[0].size()), {Dense(ReLU(),300)}, Output(Sigmoid(),10), Cost(MSE(),10));
+    SequentialModel model(Input(input[0].size()), {Dense(ReLU(),300)}, Output(Softmax(),10), Cost(MSE(),10));
 
     model.train( train_input, train_target, 1500, 200, PrimitiveSGD(0.1,0.99), 20, 0.98 );
 
