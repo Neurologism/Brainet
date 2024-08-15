@@ -38,17 +38,21 @@ void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
 
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {
-        double _sum = 0;
+        
         double _max = inputs.front()->getData()->at({i, 0}); // normalize the input to avoid overflow / underflow
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
         {
-            _sum += activationFunction(inputs.front()->getData()->at({i, j}));
             if (inputs.front()->getData()->at({i, j}) > _max)
             {
                 _max = inputs.front()->getData()->at({i, j});
             }
         }
 
+        double _sum = 0;
+        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+        {
+            _sum += activationFunction(inputs.front()->getData()->at({i, j}) - _max);
+        }
 
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
         {

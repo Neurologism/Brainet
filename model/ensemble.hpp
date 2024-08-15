@@ -13,7 +13,7 @@ class Ensemble : public Model
     std::shared_ptr<EnsembleModule> mEnsembleModule;    // the module that averages the output of the models
 
 public:
-    Ensemble(std::vector<ModelVariant> models, CostVariant costFunction);
+    Ensemble(std::vector<ModelVariant> models, const Cost & costModule);
 
     ~Ensemble() = default;
 
@@ -25,7 +25,7 @@ public:
     void test(Vector2D const & input, Vector2D const & label);
 };
 
-Ensemble::Ensemble(std::vector<ModelVariant> models, CostVariant costFunction)
+Ensemble::Ensemble(std::vector<ModelVariant> models, const Cost & costFunction)
 {
     std::vector<std::shared_ptr<Variable>> ensembleInputs;
     for ( std::uint32_t i = 0; i < models.size(); i++)
@@ -42,7 +42,7 @@ Ensemble::Ensemble(std::vector<ModelVariant> models, CostVariant costFunction)
         // mBackpropVariables and mLearnableVariables to support backpropagation
     }
 
-    mEnsembleModule = std::make_shared<EnsembleModule>(ensembleInputs, costFunction);
+    mEnsembleModule = std::make_shared<EnsembleModule>(EnsembleModule(ensembleInputs, costFunction));
 
     mTargetVariables.push_back(mEnsembleModule->getVariable(2));
     mOutputVariables.push_back(mEnsembleModule->getVariable(0));

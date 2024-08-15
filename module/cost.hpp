@@ -31,7 +31,7 @@ public:
      */
     Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmoothing = 0);
 
-    ~Cost();
+    void remove();
 
     void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
 
@@ -97,7 +97,7 @@ Cost::Cost(CostVariant costFunction)
     mTargetVariable->getConsumers().push_back(mCostVariable);
 }
 
-Cost::~Cost()
+void Cost::remove()
 {
     // delete other connections
     for(auto input : mCostVariable->getInputs())

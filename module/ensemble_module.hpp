@@ -22,12 +22,12 @@ public:
      * @param inputVariables the variables to average
      * @param costFunction the cost function to apply to the output
      */
-    EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, CostVariant costFunction);
+    EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Cost & costFunction);
 
     /**
      * @brief destructor for the ensemble module removes the module from the graph
      */
-    ~EnsembleModule();    
+    void remove();
 
     /**
      * @brief function to get access to specific variables of the module.
@@ -40,11 +40,11 @@ public:
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 };
 
-EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, CostVariant costFunction)
+EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Cost & costFunction)
 {
     mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Average>(), inputVariables, {})));
 
-    mCostModule = std::make_shared<Cost>(Cost(costFunction));
+    mCostModule = std::make_shared<Cost>(costFunction);
 
     // connections within the module
     mOutputVariable->getConsumers().push_back(mCostModule->getVariable(0));
@@ -57,7 +57,7 @@ EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVaria
     }
 }
 
-EnsembleModule::~EnsembleModule()
+void EnsembleModule::remove()
 {
     // delete other connections
     for(auto input : mOutputVariable->getInputs())
