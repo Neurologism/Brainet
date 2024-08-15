@@ -12,57 +12,42 @@
 class Module
 {
 protected:
-    static std::shared_ptr<Graph> sGraph; // shared by all clusters , points to the graph into which the module should add its variables
-    static std::vector<std::shared_ptr<Variable>> sLearnableParameters; // shared by all clusters , points to the learnable parameters of the graph for later use in the optimization process
-    std::uint32_t mUnits = -1; // stores the input size of the module (could be moved to respective derived classes)
+    std::uint32_t mUnits = -1; // stores the input size of the module (should be set in the constructor) move to child classes?
 public:
     virtual ~Module() = default;
+
     /**
-     * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as input for the module. 
+     * @brief used to initialize the module. This is used to add initial connections to other modules.
      */
-    virtual void addInput(std::shared_ptr<Variable> input, std::uint32_t units){};
+    virtual void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) = 0;
+
     /**
-     * @brief virtual function that is supposed to be implemented by the derived classes. It is used to mark variables as output for the module.
+     * @brief function to get access to specific variables of the module.
+     * @param index the index of the variable
+     * @return the variable specified by the index
      */
-    virtual void addOutput(std::shared_ptr<Variable> output){};
+    virtual std::shared_ptr<Variable> getVariable(std::uint32_t index) = 0;
+
     /**
-     * @brief virtual function that is supposed to be implemented by the derived classes. It is used to get the input variables of the module specified by the index.
-     */
-    virtual std::shared_ptr<Variable> input(std::uint32_t index = 0){return nullptr;}
-    /**
-     * @brief virtual function that is supposed to be implemented by the derived classes. It is used to get the output variables of the module specified by the index.
-     */
-    virtual std::shared_ptr<Variable> output(std::uint32_t index = 0){return nullptr;}
-    /**
-     * @brief wrapper class used to set the graph for all module objects manually. Manly intended for use with multiple graphs.
-     */
-    static void setGraph(std::shared_ptr<Graph> graph){sGraph = graph;}
-    /**
-     * @brief used to get the private variable mUnits, could be moved to the respective derived classes.
+     * @brief used to get the private variable mUnits
      */
     std::uint32_t getUnits()
     {
         if(mUnits == -1)throw std::runtime_error("units not set");
         return mUnits;
     }
-    /**
-     * @brief used to get all learnable parameters declared by the module objects.
-     */
-    static std::vector<std::shared_ptr<Variable>> & getLearnableParameters(){return sLearnableParameters;}
 };
 
 
 // this is mainly for interface purposes
 
-std::shared_ptr<Graph> Module::sGraph = nullptr;
-std::vector<std::shared_ptr<Variable>> Module::sLearnableParameters = {};
-
 
 // code of all child classes
 #include "input.hpp"
-#include "dense.hpp"
+#include "fullyconnected/dense.hpp"
 #include "cost.hpp"
+#include "fullyconnected/output.hpp"
 
-using ModuleVariant = std::variant<Input, Dense, Cost>;
+using ModuleVariant = std::variant<Dense>;
 
 #endif // MODULE_HPP

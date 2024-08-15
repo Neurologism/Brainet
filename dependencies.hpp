@@ -19,5 +19,6 @@
 #include <fstream>
 #include <bitset>
 #include <map>
+#include <array>
 
 #endif // DEPENDENCIES_HPP

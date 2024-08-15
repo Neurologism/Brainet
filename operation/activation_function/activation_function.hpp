@@ -78,7 +78,7 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
 #include "sigmoid.hpp"
 #include "softmax.hpp"
 
-using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Linear, HeavysideStep, Sigmoid, Softmax>; // this can be used from the user side and should move to a different location at some point
-
+using HiddenVariant = std::variant<ReLU, HyperbolicTangent, Sigmoid>; // probably change later to one variant for all activation functions
+using OutputVariant = std::variant<Linear, Sigmoid, Softmax>; 
 
 #endif // ACTIVATIONFUNCTION_HPP
