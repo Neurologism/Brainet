@@ -47,6 +47,8 @@ public:
 #include "fullyconnected/dense.hpp"
 #include "cost.hpp"
 #include "fullyconnected/output.hpp"
+#include "ensemble_module.hpp"
+#include "performance.hpp"
 
 using ModuleVariant = std::variant<Dense>;
 

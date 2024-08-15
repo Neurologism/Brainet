@@ -1,12 +1,12 @@
 #ifndef ERROR_RATE_HPP
 #define ERROR_RATE_HPP
 
-#include "performance.hpp"
+#include "performance_function.hpp"
 
 /**
  * @brief the error rate operation is used to calculate the error rate of the model.
  */
-class ErrorRate : public Performance
+class ErrorRate : public PerformanceFunction
 {
 public:
     /**
@@ -15,6 +15,11 @@ public:
     ErrorRate() { mName = "ERROR_RATE"; };
     ~ErrorRate() = default;
 
+    /**
+     * @brief calculate the error rate of the input tensors
+     * @param inputs The input tensors
+     * @note The first input tensor is the prediction and the second input tensor is the target.
+     */
     void f(std::vector<std::shared_ptr<Variable>> &inputs) override;
 };
 
@@ -25,21 +30,35 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
         throw std::runtime_error("ErrorRate: number of inputs is not 2");
     }
 
-    if (inputs[0]->getData()->shape() != inputs[1]->getData()->shape())
+    if (inputs[1]->getData()->shape(1) != 1)
     {
-        throw std::runtime_error("ErrorRate: the shape of the inputs must be the same");
+        throw std::runtime_error("ErrorRate: the target tensor must be 1D");
     }
 
-    std::uint32_t size = inputs[0]->getData()->capacity();
-    double error = 0;
-    for (std::uint32_t i = 0; i < size; i++)
+    if (inputs[0]->getData()->shape(0) != inputs[1]->getData()->shape(0))
     {
-        if (inputs[0]->getData()->at({i}) != inputs[1]->getData()->at({i}))
+        throw std::runtime_error("ErrorRate: the size of the prediction and target tensor must be the same");
+    }
+
+    double error = 0;
+    for (std::uint32_t i = 0; i < inputs[0]->getData()->shape(0); i++)
+    {
+        double max = inputs[0]->getData()->at({i, 0});
+        std::uint32_t maxIndex = 0;
+        for (std::uint32_t j = 1; j < inputs[0]->getData()->shape(1); j++)
+        {
+            if (inputs[0]->getData()->at({i, j}) > max)
+            {
+                max = inputs[0]->getData()->at({i, j});
+                maxIndex = j;
+            }
+        }
+        if (maxIndex != inputs[1]->getData()->at({i}))
         {
             error++;
         }
     }
-
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}));
-    this->getVariable()->getData()->at({0}) = error / size;
+    std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0) << "%" << std::endl;
 }
+
+#endif // ERROR_RATE_HPP

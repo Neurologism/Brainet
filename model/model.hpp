@@ -197,6 +197,9 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
 
     const std::uint32_t dataSamples = inputs[0].size();
 
+    Performance performance = Performance(ErrorRate());
+    performance.__init__({mOutputVariables[0], mTargetVariables[0]}, {});
+
     std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
