@@ -50,29 +50,22 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
         return std::shared_ptr<Module>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, ModuleVariant{layer});
         hiddenModules.push_back(modulePtr);
     }
+    
+    // store modules
+    mModules.push_back(inputLayer);
+    mModules.insert(mModules.end(), hiddenModules.begin(), hiddenModules.end());
+    mModules.push_back(outputLayer);
+    mModules.push_back(costFunction);
 
     // connect Layers in Graph
     // assumes for all modules that getVariable(0) is the input variable and getVariable(1) is the output variable
 
     inputLayer->__init__({}, {hiddenModules.front()->getVariable(0)});
     
-    for(std::uint32_t i = 0; i < hiddenModules.size(); i++)
+    for(std::uint32_t i = 1; i < mModules.size()-1; i++)
     {
-        if ( i == 0)
-        {
-            hiddenModules[i]->__init__({inputLayer->getVariable(1)}, {hiddenModules[i+1]->getVariable(0)});
-        }
-        else if (i == hiddenModules.size() - 1)
-        {
-            hiddenModules[i]->__init__({hiddenModules[i-1]->getVariable(1)}, {outputLayer->getVariable(0)});
-        }
-        else
-        {
-            hiddenModules[i]->__init__({hiddenModules[i-1]->getVariable(1)}, {hiddenModules[i+1]->getVariable(0)});
-        }
+        mModules[i]->__init__({mModules[i-1]->getVariable(1)}, {mModules[i+1]->getVariable(0)});
     }
-
-    outputLayer->__init__({hiddenModules.back()->getVariable(1)}, {costFunction->getVariable(0)});
 
     costFunction->__init__({outputLayer->getVariable(1)}, {});
 
@@ -102,11 +95,7 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     }
 
 
-    // store modules
-    mModules.push_back(inputLayer);
-    mModules.insert(mModules.end(), hiddenModules.begin(), hiddenModules.end());
-    mModules.push_back(outputLayer);
-    mModules.push_back(costFunction);
+    
 
 
     // store special variables
@@ -116,7 +105,14 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
         {
             // module is an object of class Dense
             mLearnableVariables.push_back(module->getVariable(2));      // weight matrix
-            mBackpropVariables.push_back(module->getVariable(3));       // norm
+            try
+            {
+                mBackpropVariables.push_back(module->getVariable(3));   // norm
+            }
+            catch(const std::exception& e)
+            {
+                // no norm variable
+            }
         }
     }
     mLearnableVariables.push_back(outputLayer->getVariable(2));         // weight matrix
@@ -129,7 +125,14 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
 
     mLossVariables.push_back(costFunction->getVariable(1));             // cost function
 
-    mBackpropVariables.push_back(outputLayer->getVariable(3));          // norm
+    try
+    {
+        mBackpropVariables.push_back(costFunction->getVariable(3));     // norm
+    }
+    catch(const std::exception& e)
+    {
+        // no norm variable
+    }
     mBackpropVariables.push_back(costFunction->getVariable(1));         // cost function
 
 }

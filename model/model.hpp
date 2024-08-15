@@ -24,11 +24,24 @@ protected:
     virtual ~Model(){};
 
     /**
-     * @brief 
+     * @brief function to train the model
+     * @param inputs the input data
+     * @param labels the labels
+     * @param epochs the number of epochs
+     * @param batchSize the size of the batch
+     * @param optimizer the optimizer to use
+     * @param earlyStoppingIteration the number of iterations to wait for early stopping
+     * @param split the split between training and validation data
+     * @note the function will split the data into training and validation data per default
      */
     void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration = 20, double split = 0.8 );
 
-
+    /**
+     * @brief function to test the model
+     * @param inputs the input data
+     * @param labels the labels
+     * @note the function will print the error of the model
+     */
     void test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels);
 };
 
@@ -59,6 +72,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
     std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+    graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
     Vector2D trainData;
     Vector2D trainLabel;
@@ -183,6 +197,7 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
 
     std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+    graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
     mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[0]));
     mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[0])); // support multiple inputs and labels in the future

@@ -123,6 +123,10 @@ std::shared_ptr<Variable> FullyConnected::getVariable(std::uint32_t index)
         return mpWeightMatrixVariable;
         break;
     case 3:
+        if (mpNormVariable == nullptr)
+        {
+            throw std::invalid_argument("FullyConnected::getVariable: norm variable not initialized");
+        }
         return mpNormVariable;
         break;
     default:
