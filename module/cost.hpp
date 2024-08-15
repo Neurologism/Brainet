@@ -13,7 +13,7 @@
 class Cost : public Module
 {
     std::shared_ptr<Variable> mTargetVariable; // storing y truth
-    std::shared_ptr<Variable> mOutputVariable; // actual cost funtion 
+    std::shared_ptr<Variable> mCostVariable; // actual cost funtion 
     std::shared_ptr<Variable> mOneHotVariable; // one hot encoding of the y truth
 
 public:
@@ -39,8 +39,8 @@ public:
      * @brief function to get access to specific variables of the module.
      * @param index the index of the variable
      * @return the variable specified by the index
-     * @note 0: output variable
-     * @note 1: output variable
+     * @note 0: cost variable
+     * @note 1: cost variable
      * @note 2: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
@@ -72,12 +72,12 @@ Cost::Cost(CostVariant costFunction, std::uint32_t encodingSize, double labelSmo
     mOneHotVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<OneHot>(OneHot(encodingSize, 1-labelSmoothing, labelSmoothing/(encodingSize-1))), {mTargetVariable}, {}))); 
 
     // conversion of the CostVariant to an operation pointer
-    mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+    mCostVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{costFunction}), {mOneHotVariable}, {})));
     
     // connections within the module
     mTargetVariable->getConsumers().push_back(mOneHotVariable);
-    mOneHotVariable->getConsumers().push_back(mOutputVariable);
+    mOneHotVariable->getConsumers().push_back(mCostVariable);
 }
 
 Cost::Cost(CostVariant costFunction)
@@ -90,11 +90,11 @@ Cost::Cost(CostVariant costFunction)
     // add variables to the graph
     mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
-    mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+    mCostVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{costFunction}), {mTargetVariable}, {})));
     
     // connections within the module
-    mTargetVariable->getConsumers().push_back(mOutputVariable);
+    mTargetVariable->getConsumers().push_back(mCostVariable);
 }
 
 void Cost::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs )
@@ -108,7 +108,7 @@ void Cost::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::v
         throw std::invalid_argument("Cost::__init__: the number of output variables must be 0");
     }
 
-    mOutputVariable->getInputs().push_back(initialInpus[0]);
+    mCostVariable->getInputs().push_back(initialInpus[0]);
 }
 
 std::shared_ptr<Variable> Cost::getVariable(std::uint32_t index)
@@ -116,10 +116,10 @@ std::shared_ptr<Variable> Cost::getVariable(std::uint32_t index)
     switch (index)
     {
     case 0:
-        return mOutputVariable;
+        return mCostVariable;
         break;
     case 1:
-        return mOutputVariable;
+        return mCostVariable;
         break;
     case 2:
         return mTargetVariable;

@@ -116,7 +116,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
         std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
         
-        std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
+        std::cout << "Batch: " << iteration << "\t Training-error: " << loss->at(0);
 
         GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
         
@@ -132,7 +132,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
         std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
 
-        std::cout << " Validation-error: " << validationLoss->at(0) << std::endl;
+        std::cout << "\t Validation-error: " << validationLoss->at(0) << "\t\t\t\r";	
 
         
         // early stopping
@@ -155,7 +155,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         }
         else if ( lastImprovement + earlyStoppingIteration <= iteration)
         {
-            std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
+            std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
             std::cout << "Best validation loss: " << bestLoss << std::endl;
             for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
             {
@@ -209,6 +209,12 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
     std::cout << "Test-error: " << loss->at(0) << std::endl;
 }
 
-    
+
+// ModelVariant
+
+#include "sequential.hpp"
+
+using ModelVariant = std::variant<SequentialModel>;
+
 
 #endif // MODEL_HPP

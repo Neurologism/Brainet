@@ -144,7 +144,7 @@ void SequentialModel::train(Vector2D const & input, Vector2D const & label, std:
 
 void SequentialModel::test(Vector2D const & data, Vector2D const & label)
 {
-    test({data}, {label});
+    Model::test({data}, {label});
 }
 
 #endif // SEQUENTIAL_HPP
