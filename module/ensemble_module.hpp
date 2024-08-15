@@ -2,7 +2,9 @@
 #define ENSEMBLE_MODULE_HPP
 
 #include "module.hpp"
-#include "cost.hpp"
+#include "../operation/processing/average.hpp"
+#include "../operation/cost_function/cost_function.hpp"
+
 
 /**
  * @brief the ensemble module is used to average the output of multiple Variables and apply a cost function to the output.
@@ -22,7 +24,10 @@ public:
      */
     EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, CostVariant costFunction);
 
-    ~EnsembleModule() = default;    
+    /**
+     * @brief destructor for the ensemble module removes the module from the graph
+     */
+    ~EnsembleModule();    
 
     /**
      * @brief function to get access to specific variables of the module.
@@ -36,7 +41,7 @@ public:
 
 EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, CostVariant costFunction)
 {
-    mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, inputVariables, {}))); // replace with average function
+    mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Average>(), inputVariables, {})));
 
     mCostVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{costFunction}), {mOutputVariable}, {})));
@@ -49,6 +54,19 @@ EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVaria
     {
         inputVariable->getConsumers().push_back(mOutputVariable);
     }
+}
+
+EnsembleModule::~EnsembleModule()
+{
+    // delete other connections
+    for(auto input : mOutputVariable->getInputs())
+    {
+        input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mOutputVariable));
+    }
+
+    // delete the variables
+    GRAPH->removeVariable(mOutputVariable);
+    GRAPH->removeVariable(mCostVariable);
 }
 
 std::shared_ptr<Variable> EnsembleModule::getVariable(std::uint32_t index)

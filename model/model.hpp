@@ -199,12 +199,18 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
-    mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[0]));
-    mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[0])); // support multiple inputs and labels in the future
+    for (std::uint32_t i = 0; i < inputs.size(); i++)
+    {
+        mInputVariables[i]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[i]));
+    }
+    for (std::uint32_t i = 0; i < labels.size(); i++)
+    {
+        mTargetVariables[i]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[i]));
+    }
 
     GRAPH->forward(graphInputs); // forward pass
 
-    std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
+    std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
     
     std::cout << "Test-error: " << loss->at(0) << std::endl;
 }

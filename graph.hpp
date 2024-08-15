@@ -59,23 +59,20 @@ public:
      * @param pVar The variable for which the gradient is calculated.
      * @return The gradient of the variable.
      */
-    std::shared_ptr<Tensor<double>> getGradient(VariablePtr pVar)
-    {
-        if(mGradTable.find(pVar) == mGradTable.end()) throw std::runtime_error("Variable not in gradient table");
-        return mGradTable[pVar];
-    }
+    std::shared_ptr<Tensor<double>> getGradient(VariablePtr pVar);
 
     /**
      * @brief This function adds a variable to the graph.
      * @param var The variable to be added.
      * @return VariablePtr The added variable.
      */
-    VariablePtr addVariable(const VariablePtr & pVar)
-    {
-        mVariableVec.push_back(pVar); 
-        if(pVar->getOperation()!=nullptr)pVar->getOperation()->setVariable(mVariableVec.back()); // address of variable has changed -> invalidation of pointers; not nice but works
-        return mVariableVec.back();
-    };
+    VariablePtr addVariable(const VariablePtr & pVar);
+
+    /**
+     * @brief This function removes a variable from the graph.
+     * @param var The variable to be removed.
+     */
+    void removeVariable(const VariablePtr & pVar);
 }; 
 
 
@@ -217,6 +214,24 @@ void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable)
 std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
 {
     return mVariableVec;
+}
+
+std::shared_ptr<Tensor<double>> Graph::getGradient(VariablePtr pVar)
+{
+    if(mGradTable.find(pVar) == mGradTable.end()) throw std::runtime_error("Variable not in gradient table");
+    return mGradTable[pVar];
+}
+
+std::shared_ptr<Variable> Graph::addVariable(const VariablePtr & pVar)
+{
+    mVariableVec.push_back(pVar); 
+    if(pVar->getOperation()!=nullptr)pVar->getOperation()->setVariable(mVariableVec.back()); // address of variable has changed -> invalidation of pointers; not nice but works
+    return mVariableVec.back();
+}
+
+void Graph::removeVariable(const VariablePtr & pVar)
+{
+    mVariableVec.erase(std::find(mVariableVec.begin(), mVariableVec.end(), pVar));
 }
 
 std::shared_ptr<Graph> GRAPH = std::make_shared<Graph>(); // global graph object
