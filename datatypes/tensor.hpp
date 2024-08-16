@@ -157,16 +157,8 @@ std::uint32_t Tensor<T>::calculateIndex(const ShapeVector &rIndex)
 template <class T>
 Tensor<T>::Tensor(const ShapeVector &dimensionality)
 {
-    mData = DataVector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>())); // initialize the data vector
+    mData = DataVector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>()), 0);
     mShape = dimensionality;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<T> dis(-1/std::sqrt(dimensionality[0]), 1/std::sqrt(dimensionality[0]));
-    for (std::uint32_t i = 0; i < mData.size(); i++)
-    {
-        mData[i] = dis(gen);
-    }
 }
 
 template <class T>

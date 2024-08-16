@@ -138,6 +138,19 @@ std::shared_ptr<Variable> FullyConnected::getVariable(std::uint32_t index)
 void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
 {
     mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
+
+    // initialize the weights randomly
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(-std::sqrt(2/(inputUnits+mUnits)), std::sqrt(2/(inputUnits+mUnits)));
+    for (std::uint32_t i = 0; i < inputUnits; i++) // dont initialize the bias
+    {
+        for (std::uint32_t j = 0; j < mUnits; j++)
+        {
+            mpWeightMatrixVariable->getData()->set({i,j},dis(gen));
+        }
+    }
+
 }
 
 
