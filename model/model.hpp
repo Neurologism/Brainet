@@ -217,7 +217,7 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
 
     std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
     
-    std::cout << "Test-error: " << loss->at(0) << std::endl;
+    std::cout << "Error metric: " << loss->at(0) << std::endl;
 }
 
 

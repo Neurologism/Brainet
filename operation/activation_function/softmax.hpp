@@ -39,14 +39,16 @@ void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {
         
-        double _max = inputs.front()->getData()->at({i, 0}); // normalize the input to avoid overflow / underflow
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
-        {
-            if (inputs.front()->getData()->at({i, j}) > _max)
-            {
-                _max = inputs.front()->getData()->at({i, j});
-            }
-        }
+        // double _max = inputs.front()->getData()->at({i, 0}); // normalize the input to avoid overflow / underflow
+        // for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+        // {
+        //     if (inputs.front()->getData()->at({i, j}) > _max)
+        //     {
+        //         _max = inputs.front()->getData()->at({i, j});
+        //     }
+        // }
+
+        double _max = 0; 
 
         double _sum = 0;
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
@@ -89,7 +91,7 @@ std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Varia
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)  
         {
             _sum -= _data->at({i, j}) * gradient->at({i, j});
-            _grad->set({i, j}, _data->at({i,j}) * (1-_data->at({i,j})) * _grad->at({i,j}) - _sum * _data->at({i,j}));
+            _grad->set({i, j}, _data->at({i,j}) * ((1-_data->at({i,j})) * gradient->at({i,j}) - _sum));
             _sum += _data->at({i, j}) * gradient->at({i, j});
         }
     }

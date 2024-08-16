@@ -58,7 +58,7 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
             error++;
         }
     }
-    std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0) << "%" << std::endl;
+    std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0)*100 << "%" << std::endl;
 }
 
 #endif // ERROR_RATE_HPP
