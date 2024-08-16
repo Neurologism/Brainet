@@ -42,26 +42,26 @@ void CrossEntropy::f(std::vector<std::shared_ptr<Variable>> &inputs)
         throw std::runtime_error("CrossEntropy: number of inputs is not 2");
     }
 
-    if (inputs[1]->getData()->shape(1) != 1)
+    if (inputs[0]->getData()->shape(1) != 1)
     {
         throw std::runtime_error("CrossEntropy: the target tensor must be 1D");
     }
 
-    if (inputs[0]->getData()->shape(0) != inputs[1]->getData()->shape(0))
+    if (inputs[1]->getData()->shape(0) != inputs[0]->getData()->shape(0))
     {
         throw std::runtime_error("CrossEntropy: the size of the prediction and target tensor must be the same");
     }
 
     double error = 0;
-    for (std::uint32_t i = 0; i < inputs[0]->getData()->shape(0); i++)
+    for (std::uint32_t i = 0; i < inputs[1]->getData()->shape(0); i++)
     {     
         if (mUseWithLog)
         {
-            error -= log(inputs[0]->getData()->at({i, (std::uint32_t)inputs[1]->getData()->at({i})}));
+            error -= log(inputs[1]->getData()->at({i, (std::uint32_t)inputs[0]->getData()->at({i})}));
         }
         else
         {
-            error -= inputs[0]->getData()->at({i, (std::uint32_t)inputs[1]->getData()->at({i})});
+            error -= inputs[1]->getData()->at({i, (std::uint32_t)inputs[0]->getData()->at({i})});
         }
     }
 
@@ -78,7 +78,7 @@ std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<
         throw std::runtime_error("CrossEntropy: number of inputs is not 2");
     }
 
-    if (inputs[1]->getData()->shape(1) != 1)
+    if (inputs[0]->getData()->shape(1) != 1)
     {
         throw std::runtime_error("CrossEntropy: the target tensor must be 1D");
     }
@@ -88,19 +88,19 @@ std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<
         throw std::runtime_error("CrossEntropy: the gradient tensor must have shape {1}");
     }
 
-    std::shared_ptr<Tensor<double>> _gradient = std::make_shared<Tensor<double>>(Tensor<double>(inputs[0]->getData()->shape()));
+    std::shared_ptr<Tensor<double>> _gradient = std::make_shared<Tensor<double>>(Tensor<double>(inputs[1]->getData()->shape()));
 
-    for (std::uint32_t i = 0; i < inputs[0]->getData()->shape(0); i++)
+    for (std::uint32_t i = 0; i < inputs[1]->getData()->shape(0); i++)
     {
-        for (std::uint32_t j = 0; j < inputs[0]->getData()->shape(1); j++)
+        for (std::uint32_t j = 0; j < inputs[1]->getData()->shape(1); j++)
         {
             if (mUseWithLog)
             {
-                _gradient->set({i, j}, -1 / inputs[0]->getData()->at({i, j}) * (j == (std::uint32_t)inputs[1]->getData()->at({i})));
+                _gradient->set({i, j}, -1 / inputs[1]->getData()->at({i, j}) * (j == (std::uint32_t)inputs[0]->getData()->at({i})));
             }
             else
             {
-                _gradient->set({i, j}, -1 * (j == (std::uint32_t)inputs[1]->getData()->at({i})));
+                _gradient->set({i, j}, -1 * (j == (std::uint32_t)inputs[0]->getData()->at({i})));
             }
         }
     }

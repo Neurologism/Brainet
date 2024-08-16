@@ -38,6 +38,11 @@ public:
      * @note 3: norm variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
+
+    /**
+     * @brief used to initialize the module with the input and output variables.
+     */
+    void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
 };
 
 Dense::Dense(HiddenVariant activationFunction, std::uint32_t units) : FullyConnected(units)
@@ -78,14 +83,45 @@ std::shared_ptr<Variable> Dense::getVariable(std::uint32_t index)
     case 3:
         if (mpNormVariable == nullptr)
         {
-            throw std::invalid_argument("FullyConnected::getVariable: norm variable not initialized");
+            throw std::invalid_argument("Dense::getVariable: norm variable not initialized");
         }
         return mpNormVariable;
         break;
     default:
-        throw std::invalid_argument("FullyConnected::getVariable: index out of range");
+        throw std::invalid_argument("Dense::getVariable: index out of range");
         break;
     }
+}
+
+void Dense::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs)
+{
+    if (initialInpus.size() != 1)
+    {
+        throw std::invalid_argument("Dense::__init__: the number of input variables must be 1");
+    }
+    if (initialOutputs.size() != 1)
+    {
+        throw std::invalid_argument("Dense::__init__: the number of output variables must be 1");
+    }
+
+    mpPaddingVariable->getInputs().push_back(initialInpus[0]);
+        
+    // init default norm
+    if(mpNorm == nullptr && mpsDefaultNorm != nullptr)
+    {
+        mpNorm = std::visit([](auto&& arg) {
+            // Assuming all types in the variant can be dynamically casted to Operation*
+            return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *mpsDefaultNorm);
+    }
+    
+    if (mpNorm != nullptr) // adding norm to activation function
+    {
+        mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));  
+        mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
+    }
+
+
+    mpActivationVariable->getConsumers().push_back(initialOutputs[0]);
 }
 
 #endif // DENSE_HPP

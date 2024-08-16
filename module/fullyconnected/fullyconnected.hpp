@@ -26,13 +26,6 @@ protected:
 public:
 
     FullyConnected( std::uint32_t units);
-    
-
-
-    /**
-     * @brief used to initialize the module with the input and output variables.
-     */
-    void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
 
     /**
      * @brief used to create the weight matrix for the dense layer.
@@ -67,37 +60,6 @@ FullyConnected::FullyConnected(std::uint32_t units)
     mpWeightMatrixVariable->getConsumers().push_back(mpMatmulVariable);
 }
 
-void FullyConnected::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs)
-{
-    if (initialInpus.size() != 1)
-    {
-        throw std::invalid_argument("FullyConnected::__init__: the number of input variables must be 1");
-    }
-    if (initialOutputs.size() != 1)
-    {
-        throw std::invalid_argument("FullyConnected::__init__: the number of output variables must be 1");
-    }
-
-    mpPaddingVariable->getInputs().push_back(initialInpus[0]);
-        
-    // init default norm
-    if(mpNorm == nullptr && mpsDefaultNorm != nullptr)
-    {
-        mpNorm = std::visit([](auto&& arg) {
-            // Assuming all types in the variant can be dynamically casted to Operation*
-            return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *mpsDefaultNorm);
-    }
-    
-    if (mpNorm != nullptr) // adding norm to activation function
-    {
-        mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));  
-        mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
-    }
-
-
-    mpActivationVariable->getConsumers().push_back(initialOutputs[0]);
-}
-
 void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
 {
     mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
@@ -105,7 +67,8 @@ void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
     // initialize the weights randomly
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(-std::sqrt(2/(inputUnits+mUnits)), std::sqrt(2/(inputUnits+mUnits)));
+    double connections = inputUnits + mUnits;
+    std::uniform_real_distribution<double> dis(-std::sqrt(2/(connections)), std::sqrt(2/(connections)));
     for (std::uint32_t i = 0; i < inputUnits; i++) // dont initialize the bias
     {
         for (std::uint32_t j = 0; j < mUnits; j++)
@@ -113,7 +76,7 @@ void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
             mpWeightMatrixVariable->getData()->set({i,j},dis(gen));
         }
     }
-
+    
 }
 
 

@@ -40,6 +40,11 @@ public:
      * @note 5: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
+
+    /**
+     * @brief used to initialize the module with the input and output variables.
+     */
+    void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
 };
 
 Output::Output(OutputVariant activationFunction, std::uint32_t units) : FullyConnected(units)
@@ -123,6 +128,19 @@ std::shared_ptr<Variable> Output::getVariable(std::uint32_t index)
     }
 }
 
+void Output::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs)
+{
+    if (initialInpus.size() != 1)
+    {
+        throw std::invalid_argument("Output::__init__: the number of input variables must be 1");
+    }
+    if (initialOutputs.size() != 0)
+    {
+        throw std::invalid_argument("Output::__init__: the number of output variables must be 0");
+    }
+
+    mpPaddingVariable->getInputs().push_back(initialInpus[0]);
+}
 
 
 #endif // OUTPUT_HPP

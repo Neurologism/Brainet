@@ -10,7 +10,6 @@ class Softmax : public Operation
 {   
     bool mUseWithExp = true;
 protected:
-    double activationFunction(double input);
 
     void f(std::vector<std::shared_ptr<Variable>>& inputs) override;
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
@@ -21,13 +20,6 @@ public:
 
     void useWithLog();
 };
-
-double Softmax::activationFunction(double input)
-{
-    return exp(input);
-}
-
-
 
 void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
@@ -51,16 +43,26 @@ void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
             }
         }
 
+        
         double _sum = 0;
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
         {
-            _sum += activationFunction(inputs.front()->getData()->at({i, j}) - _max);
+            _sum += std::exp(inputs.front()->getData()->at({i, j}) - _max);
         }
 
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+        if (mUseWithExp)
         {
-
-            _data->set({i, j}, activationFunction(inputs.front()->getData()->at({i, j}) - _max) / _sum);
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+            {
+                _data->set({i, j}, std::exp(inputs.front()->getData()->at({i, j}) - _max) / _sum);
+            }
+        }
+        else
+        {
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+            {
+                _data->set({i, j}, inputs[0]->getData()->at({i, j}) - _max - std::log(_sum));
+            }
         }
     }
     this->getVariable()->getData() = _data; // store the result in the variable
@@ -83,15 +85,25 @@ std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Varia
 
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {
-        double _sum = 0;
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // precalculate the sum of the gradient
+        if (mUseWithExp)
         {
-            _sum += data->at({i, j}) * gradient->at({i, j});
-        }
+            double _sum = 0;
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // precalculate the sum of the gradient
+            {
+                _sum += data->at({i, j}) * gradient->at({i, j});
+            }
 
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)  
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)  
+            {
+                grad->set({i, j}, data->at({i,j}) * ( gradient->at({i,j}) - _sum ));
+            }
+        }
+        else 
         {
-            grad->set({i, j}, data->at({i,j}) * ( gradient->at({i,j}) - _sum ));
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // simplified version of the gradient 
+            {
+                grad->set({i, j}, data->at({i, j}) - gradient->at({i, j}));
+            }
         }
     }
 
