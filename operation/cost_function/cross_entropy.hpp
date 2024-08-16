@@ -1,20 +1,20 @@
-#ifndef NEGATIVELOGLIKELYHOOD_HPP
-#define NEGATIVELOGLIKELYHOOD_HPP
+#ifndef CROSS_ENTROPY_HPP
+#define CROSS_ENTROPY_HPP
 
 #include "cost_function.hpp"
 
 /**
- * @brief The NegativeLogLikelyhood class is a cost function that is used to train a model using the negative log likelyhood.
+ * @brief The CrossEntropy class is a cost function that is used to train a model using the negative log likelyhood.
  */
-class NegativeLogLikelyhood : public Operation
+class CrossEntropy : public Operation
 {
     bool mUseWithLog = true;
 public:
     /**
-     * @brief constructor for the NegativeLogLikelyhood operation
+     * @brief constructor for the CrossEntropy operation
      */
-    NegativeLogLikelyhood() { mName = "NEGATIVE_LOG_LIKELYHOOD"; };
-    ~NegativeLogLikelyhood() = default;
+    CrossEntropy() { mName = "NEGATIVE_LOG_LIKELYHOOD"; };
+    ~CrossEntropy() = default;
 
     /**
      * @brief calculate the negative log likelyhood of the input tensors
@@ -35,21 +35,21 @@ public:
     void useWithExp();
 };
 
-void NegativeLogLikelyhood::f(std::vector<std::shared_ptr<Variable>> &inputs)
+void CrossEntropy::f(std::vector<std::shared_ptr<Variable>> &inputs)
 {
     if (inputs.size() != 2)
     {
-        throw std::runtime_error("NegativeLogLikelyhood: number of inputs is not 2");
+        throw std::runtime_error("CrossEntropy: number of inputs is not 2");
     }
 
     if (inputs[1]->getData()->shape(1) != 1)
     {
-        throw std::runtime_error("NegativeLogLikelyhood: the target tensor must be 1D");
+        throw std::runtime_error("CrossEntropy: the target tensor must be 1D");
     }
 
     if (inputs[0]->getData()->shape(0) != inputs[1]->getData()->shape(0))
     {
-        throw std::runtime_error("NegativeLogLikelyhood: the size of the prediction and target tensor must be the same");
+        throw std::runtime_error("CrossEntropy: the size of the prediction and target tensor must be the same");
     }
 
     double error = 0;
@@ -67,25 +67,25 @@ void NegativeLogLikelyhood::f(std::vector<std::shared_ptr<Variable>> &inputs)
 
     this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error));
 
-    std::cout << "NegativeLogLikelyhood: " << error << std::endl;
+    std::cout << "CrossEntropy: " << error << std::endl;
 }
 
 
-std::shared_ptr<Tensor<double>> NegativeLogLikelyhood::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient)
+std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient)
 {
     if (inputs.size() != 2)
     {
-        throw std::runtime_error("NegativeLogLikelyhood: number of inputs is not 2");
+        throw std::runtime_error("CrossEntropy: number of inputs is not 2");
     }
 
     if (inputs[1]->getData()->shape(1) != 1)
     {
-        throw std::runtime_error("NegativeLogLikelyhood: the target tensor must be 1D");
+        throw std::runtime_error("CrossEntropy: the target tensor must be 1D");
     }
 
     if (gradient->shape() != std::vector<size_t>({1}))
     {
-        throw std::runtime_error("NegativeLogLikelyhood: the gradient tensor must have shape {1}");
+        throw std::runtime_error("CrossEntropy: the gradient tensor must have shape {1}");
     }
 
     std::shared_ptr<Tensor<double>> _gradient = std::make_shared<Tensor<double>>(Tensor<double>(inputs[0]->getData()->shape()));
@@ -108,10 +108,10 @@ std::shared_ptr<Tensor<double>> NegativeLogLikelyhood::bprop(std::vector<std::sh
     return _gradient;
 }
 
-void NegativeLogLikelyhood::useWithExp()
+void CrossEntropy::useWithExp()
 {
     mUseWithLog = false;
 }
 
 
-#endif // NEGATIVELOGLIKELYHOOD_HPP
+#endif // CROSS_ENTROPY_HPP

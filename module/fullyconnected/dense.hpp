@@ -27,6 +27,17 @@ public:
     Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant norm);
 
     ~Dense() = default;
+
+    /**
+     * @brief function to get access to specific variables of the module.
+     * @param index the index of the variable
+     * @return the variable specified by the index
+     * @note 0: padding variable
+     * @note 1: activation variable
+     * @note 2: weight matrix variable
+     * @note 3: norm variable
+     */
+    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 };
 
 Dense::Dense(HiddenVariant activationFunction, std::uint32_t units) : FullyConnected(units)
@@ -49,6 +60,32 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant 
         // Assuming all types in the variant can be dynamically casted to Operation*
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, norm);
     Dense(activationFunction, units);
+}
+
+std::shared_ptr<Variable> Dense::getVariable(std::uint32_t index)
+{
+    switch (index)
+    {
+    case 0:
+        return mpPaddingVariable;
+        break;
+    case 1:
+        return mpActivationVariable;
+        break;
+    case 2:
+        return mpWeightMatrixVariable;
+        break;
+    case 3:
+        if (mpNormVariable == nullptr)
+        {
+            throw std::invalid_argument("FullyConnected::getVariable: norm variable not initialized");
+        }
+        return mpNormVariable;
+        break;
+    default:
+        throw std::invalid_argument("FullyConnected::getVariable: index out of range");
+        break;
+    }
 }
 
 #endif // DENSE_HPP

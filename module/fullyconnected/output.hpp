@@ -1,10 +1,13 @@
 #ifndef OUTPUT_HPP
 #define OUTPUT_HPP
 
-#include "./fullyconnected.hpp"
+#include "./fullyconnected.hpp"	
+#include "../cost.hpp"
 
 class Output : public FullyConnected
 {
+    std::shared_ptr<Cost> mpCost;
+
 public:
     /**
      * @brief add a output layer to the graph
@@ -21,7 +24,22 @@ public:
      */
     Output(OutputVariant activationFunction, std::uint32_t units, NormVariant norm);
 
+    Output(OutputVariant activationFunction, std::uint32_t units, CostVariant costFunction );
+
     ~Output() = default;
+
+    /**
+     * @brief function to get access to specific variables of the module.
+     * @param index the index of the variable
+     * @return the variable specified by the index
+     * @note 0: padding variable
+     * @note 1: activation variable
+     * @note 2: weight matrix variable
+     * @note 3: norm variable
+     * @note 4: cost variable
+     * @note 5: target variable
+     */
+    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 };
 
 Output::Output(OutputVariant activationFunction, std::uint32_t units) : FullyConnected(units)
@@ -45,6 +63,66 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, NormVarian
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, norm);
     Output(activationFunction, units);
 }
+
+Output::Output(OutputVariant activationFunction, std::uint32_t units, CostVariant costFunction ) : Output(activationFunction, units)
+{
+    mpCost = std::make_shared<Cost>(costFunction);
+
+    // connect the cost function to the output layer
+
+    mpCost->__init__({mpActivationVariable}, {});
+    mpActivationVariable->getConsumers().push_back(mpCost->getVariable(0));
+
+    std::shared_ptr<Operation> activation_function = mpActivationVariable->getOperation();
+    std::shared_ptr<Operation> cost_function = mpCost->getVariable(0)->getOperation();
+    if ( dynamic_cast<Softmax*>(activation_function.get()) != nullptr && dynamic_cast<CrossEntropy*>(cost_function.get()) != nullptr) // numerical stability
+    {
+        ((Softmax*)activation_function.get())->useWithLog();
+        ((CrossEntropy*)cost_function.get())->useWithExp();
+    }
+
+}
+
+std::shared_ptr<Variable> Output::getVariable(std::uint32_t index)
+{
+    switch (index)
+    {
+        case 0:
+            return mpPaddingVariable;
+            break;
+        case 1:
+            return mpActivationVariable;
+            break;
+        case 2:
+            return mpWeightMatrixVariable;
+            break;
+        case 3: 
+            if (mpNormVariable == nullptr)
+            {
+                throw std::invalid_argument("FullyConnected::getVariable: norm variable not initialized");
+            }
+            return mpNormVariable;
+            break;
+        case 4:
+            if (mpCost == nullptr)
+            {
+                throw std::invalid_argument("Output::getVariable: cost variable not initialized");
+            }
+            return mpCost->getVariable(0);
+            break;
+        case 5:
+            if (mpCost == nullptr)
+            {
+                throw std::invalid_argument("Output::getVariable: target variable not initialized");
+            }
+            return mpCost->getVariable(2);
+            break;
+        default:
+            throw std::invalid_argument("Output::getVariable: invalid index");
+            break;
+    }
+}
+
 
 
 #endif // OUTPUT_HPP

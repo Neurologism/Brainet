@@ -35,17 +35,6 @@ public:
     void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
 
     /**
-     * @brief function to get access to specific variables of the module.
-     * @param index the index of the variable
-     * @return the variable specified by the index
-     * @note 0: padding variable
-     * @note 1: activation variable
-     * @note 2: weight matrix variable
-     * @note 3: norm variable
-     */
-    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
-
-    /**
      * @brief used to create the weight matrix for the dense layer.
      */
     void createWeightMatrix(std::uint32_t inputUnits);
@@ -107,32 +96,6 @@ void FullyConnected::__init__(std::vector<std::shared_ptr<Variable>> initialInpu
 
 
     mpActivationVariable->getConsumers().push_back(initialOutputs[0]);
-}
-
-std::shared_ptr<Variable> FullyConnected::getVariable(std::uint32_t index)
-{
-    switch (index)
-    {
-    case 0:
-        return mpPaddingVariable;
-        break;
-    case 1:
-        return mpActivationVariable;
-        break;
-    case 2:
-        return mpWeightMatrixVariable;
-        break;
-    case 3:
-        if (mpNormVariable == nullptr)
-        {
-            throw std::invalid_argument("FullyConnected::getVariable: norm variable not initialized");
-        }
-        return mpNormVariable;
-        break;
-    default:
-        throw std::invalid_argument("FullyConnected::getVariable: index out of range");
-        break;
-    }
 }
 
 void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
