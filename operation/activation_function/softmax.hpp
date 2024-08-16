@@ -102,7 +102,7 @@ std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Varia
         {
             for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // simplified version of the gradient 
             {
-                grad->set({i, j}, data->at({i, j}) - gradient->at({i, j}));
+                grad->set({i, j}, std::exp(data->at({i, j})) + gradient->at({i, j}));
             }
         }
     }

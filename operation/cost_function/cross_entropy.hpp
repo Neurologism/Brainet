@@ -65,9 +65,7 @@ void CrossEntropy::f(std::vector<std::shared_ptr<Variable>> &inputs)
         }
     }
 
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error));
-
-    std::cout << "CrossEntropy: " << error << std::endl;
+    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[1]->getData()->shape(0)));
 }
 
 
