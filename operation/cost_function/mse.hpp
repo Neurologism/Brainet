@@ -11,7 +11,18 @@ class MSE : public Operation
 {
 public:
     MSE() { mName = "MSE"; }
+    /**
+     * @brief Calculates the mean squared error.
+     * @param inputs The input variables x and y.
+    */
     void f(std::vector<std::shared_ptr<Variable>>& inputs) override;
+    /**
+     * @brief Calculates the gradient of the mean squared error.
+     * @param inputs The input variables x and y.
+     * @param focus The focus variable.
+     * @param gradient The gradient tensor.
+     * @return The gradient tensor.
+    */
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
 };
 

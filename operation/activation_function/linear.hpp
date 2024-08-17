@@ -8,7 +8,15 @@
 */
 class Linear : public ActivationFunction
 {   
+    /**
+     * @brief The linear function.
+     * @param input The input value.
+     */
     double activationFunction(double input)override;
+    /**
+     * @brief The derivative of the linear function.
+     * @param input The input value.
+     */
     double activationFunctionDerivative(double input)override;
 public:
     Linear() { mName = "LINEAR"; };

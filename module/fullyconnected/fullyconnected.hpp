@@ -24,16 +24,21 @@ protected:
     std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization
 
 public:
-
+    /**
+     * @brief add a fully connected layer to the graph
+     * @param units the number of neurons in the layer
+     */
     FullyConnected( std::uint32_t units);
 
     /**
-     * @brief used to create the weight matrix for the dense layer.
+     * @brief initialize the weight matrix of the layer with random values
+     * @param inputUnits the number of weights each neuron has
      */
     void createWeightMatrix(std::uint32_t inputUnits);
 
     /**
-     * @brief used to set the default norm to use for regularization.
+     * @brief set the default norm to use for regularization. Layers are initialized with this norm, if no other norm is specified.
+     * @param norm the norm to use
      */
     static void setDefaultNorm(NormVariant const & norm)
     {

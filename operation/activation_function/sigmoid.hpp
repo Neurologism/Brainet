@@ -8,7 +8,15 @@
 */
 class Sigmoid : public ActivationFunction
 {   
+    /**
+     * @brief The sigmoid function.
+     * @param input The input value.
+    */
     double activationFunction(double input)override;
+    /**
+     * @brief The derivative of the sigmoid function.
+     * @param input The input value.
+    */
     double activationFunctionDerivative(double input)override;
 public:
     Sigmoid() { mName = "SIGMOID"; };

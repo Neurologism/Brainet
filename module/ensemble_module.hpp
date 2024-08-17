@@ -14,6 +14,7 @@ class EnsembleModule : private Module
     std::shared_ptr<Variable> mOutputVariable; 
     std::shared_ptr<Module> mCostModule; 
     
+    // not supported
     void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override {};
 
 public:

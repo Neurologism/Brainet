@@ -8,7 +8,15 @@
 */
 class HeavysideStep : public ActivationFunction
 {   
+    /**
+     * @brief The Heavyside step function.
+     * @param input The input value.
+     */
     double activationFunction(double input)override;
+    /**
+     * @brief The derivative of the Heavyside step function.
+     * @param input The input value.
+     */
     double activationFunctionDerivative(double input)override;
 public:
     HeavysideStep() { mName = "HEAVYSIDE_STEP"; };
