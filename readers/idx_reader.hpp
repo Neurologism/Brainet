@@ -36,13 +36,11 @@ std::vector<std::vector<double>> read_idx(const std::string path)
         tensor.resize(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<size_t>())));
         for (std::uint32_t i = 0; i < tensor.size(); i++)
         {
-            unsigned char pixel;
-            file.read((char *)&pixel, 1);
             for (std::uint32_t j = 0; j < tensor[i].size(); j++)
             {
-                unsigned char pixel;
-                file.read((char *)&pixel, 1);
-                tensor[i][j] = (double)pixel;
+                unsigned char pixel[1];
+                file.read((char *)pixel, 1);
+                tensor[i][j] = (double)pixel[0];
             }
         }
     }

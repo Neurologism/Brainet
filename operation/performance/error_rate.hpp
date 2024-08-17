@@ -41,6 +41,8 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
     }
 
     double error = 0;
+    std::vector<std::uint32_t> prediction(10);
+    std::vector<std::uint32_t> target(10);
     for (std::uint32_t i = 0; i < inputs[0]->getData()->shape(0); i++)
     {
         double max = inputs[0]->getData()->at({i, 0});
@@ -57,8 +59,16 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
         {
             error++;
         }
+        std::cout << "Prediction: " << maxIndex << " Target: " << inputs[1]->getData()->at({i}) << std::endl;
+        prediction[maxIndex]++;
+        target[inputs[1]->getData()->at({i})]++;
+
     }
     std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0)*100 << "%" << std::endl;
+    for (std::uint32_t i = 0; i < 10; i++)
+    {
+        std::cout << "Digit " << i << " Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
+    }
 }
 
 #endif // ERROR_RATE_HPP
