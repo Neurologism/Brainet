@@ -64,6 +64,29 @@ void CrossEntropy::f(std::vector<std::shared_ptr<Variable>> &inputs)
             error -= inputs[1]->getData()->at({i, (std::uint32_t)inputs[0]->getData()->at({i})});
         }
     }
+    // std::vector<std::uint32_t> prediction(10);
+    // std::vector<std::uint32_t> target(10);
+
+    // for (std::uint32_t i = 0; i < inputs[1]->getData()->shape(0); i++)
+    // {
+    //     double max = inputs[1]->getData()->at({i, 0});
+    //     std::uint32_t maxIndex = 0;
+    //     for (std::uint32_t j = 1; j < inputs[1]->getData()->shape(1); j++)
+    //     {
+    //         if (inputs[1]->getData()->at({i, j}) > max)
+    //         {
+    //             max = inputs[1]->getData()->at({i, j});
+    //             maxIndex = j;
+    //         }
+    //     }
+    //     prediction[maxIndex]++;
+    //     target[(std::uint32_t)inputs[0]->getData()->at({i})]++;
+    // }
+
+    // for (std::uint32_t i = 0; i < 10; i++)
+    // {
+    //     std::cout << "Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
+    // }
 
     this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[1]->getData()->shape(0)));
 }
@@ -98,7 +121,7 @@ std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<
             }
             else
             {
-                _gradient->set({i, j}, -1 * (j == (std::uint32_t)inputs[0]->getData()->at({i})));
+                _gradient->set({i, j}, -1*(j == (std::uint32_t)inputs[0]->getData()->at({i})));
             }
         }
     }

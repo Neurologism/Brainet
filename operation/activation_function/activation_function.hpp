@@ -63,7 +63,7 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply derivative of activation function to all elements
     {
-        _data->set(i, activationFunctionDerivative(inputs.front()->getData()->at(i))); // apply derivative of activation function
+        _data->set(i, activationFunctionDerivative(inputs.front()->getData()->at(i)) * gradient->at(i)); // apply derivative of activation function
     }
 
     return _data;

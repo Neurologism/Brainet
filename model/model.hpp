@@ -134,7 +134,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
         std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
 
-        std::cout << "\t Validation-error: " << validationLoss->at(0) << "\t\t\t\r";	
+        std::cout << "\t Validation-error: " << validationLoss->at(0) << std::endl;	
 
         
         // early stopping

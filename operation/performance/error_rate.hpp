@@ -59,7 +59,6 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
         {
             error++;
         }
-        std::cout << "Prediction: " << maxIndex << " Target: " << inputs[1]->getData()->at({i}) << std::endl;
         prediction[maxIndex]++;
         target[inputs[1]->getData()->at({i})]++;
 

@@ -54,7 +54,7 @@ std::int32_t main()
 
     SequentialModel model(Input(input[0].size()), {Dense(ReLU(),300)}, Output(Softmax(),10, CrossEntropy()));
 
-    model.train( train_input, train_target, 15, 200, SGD(0.1), 20, 0.98 );
+    model.train( train_input, train_target, 15, 100, SGD(0.5), 20, 0.99 );
 
     model.test(test_input,test_target);
     return 0; 
