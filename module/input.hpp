@@ -76,7 +76,6 @@ void Input::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::
     if(mNoiseVariable != nullptr)
     {
         mInputVariable->getConsumers().push_back(mNoiseVariable);
-        mNoiseVariable->getConsumers().push_back(mDropoutVariable);
         mDropoutVariable->getInputs().push_back(mNoiseVariable);
     }
     else

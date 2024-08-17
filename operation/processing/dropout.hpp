@@ -36,14 +36,7 @@ void Dropout::f(std::vector<std::shared_ptr<Variable>>& inputs)
     for(std::uint32_t i = 0; i < input->capacity(); i++)
     {
         mMask[i] = dist(gen);
-        if(mMask[i])
-        {
-            result->set({i}, input->at({i}));
-        }
-        else
-        {
-            result->set({i}, 0);
-        }
+        result->set({i}, input->at({i}) * mMask[i]);
     }
 
     this->getVariable()->getData() = result;
