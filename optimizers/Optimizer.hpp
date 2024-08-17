@@ -17,9 +17,9 @@ public:
 };
 
 
-#include "primitive_SGD.hpp"
+#include "SGD.hpp"
 
-using OptimizerVariant = std::variant<PrimitiveSGD>;
+using OptimizerVariant = std::variant<SGD>;
 
 
 #endif // OPTIMIZER_HPP

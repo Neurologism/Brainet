@@ -26,7 +26,7 @@ public:
      * @param cost_function the cost function of the model.
      * @note calls the __init__ function of every module with __init__({previousModule->getVariable(1)}, {nextModule->getVariable(0)})
      */
-    SequentialModel(Input input_layer, std::vector<ModuleVariant> hidden_layers, Output output_layer, Cost cost_function);
+    SequentialModel(Input input_layer, std::vector<ModuleVariant> hidden_layers, Output output_layer);
 
     ~SequentialModel() = default;
 
@@ -36,13 +36,12 @@ public:
     void test(Vector2D const & data, Vector2D const & label);
 };
 
-SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> hidden_layers, Output output_layer, Cost cost_function)
+SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> hidden_layers, Output output_layer)
 {
     // convert modules to shared pointers
     std::shared_ptr<Input> inputLayer = std::make_shared<Input>(input_layer);
     std::vector<std::shared_ptr<Module>> hiddenModules;
     std::shared_ptr<Output> outputLayer = std::make_shared<Output>(output_layer);
-    std::shared_ptr<Cost> costFunction = std::make_shared<Cost>(cost_function);
 
     for (ModuleVariant& layer : hidden_layers) {
         std::shared_ptr<Module> modulePtr = std::visit([](auto&& arg) {
@@ -55,7 +54,6 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     mModules.push_back(inputLayer);
     mModules.insert(mModules.end(), hiddenModules.begin(), hiddenModules.end());
     mModules.push_back(outputLayer);
-    mModules.push_back(costFunction);
 
     // connect Layers in Graph
     // assumes for all modules that getVariable(0) is the input variable and getVariable(1) is the output variable
@@ -67,7 +65,7 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
         mModules[i]->__init__({mModules[i-1]->getVariable(1)}, {mModules[i+1]->getVariable(0)});
     }
 
-    costFunction->__init__({outputLayer->getVariable(1)}, {});
+    outputLayer->__init__({hiddenModules.back()->getVariable(1)}, {});
 
 
     // load weight matrices
@@ -95,9 +93,6 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     }
 
 
-    
-
-
     // store special variables
     for (auto & module : hiddenModules)
     {
@@ -119,22 +114,26 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
 
     mInputVariables.push_back(inputLayer->getVariable(0));              // input
 
-    mTargetVariables.push_back(costFunction->getVariable(2));           // target
-
     mOutputVariables.push_back(outputLayer->getVariable(1));            // model output
-
-    mLossVariables.push_back(costFunction->getVariable(1));             // cost function
 
     try
     {
-        mBackpropVariables.push_back(costFunction->getVariable(3));     // norm
+        mTargetVariables.push_back(outputLayer->getVariable(5));        // target
+        mLossVariables.push_back(outputLayer->getVariable(4));          // cost function
+        mBackpropVariables.push_back(outputLayer->getVariable(4));      // cost function
+    }
+    catch(const std::exception& e)
+    {
+        // no cost module
+    }
+    try
+    {
+        mBackpropVariables.push_back(outputLayer->getVariable(3));      // norm
     }
     catch(const std::exception& e)
     {
         // no norm variable
     }
-    mBackpropVariables.push_back(costFunction->getVariable(1));         // cost function
-
 }
 
 void SequentialModel::train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping, double split)
@@ -144,7 +143,7 @@ void SequentialModel::train(Vector2D const & input, Vector2D const & label, std:
 
 void SequentialModel::test(Vector2D const & data, Vector2D const & label)
 {
-    test({data}, {label});
+    Model::test({data}, {label});
 }
 
 #endif // SEQUENTIAL_HPP

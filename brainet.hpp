@@ -7,7 +7,7 @@
 #include "optimizers/optimizer.hpp"
 #include "preprocessing/split.hpp"
 #include "model/model.hpp"
-#include "model/sequential.hpp"
+#include "model/ensemble.hpp"
 
 
 #endif // BRAINET_HPP

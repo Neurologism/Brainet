@@ -157,16 +157,8 @@ std::uint32_t Tensor<T>::calculateIndex(const ShapeVector &rIndex)
 template <class T>
 Tensor<T>::Tensor(const ShapeVector &dimensionality)
 {
-    mData = DataVector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>())); // initialize the data vector
+    mData = DataVector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>()), 0);
     mShape = dimensionality;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::normal_distribution<T> dis(0, 1.0);
-    for (std::uint32_t i = 0; i < mData.size(); i++)
-    {
-        mData[i] = dis(gen);
-    }
 }
 
 template <class T>
@@ -185,6 +177,8 @@ T Tensor<T>::at(const ShapeVector &index)
 template <class T>
 T Tensor<T>::at(const size_t &index)
 {
+    if (mData.size() == 0)
+        throw std::out_of_range("Tensor::at: Tensor is empty");
     if (index >= mData.size())
         throw std::out_of_range("Index out of range");
     return mData[index];

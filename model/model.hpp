@@ -43,6 +43,8 @@ protected:
      * @note the function will print the error of the model
      */
     void test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels);
+
+    friend class Ensemble;
 };
 
 void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration, double split)
@@ -116,7 +118,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
         std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
         
-        std::cout << "Batch: " << iteration << " Training-error: " << loss->at(0);
+        std::cout << "Batch: " << iteration << "\t Training-error: " << loss->at(0);
 
         GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
         
@@ -132,7 +134,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
         std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
 
-        std::cout << " Validation-error: " << validationLoss->at(0) << std::endl;
+        std::cout << "\t Validation-error: " << validationLoss->at(0) << std::endl;	
 
         
         // early stopping
@@ -155,7 +157,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         }
         else if ( lastImprovement + earlyStoppingIteration <= iteration)
         {
-            std::cout << "Early stopping after " << iteration << " iterations." << std::endl;
+            std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
             std::cout << "Best validation loss: " << bestLoss << std::endl;
             for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
             {
@@ -195,20 +197,35 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
 
     const std::uint32_t dataSamples = inputs[0].size();
 
+    Performance performance = Performance(ErrorRate());
+    performance.__init__({mOutputVariables[0], mTargetVariables[0]}, {});
+
     std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
-    mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[0]));
-    mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[0])); // support multiple inputs and labels in the future
+    for (std::uint32_t i = 0; i < inputs.size(); i++)
+    {
+        mInputVariables[i]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[i]));
+    }
+    for (std::uint32_t i = 0; i < labels.size(); i++)
+    {
+        mTargetVariables[i]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[i]));
+    }
 
     GRAPH->forward(graphInputs); // forward pass
 
-    std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
+    std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
     
-    std::cout << "Test-error: " << loss->at(0) << std::endl;
+    std::cout << "Error metric: " << loss->at(0) << std::endl;
 }
 
-    
+
+// ModelVariant
+
+#include "sequential.hpp"
+
+using ModelVariant = std::variant<SequentialModel>;
+
 
 #endif // MODEL_HPP

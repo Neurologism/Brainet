@@ -8,8 +8,8 @@
 */
 class Softmax : public Operation
 {   
+    bool mUseWithExp = true;
 protected:
-    double activationFunction(double input);
 
     void f(std::vector<std::shared_ptr<Variable>>& inputs) override;
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
@@ -17,14 +17,9 @@ protected:
 public:
     Softmax() { mName = "SOFTMAX"; }
     ~Softmax() = default;
+
+    void useWithLog();
 };
-
-double Softmax::activationFunction(double input)
-{
-    return exp(input);
-}
-
-
 
 void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
@@ -38,22 +33,36 @@ void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
 
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {
-        double _sum = 0;
+        
         double _max = inputs.front()->getData()->at({i, 0}); // normalize the input to avoid overflow / underflow
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
         {
-            _sum += activationFunction(inputs.front()->getData()->at({i, j}));
             if (inputs.front()->getData()->at({i, j}) > _max)
             {
                 _max = inputs.front()->getData()->at({i, j});
             }
         }
 
-
+        
+        double _sum = 0;
         for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
         {
+            _sum += std::exp(inputs.front()->getData()->at({i, j}) - _max);
+        }
 
-            _data->set({i, j}, activationFunction(inputs.front()->getData()->at({i, j}) - _max) / _sum);
+        if (mUseWithExp)
+        {
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+            {
+                _data->set({i, j}, std::exp(inputs.front()->getData()->at({i, j}) - _max) / _sum);
+            }
+        }
+        else
+        {
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)
+            {
+                _data->set({i, j}, inputs[0]->getData()->at({i, j}) - _max - std::log(_sum));
+            }
         }
     }
     this->getVariable()->getData() = _data; // store the result in the variable
@@ -71,25 +80,39 @@ std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Varia
         throw std::invalid_argument("Softmax::bprop: The focus variable is not the input variable.");
     }
 
-    std::shared_ptr<Tensor<double>> _data = this->getVariable()->getData(); // get the data of the variable
-    std::shared_ptr<Tensor<double>> _grad = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape()); // create a new tensor to store the gradient
+    std::shared_ptr<Tensor<double>> data = this->getVariable()->getData(); // get the data of the variable
+    std::shared_ptr<Tensor<double>> grad = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape()); // create a new tensor to store the gradient
 
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {
-        double _sum = 0;
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // precalculate the sum of the gradient
+        if (mUseWithExp)
         {
-            _sum += _data->at({i, j}) * gradient->at({i, j});
-        }
+            double _sum = 0;
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // precalculate the sum of the gradient
+            {
+                _sum += data->at({i, j}) * gradient->at({i, j});
+            }
 
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)  
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++)  
+            {
+                grad->set({i, j}, data->at({i,j}) * ( gradient->at({i,j}) - _sum ));
+            }
+        }
+        else 
         {
-            _sum -= _data->at({i, j}) * gradient->at({i, j});
-            _grad->set({i, j}, _data->at({i,j}) * (1-_data->at({i,j})) * _grad->at({i,j}) - _sum * _data->at({i,j}));
-            _sum += _data->at({i, j}) * gradient->at({i, j});
+            for (std::uint32_t j = 0; j < inputs.front()->getData()->shape()[1]; j++) // simplified version of the gradient 
+            {
+                grad->set({i, j}, std::exp(data->at({i, j})) + gradient->at({i, j}));
+            }
         }
     }
 
-    return _grad; // return the gradient
+    return grad; // return the gradient
 }
+
+void Softmax::useWithLog()
+{
+    mUseWithExp = false;
+}
+
 #endif // SOFTMAX_HPP

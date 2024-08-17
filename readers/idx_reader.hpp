@@ -18,31 +18,46 @@ std::vector<std::vector<double>> read_idx(const std::string path)
 
 
     // to understand the IDX file format see: http://yann.lecun.com/exdb/mnist/
-    char magic[4];
-    file.read(magic, 4);
+
+
+    auto file_iterator = std::istreambuf_iterator<char>(file);
+	auto file_end = std::istreambuf_iterator<char>{};
+
+    std::array<std::byte, 4> magic;
+
+    for (std::uint32_t i = 0; i < 4; i++)
+    {
+        magic[i] = std::byte(*file_iterator++);
+    }
 
     data_type tensor;
 
-    if (magic[2] == 0x08)
+    if ( magic[2] == std::byte(0x08) )
     {
-        size_t dimensions = magic[3];
+        size_t dimensions = (size_t)magic[3];
         std::vector<size_t> shape(dimensions);
         for (std::uint32_t i = 0; i < dimensions; i++)
         {
-            unsigned char dimension[4];
-            file.read((char *)dimension, 4);
-            shape[i] = (size_t)dimension[0] << 24 | (size_t)dimension[1] << 16 | (size_t)dimension[2] << 8 | (size_t)dimension[3];
+            std::array<std::byte, 4> dimension;
+            for (std::uint32_t j = 0; j < 4; j++)
+            {
+                dimension[j] = std::byte(*file_iterator++);
+            }
+            shape[i] = std::to_integer<size_t>(dimension[0]) << 24 | std::to_integer<size_t>(dimension[1]) << 16 | std::to_integer<size_t>(dimension[2]) << 8 | std::to_integer<size_t>(dimension[3]);
         }
-        tensor.resize(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<size_t>())));
+
+        tensor = data_type(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<size_t>()), 0));
+
         for (std::uint32_t i = 0; i < tensor.size(); i++)
         {
-            unsigned char pixel;
-            file.read((char *)&pixel, 1);
+            if (file_iterator == file_end)
+            {
+                throw std::invalid_argument("IDX_READER::read_idx: Unexpected end of file");
+            }
             for (std::uint32_t j = 0; j < tensor[i].size(); j++)
             {
-                unsigned char pixel;
-                file.read((char *)&pixel, 1);
-                tensor[i][j] = (double)pixel;
+                tensor[i][j] = std::to_integer<int>(std::byte(*file_iterator++));
+                
             }
         }
     }
