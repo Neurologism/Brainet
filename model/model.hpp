@@ -68,6 +68,8 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
     }
 
+    Dropout::deactivateAveraging();
+
     const std::uint32_t dataSamples = inputs[0].size();
 
     const std::uint32_t trainingIterations = epochs * dataSamples / batchSize;
@@ -194,6 +196,8 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
     {
         throw std::invalid_argument("Model::test: the size of all inputs and labels must be the same");
     }
+
+    Dropout::activateAveraging();
 
     const std::uint32_t dataSamples = inputs[0].size();
 

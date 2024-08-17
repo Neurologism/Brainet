@@ -13,15 +13,29 @@ class Ensemble : public Model
     std::shared_ptr<EnsembleModule> mEnsembleModule;    // the module that averages the output of the models
 
 public:
+    /**
+     * @brief add an ensemble of models to the graph
+     * @param models the models to add to the ensemble
+     * @param costModule the cost module to use for the ensemble
+     */
     Ensemble(std::vector<ModelVariant> models, const Cost & costModule);
 
     ~Ensemble() = default;
 
+    /**
+     * @brief add a model to the ensemble
+     * @param model the model to add to the ensemble
+     */
     void addModel(ModelVariant model);
 
     // should be supported in the future, need a rewrite of the train function
     void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration = 20, double split = 0.8){};
 
+    /**
+     * @brief function to get the test error of the ensemble
+     * @param input the input data
+     * @param label the label data
+     */
     void test(Vector2D const & input, Vector2D const & label);
 };
 

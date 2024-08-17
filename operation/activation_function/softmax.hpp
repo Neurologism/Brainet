@@ -10,8 +10,18 @@ class Softmax : public Operation
 {   
     bool mUseWithExp = true;
 protected:
-
+    /**
+     * @brief The softmax function.
+     * @param inputs The input values.
+    */
     void f(std::vector<std::shared_ptr<Variable>>& inputs) override;
+    /**
+     * @brief The derivative of the softmax function.
+     * @param inputs The input values.
+     * @param focus The focus tensor
+     * @param gradient The gradient tensor
+     * @return The gradient tensor
+    */
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
 
 public:

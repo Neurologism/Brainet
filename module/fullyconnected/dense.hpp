@@ -40,7 +40,9 @@ public:
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 
     /**
-     * @brief used to initialize the module with the input and output variables.
+     * @brief function to initialize the module
+     * @param initialInpus the initial input variables
+     * @param initialOutputs the initial output variables
      */
     void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
 };
@@ -125,7 +127,7 @@ void Dense::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::v
     }
 
 
-    mpActivationVariable->getConsumers().push_back(initialOutputs[0]);
+    mpDropoutVariable->getConsumers().push_back(initialOutputs[0]);
 }
 
 #endif // DENSE_HPP

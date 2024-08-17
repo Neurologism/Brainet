@@ -31,7 +31,11 @@ public:
 
     ~Input() = default;
 
-    
+    /**
+     * @brief used to initialize the module with the input and output variables.
+     * @param initialInpus the initial input variables
+     * @param initialOutputs the initial output variables
+     */
     void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
 
     /**

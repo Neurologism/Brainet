@@ -28,7 +28,7 @@ std::int32_t main()
         }
     }
 
-    model.train( train_input, train_target, 10, 200, SGD(0.01), 20, 0.995 );
+    model.train( train_input, train_target, 10, 200, SGD(0.1), 20, 0.995 );
 
     model.test(test_input,test_target);
 

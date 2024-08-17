@@ -18,6 +18,8 @@ public:
 
     /**
      * @brief used to initialize the module. This is used to add initial connections to other modules.
+     * @param initialInpus the input variables
+     * @param initialOutputs the output variables
      */
     virtual void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) = 0;
 

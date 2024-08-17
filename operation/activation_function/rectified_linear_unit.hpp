@@ -10,7 +10,16 @@ class ReLU : public ActivationFunction
 {
     double __gradient; // gradient of left part of the function
 
+protected:
+    /**
+     * @brief The ReLU function.
+     * @param input The input value.
+    */
     double activationFunction(double input)override;
+    /**
+     * @brief The derivative of the ReLU function.
+     * @param input The input value.
+    */
     double activationFunctionDerivative(double input)override;
 public:
     ReLU(double gradient = 0);

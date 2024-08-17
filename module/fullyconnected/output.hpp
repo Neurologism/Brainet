@@ -24,6 +24,12 @@ public:
      */
     Output(OutputVariant activationFunction, std::uint32_t units, NormVariant norm);
 
+    /**
+     * @brief add a output layer to the graph
+     * @param activationFunction the operation representing the activation function.
+     * @param units the number of neurons in the layer.
+     * @param costFunction the operation representing the cost function.
+     */
     Output(OutputVariant activationFunction, std::uint32_t units, CostVariant costFunction );
 
     ~Output() = default;

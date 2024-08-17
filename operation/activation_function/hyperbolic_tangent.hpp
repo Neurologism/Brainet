@@ -8,7 +8,15 @@
 */
 class HyperbolicTangent : public ActivationFunction
 {   
+    /**
+     * @brief The hyperbolic tangent function.
+     * @param input The input value.
+     */
     double activationFunction(double input)override;
+    /**
+     * @brief The derivative of the hyperbolic tangent function.
+     * @param input The input value.
+     */
     double activationFunctionDerivative(double input)override;
 public:
     HyperbolicTangent() { mName = "HYPERBOLIC_TANGENT"; };
