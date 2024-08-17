@@ -3,6 +3,7 @@
 
 #include "./module.hpp"
 #include "../operation/processing/noise.hpp"
+#include "../operation/processing/dropout.hpp"
 
 /**
  * @brief this can store the input data of the model. Initalize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.
@@ -12,19 +13,21 @@ class Input : public Module
 {
     std::shared_ptr<Variable> mInputVariable;
     std::shared_ptr<Variable> mNoiseVariable;
+    std::shared_ptr<Variable> mDropoutVariable;
+
 public:
     /**
      * @brief add an input to the graph
      * @param units the respective size of a single input
      */
-    Input(std::uint32_t units);
+    Input(std::uint32_t units, double dropout = 1.0);
     
     /**
      * @brief add an input to the graph with a noise operation
      * @param units the respective size of a single input
      * @param noise the noise operation to add to the input
      */
-    Input(std::uint32_t units, Noise noise);
+    Input(std::uint32_t units, Noise noise, double dropout = 1.0);
 
     ~Input() = default;
 
@@ -36,42 +39,25 @@ public:
      * @param index the index of the variable
      * @return the variable specified by the index
      * @note 0: InputVariable
-     * @note 1: NoiseVariable if added else InputVariable
+     * @note 1: DropoutVariable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;    
 };
 
-Input::Input(std::uint32_t units)
+Input::Input(std::uint32_t units, double dropout)
 {
-    // error checks
-    if(GRAPH == nullptr)
-    {
-        throw std::runtime_error("graph is not set");
-    }
-    
     // create the input variable
     mInputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
     mUnits = units; // set the number of neurons in the layer
 
-    mNoiseVariable = nullptr; // no noise is added
+    // create the dropout variable
+    mDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)), {mInputVariable})));
 }
 
-Input::Input(std::uint32_t units, Noise noise)
+Input::Input(std::uint32_t units, Noise noise, double dropout) : Input(units, dropout)
 {
-    // error checks
-    if(GRAPH == nullptr)
-    {
-        throw std::runtime_error("graph is not set");
-    }
-    
-    // create the input variable
-    mInputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
-    mUnits = units; // set the number of neurons in the layer
-
     // create the noise variable
-    mNoiseVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Noise>(noise), {mInputVariable})));
-    
-    mInputVariable->getConsumers().push_back(mNoiseVariable); // add the noise variable as a consumer of the input variable
+    mNoiseVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Noise>(noise), {mInputVariable}, {mDropoutVariable})));
 }
 
 
@@ -105,14 +91,7 @@ std::shared_ptr<Variable> Input::getVariable(std::uint32_t index)
         return mInputVariable;
         break;
     case 1:
-        if(mNoiseVariable != nullptr)
-        {
-            return mNoiseVariable;
-        }
-        else
-        {
-            return mInputVariable;
-        }
+        return mDropoutVariable;
         break;
     default:
         throw std::runtime_error("index out of bounds");

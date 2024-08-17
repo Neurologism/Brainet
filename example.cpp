@@ -19,7 +19,6 @@ using namespace std;
     - The current Modules are:
         - Input
         - Dense
-        - Cost
     
     - Each Module provides certain configuration options. For example the Dense Module provides the activation function.
     - Those configuration options are basically just functions with a derivative and can be found in the operation folder.
