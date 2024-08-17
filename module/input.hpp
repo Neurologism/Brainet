@@ -51,7 +51,7 @@ Input::Input(std::uint32_t units, double dropout)
     mUnits = units; // set the number of neurons in the layer
 
     // create the dropout variable
-    mDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)), {mInputVariable})));
+    mDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)), {})));
 }
 
 Input::Input(std::uint32_t units, Noise noise, double dropout) : Input(units, dropout)
@@ -75,12 +75,16 @@ void Input::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::
 
     if(mNoiseVariable != nullptr)
     {
-        mNoiseVariable->getConsumers().push_back(initialOutputs[0]);
+        mInputVariable->getConsumers().push_back(mNoiseVariable);
+        mNoiseVariable->getConsumers().push_back(mDropoutVariable);
+        mDropoutVariable->getInputs().push_back(mNoiseVariable);
     }
     else
     {
-        mInputVariable->getConsumers().push_back(initialOutputs[0]);
-    }
+        mInputVariable->getConsumers().push_back(mDropoutVariable);
+        mDropoutVariable->getInputs().push_back(mInputVariable);
+    }   
+    mDropoutVariable->getConsumers().push_back(initialOutputs[0]);
 }
 
 std::shared_ptr<Variable> Input::getVariable(std::uint32_t index)
