@@ -16,9 +16,9 @@ public:
     /**
      * @brief add an ensemble of models to the graph
      * @param models the models to add to the ensemble
-     * @param costModule the cost module to use for the ensemble
+     * @param lossModule the loss module to use
      */
-    Ensemble(std::vector<ModelVariant> models, const Cost & costModule);
+    Ensemble(std::vector<ModelVariant> models, const Loss & lossModule);
 
     ~Ensemble() = default;
 
@@ -39,7 +39,7 @@ public:
     void test(Vector2D const & input, Vector2D const & label);
 };
 
-Ensemble::Ensemble(std::vector<ModelVariant> models, const Cost & costFunction)
+Ensemble::Ensemble(std::vector<ModelVariant> models, const Loss & lossFunction)
 {
     std::vector<std::shared_ptr<Variable>> ensembleInputs;
     for ( std::uint32_t i = 0; i < models.size(); i++)
@@ -56,7 +56,7 @@ Ensemble::Ensemble(std::vector<ModelVariant> models, const Cost & costFunction)
         // mBackpropVariables and mLearnableVariables to support backpropagation
     }
 
-    mEnsembleModule = std::make_shared<EnsembleModule>(EnsembleModule(ensembleInputs, costFunction));
+    mEnsembleModule = std::make_shared<EnsembleModule>(EnsembleModule(ensembleInputs, lossFunction));
 
     mTargetVariables.push_back(mEnsembleModule->getVariable(2));
     mOutputVariables.push_back(mEnsembleModule->getVariable(0));

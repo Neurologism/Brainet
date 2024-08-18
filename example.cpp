@@ -50,7 +50,6 @@ std::int32_t main()
 
     SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),800)}, Output(Softmax(), 10, CrossEntropy()));
 
-    // normalize the data (will write a separate function for this)
     for (std::uint32_t i = 0; i < train_input.size(); i++)
     {
         for (std::uint32_t j = 0; j < train_input[i].size(); j++)
@@ -66,7 +65,7 @@ std::int32_t main()
         }
     }
 
-    model.train( train_input, train_target, 10, 200, SGD(0.01), 20, 0.995 );
+    model.train( train_input, train_target, 10, 200, SGD(0.1), 20, 0.995 );
 
     model.test(test_input,test_target);
 

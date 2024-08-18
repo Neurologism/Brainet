@@ -1,12 +1,12 @@
 #ifndef OUTPUT_HPP
 #define OUTPUT_HPP
 
-#include "./fullyconnected.hpp"	
-#include "../cost.hpp"
+#include "fullyconnected.hpp"	
+#include "../loss.hpp"
 
 class Output : public FullyConnected
 {
-    std::shared_ptr<Cost> mpCost;
+    std::shared_ptr<Loss> mpLoss;
 
 public:
     /**
@@ -22,15 +22,15 @@ public:
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
      */
-    Output(OutputVariant activationFunction, std::uint32_t units, NormVariant norm);
+    Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm);
 
     /**
      * @brief add a output layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
-     * @param costFunction the operation representing the cost function.
+     * @param lossFunction the operation representing the loss function.
      */
-    Output(OutputVariant activationFunction, std::uint32_t units, CostVariant costFunction );
+    Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant lossFunction );
 
     ~Output() = default;
 
@@ -42,8 +42,9 @@ public:
      * @note 1: activation variable
      * @note 2: weight matrix variable
      * @note 3: norm variable
-     * @note 4: cost variable
-     * @note 5: target variable
+     * @note 4: surrogate loss variable
+     * @note 5: loss variable
+     * @note 6: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 
@@ -67,7 +68,7 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units) : FullyCon
     mpMatmulVariable->getConsumers().push_back(mpActivationVariable);    
 }
 
-Output::Output(OutputVariant activationFunction, std::uint32_t units, NormVariant norm) : FullyConnected(units)
+Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm) : FullyConnected(units)
 {
     mpNorm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
@@ -75,21 +76,22 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, NormVarian
     Output(activationFunction, units);
 }
 
-Output::Output(OutputVariant activationFunction, std::uint32_t units, CostVariant costFunction ) : Output(activationFunction, units)
+Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant lossFunction ) : Output(activationFunction, units)
 {
-    mpCost = std::make_shared<Cost>(costFunction);
+    mpLoss = std::make_shared<Loss>(Loss(lossFunction));
 
-    // connect the cost function to the output layer
+    // connect the loss function to the output layer
 
-    mpCost->__init__({mpActivationVariable}, {});
-    mpActivationVariable->getConsumers().push_back(mpCost->getVariable(0));
+    mpLoss->__init__({mpActivationVariable}, {});
+    mpActivationVariable->getConsumers().push_back(mpLoss->getVariable(0)); // surrogate loss
+    mpActivationVariable->getConsumers().push_back(mpLoss->getVariable(1)); // loss
 
     std::shared_ptr<Operation> activation_function = mpActivationVariable->getOperation();
-    std::shared_ptr<Operation> cost_function = mpCost->getVariable(0)->getOperation();
-    if ( dynamic_cast<Softmax*>(activation_function.get()) != nullptr && dynamic_cast<CrossEntropy*>(cost_function.get()) != nullptr) // numerical stability
+    std::shared_ptr<Operation> loss_function = mpLoss->getVariable(0)->getOperation();
+    if ( dynamic_cast<Softmax*>(activation_function.get()) != nullptr && dynamic_cast<CrossEntropy*>(mpLoss->getVariable(0)->getOperation().get()) != nullptr )
     {
         ((Softmax*)activation_function.get())->useWithLog();
-        ((CrossEntropy*)cost_function.get())->useWithExp();
+        ((CrossEntropy*)loss_function.get())->useWithExp();
     }
 
 }
@@ -115,18 +117,25 @@ std::shared_ptr<Variable> Output::getVariable(std::uint32_t index)
             return mpNormVariable;
             break;
         case 4:
-            if (mpCost == nullptr)
+            if (mpLoss == nullptr)
             {
-                throw std::invalid_argument("Output::getVariable: cost variable not initialized");
+                throw std::invalid_argument("Output::getVariable: loss variable not initialized");
             }
-            return mpCost->getVariable(0);
+            return mpLoss->getVariable(0);
             break;
         case 5:
-            if (mpCost == nullptr)
+            if (mpLoss == nullptr)
             {
                 throw std::invalid_argument("Output::getVariable: target variable not initialized");
             }
-            return mpCost->getVariable(2);
+            return mpLoss->getVariable(1);
+            break;
+        case 6:
+            if (mpLoss == nullptr)
+            {
+                throw std::invalid_argument("Output::getVariable: loss variable not initialized");
+            }
+            return mpLoss->getVariable(2);
             break;
         default:
             throw std::invalid_argument("Output::getVariable: invalid index");

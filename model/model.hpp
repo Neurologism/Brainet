@@ -118,9 +118,10 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         GRAPH->forward(graphInputs); // forward pass
 
 
-        std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); // support multiple loss variables in the future
+        std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); 
+        std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
         
-        std::cout << "Batch: " << iteration << "\t Training-error: " << loss->at(0);
+        std::cout << "Iteration: " << iteration << "\t Loss: " << loss->at(0) << "\t Surrogate loss: " << surrogateLoss->at(0);
 
         GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
         
@@ -135,8 +136,9 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         GRAPH->forward(graphInputs); // forward pass
 
         std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
+        std::shared_ptr<Tensor<double>> validationSurrogateLoss = mLossVariables[1]->getData();
 
-        std::cout << "\t Validation-error: " << validationLoss->at(0) << std::endl;	
+        std::cout << "\t Validation loss: " << validationLoss->at(0) << "\t Validation surrogate loss: " << validationSurrogateLoss->at(0) << std::endl;
 
         
         // early stopping
@@ -201,9 +203,6 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
 
     const std::uint32_t dataSamples = inputs[0].size();
 
-    Performance performance = Performance(ErrorRate());
-    performance.__init__({mOutputVariables[0], mTargetVariables[0]}, {});
-
     std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
@@ -220,8 +219,9 @@ void Model::test(std::vector<Vector2D> const & inputs, std::vector<Vector2D> con
     GRAPH->forward(graphInputs); // forward pass
 
     std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
-    
-    std::cout << "Error metric: " << loss->at(0) << std::endl;
+    std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
+
+    std::cout << "Test loss: " << loss->at(0) << "\t Test surrogate loss: " << surrogateLoss->at(0) << std::endl;
 }
 
 

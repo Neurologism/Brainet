@@ -20,7 +20,7 @@ protected:
 
 public:
     Operation() = default;
-    virtual ~Operation() = default;
+    ~Operation() = default;
 
     /**
      * @brief mathematical function the operation implements
