@@ -168,7 +168,7 @@ void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable)
     }
     if (pFocus->getConsumers().empty())
     {
-        throw std::runtime_error("Variable has no consumers"); // for now we do not support variables without consumers that are not already in the gradient table
+        return; // empty consumers -> leaf node (should handle no gradient in backprop)
     }
     if (pFocus->getConsumers().empty())
     {
@@ -194,10 +194,6 @@ void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable)
         if(pGradient == nullptr)
         {
             pGradient = pGradientPart;
-        }
-        else if(pGradient->shape() != pGradientPart->shape())
-        {
-            throw std::runtime_error("Gradient shapes do not match");
         }
         else
         {

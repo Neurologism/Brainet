@@ -70,14 +70,14 @@ Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::
     mParents = parents;
     mChildren = children;
     mpDataTensor = data;
-    // if (op != nullptr)
-    // {
-    //     mOperationName = op->getName();
-    // }
-    // else
-    // {
-    //     mOperationName = "INPUT";
-    // }
+    if (op != nullptr)
+    {
+        mOperationName = op->getName();
+    }
+    else
+    {
+        mOperationName = "INPUT";
+    }
 };
 
 std::shared_ptr<Operation> Variable::getOperation()

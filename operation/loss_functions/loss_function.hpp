@@ -17,8 +17,13 @@ public:
     ~LossFunction() = default;
 
     virtual void f(std::vector<std::shared_ptr<Variable>> &inputs) = 0;
-    virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) = 0;
+    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) override;
 };
+
+std::shared_ptr<Tensor<double>> LossFunction::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient)
+{
+    return std::make_shared<Tensor<double>>(Tensor<double>(focus->getData()->shape(), 0)); // return a tensor with the same shape as the focus variable filled with zeros (this variable has no gradient)
+}
 
 
 // performance function variant

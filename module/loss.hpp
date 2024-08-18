@@ -17,6 +17,8 @@ class Loss : public Module
     std::shared_ptr<Variable> mLossVariable; // storing the loss
     std::shared_ptr<Variable> mSurrogateLossVariable; // storing the surrogate loss
 
+    void createVariables(LossFunctionVariant lossFunction, SurrogateLossFunctionVariant surrogateLossFunction);
+
 public:
     /**
      * @brief add a loss function to the graph
@@ -57,7 +59,7 @@ Loss::Loss(LossFunctionVariant lossFunction)
 {
     if (std::holds_alternative<ErrorRate>(lossFunction)) // Error Rate & Cross Entropy
     {
-        Loss(lossFunction, CrossEntropy());
+        createVariables(lossFunction, CrossEntropy());
     }
     else
     {
@@ -67,6 +69,11 @@ Loss::Loss(LossFunctionVariant lossFunction)
 
 Loss::Loss(LossFunctionVariant lossFunction, SurrogateLossFunctionVariant surrogateLossFunction)
 {
+    createVariables(lossFunction, surrogateLossFunction);
+}
+
+void Loss::createVariables(LossFunctionVariant lossFunction, SurrogateLossFunctionVariant surrogateLossFunction)
+{
     // add variables to the graph
     mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
@@ -74,7 +81,7 @@ Loss::Loss(LossFunctionVariant lossFunction, SurrogateLossFunctionVariant surrog
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, LossFunctionVariant{lossFunction}), {mTargetVariable}, {})));
 
     mSurrogateLossVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, SurrogateLossFunctionVariant{surrogateLossFunction}), {mLossVariable}, {})));
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, SurrogateLossFunctionVariant{surrogateLossFunction}), {mTargetVariable}, {})));
     
     // connections within the module
     mTargetVariable->getConsumers().push_back(mLossVariable);

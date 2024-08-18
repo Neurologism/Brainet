@@ -118,9 +118,10 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
 
     try
     {
-        mTargetVariables.push_back(outputLayer->getVariable(5));        // target
-        mLossVariables.push_back(outputLayer->getVariable(4));          // cost function
-        mBackpropVariables.push_back(outputLayer->getVariable(4));      // cost function
+        mTargetVariables.push_back(outputLayer->getVariable(6));        // target
+        mLossVariables.push_back(outputLayer->getVariable(5));          // loss
+        mLossVariables.push_back(outputLayer->getVariable(4));          // surrogate loss
+        mBackpropVariables.push_back(outputLayer->getVariable(4));      // surrogate loss
     }
     catch(const std::exception& e)
     {

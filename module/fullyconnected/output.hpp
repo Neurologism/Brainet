@@ -42,8 +42,9 @@ public:
      * @note 1: activation variable
      * @note 2: weight matrix variable
      * @note 3: norm variable
-     * @note 4: loss variable
-     * @note 5: target variable
+     * @note 4: surrogate loss variable
+     * @note 5: loss variable
+     * @note 6: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 
@@ -77,7 +78,7 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterN
 
 Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant lossFunction ) : Output(activationFunction, units)
 {
-    mpLoss = std::make_shared<Loss>(lossFunction);
+    mpLoss = std::make_shared<Loss>(Loss(lossFunction));
 
     // connect the loss function to the output layer
 
@@ -126,6 +127,13 @@ std::shared_ptr<Variable> Output::getVariable(std::uint32_t index)
             if (mpLoss == nullptr)
             {
                 throw std::invalid_argument("Output::getVariable: target variable not initialized");
+            }
+            return mpLoss->getVariable(1);
+            break;
+        case 6:
+            if (mpLoss == nullptr)
+            {
+                throw std::invalid_argument("Output::getVariable: loss variable not initialized");
             }
             return mpLoss->getVariable(2);
             break;
