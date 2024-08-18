@@ -3,6 +3,7 @@
 
 #include "./fullyconnected.hpp"	
 #include "../loss.hpp"
+#include "../loss.hpp"
 
 class Output : public FullyConnected
 {
@@ -23,13 +24,15 @@ public:
      * @param norm the norm to use for regularization.
      */
     Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm);
+    Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm);
 
     /**
      * @brief add a output layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
-     * @param costFunction the operation representing the cost function.
+     * @param costFunction the operation representing the loss function.
      */
+    Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction );
     Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction );
 
     ~Output() = default;
@@ -42,7 +45,7 @@ public:
      * @note 1: activation variable
      * @note 2: weight matrix variable
      * @note 3: norm variable
-     * @note 4: cost variable
+     * @note 4: loss variable
      * @note 5: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
@@ -68,6 +71,7 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units) : FullyCon
 }
 
 Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm) : FullyConnected(units)
+Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm) : FullyConnected(units)
 {
     mpNorm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
@@ -76,10 +80,11 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterN
 }
 
 Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction ) : Output(activationFunction, units)
+Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction ) : Output(activationFunction, units)
 {
     mpLoss = std::make_shared<Loss>(costFunction);
 
-    // connect the cost function to the output layer
+    // connect the loss function to the output layer
 
     mpLoss->__init__({mpActivationVariable}, {});
     mpActivationVariable->getConsumers().push_back(mpLoss->getVariable(0)); // surrogate loss
@@ -118,7 +123,7 @@ std::shared_ptr<Variable> Output::getVariable(std::uint32_t index)
         case 4:
             if (mpLoss == nullptr)
             {
-                throw std::invalid_argument("Output::getVariable: cost variable not initialized");
+                throw std::invalid_argument("Output::getVariable: loss variable not initialized");
             }
             return mpLoss->getVariable(0);
             break;

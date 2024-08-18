@@ -6,7 +6,7 @@
 
 
 /**
- * @brief the ensemble module is used to average the output of multiple Variables and apply a cost function to the output.
+ * @brief the ensemble module is used to average the output of multiple Variables and apply a loss function to the output.
  */
 class EnsembleModule : private Module
 {
