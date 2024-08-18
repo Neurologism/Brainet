@@ -3,11 +3,10 @@
 
 #include "module.hpp"
 #include "../operation/processing/average.hpp"
-#include "../operation/cost_function/cost_function.hpp"
 
 
 /**
- * @brief the ensemble module is used to average the output of multiple Variables and apply a cost function to the output.
+ * @brief the ensemble module is used to average the output of multiple Variables and apply a loss function to the output.
  */
 class EnsembleModule : private Module
 {
@@ -21,9 +20,9 @@ public:
     /**
      * @brief constructor for the ensemble module
      * @param inputVariables the variables to average
-     * @param costFunction the cost function to apply to the output
+     * @param costFunction the loss function to apply to the output
      */
-    EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Cost & costFunction);
+    EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Loss & costFunction);
 
     /**
      * @brief destructor for the ensemble module removes the module from the graph
@@ -35,17 +34,17 @@ public:
      * @param index the index of the variable
      * @return the variable specified by the index
      * @note 0: output variable
-     * @note 1: cost variable
+     * @note 1: loss variable
      * @note 2: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 };
 
-EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Cost & costFunction)
+EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Loss & costFunction)
 {
     mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Average>(), inputVariables, {})));
 
-    mCostModule = std::make_shared<Cost>(costFunction);
+    mCostModule = std::make_shared<Loss>(costFunction);
 
     // connections within the module
     mOutputVariable->getConsumers().push_back(mCostModule->getVariable(0));

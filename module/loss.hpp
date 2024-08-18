@@ -44,30 +44,30 @@ public:
     
 };
 
-Loss::Loss(CostVariant lossFunction)
+Loss::Loss(LossFunctionVariant lossFunction)
 {
     // add variables to the graph
     mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
-    mCostVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, CostVariant{lossFunction}), {mTargetVariable}, {})));
+    mLossVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, LossFunctionVariant{lossFunction}), {mTargetVariable}, {})));
     
     // connections within the module
-    mTargetVariable->getConsumers().push_back(mCostVariable);
+    mTargetVariable->getConsumers().push_back(mLossVariable);
 }
 
 void Loss::remove()
 {
     // delete other connections
-    for(auto input : mCostVariable->getInputs())
+    for(auto input : mLossVariable->getInputs())
     {
-        input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mCostVariable));
+        input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mLossVariable));
     }
 
     // delete the variables
     GRAPH->removeVariable(mTargetVariable);
 
-    GRAPH->removeVariable(mCostVariable);
+    GRAPH->removeVariable(mLossVariable);
 }
 
 
@@ -82,7 +82,7 @@ void Loss::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::v
         throw std::invalid_argument("Loss::__init__: the number of output variables must be 0");
     }
 
-    mCostVariable->getInputs().push_back(initialInpus[0]);
+    mLossVariable->getInputs().push_back(initialInpus[0]);
 }
 
 std::shared_ptr<Variable> Loss::getVariable(std::uint32_t index)
@@ -90,7 +90,7 @@ std::shared_ptr<Variable> Loss::getVariable(std::uint32_t index)
     switch (index)
     {
     case 0:
-        return mCostVariable;
+        return mLossVariable;
         break;
     case 2:
         return mTargetVariable;

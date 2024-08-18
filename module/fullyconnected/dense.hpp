@@ -24,7 +24,7 @@ public:
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
      */
-    Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant norm, double dropout = 1.0);
+    Dense(HiddenVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm, double dropout = 1.0);
 
     ~Dense() = default;
 
@@ -65,7 +65,7 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, double dropo
    
 }
 
-Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, NormVariant norm, double dropout) : Dense(activationFunction, units, dropout)
+Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm, double dropout) : Dense(activationFunction, units, dropout)
 {
     mpNorm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*

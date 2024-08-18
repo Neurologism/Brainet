@@ -5,7 +5,7 @@
 #include "../../operation/matmul.hpp"
 #include "../../operation/processing/padding.hpp"
 #include "../../operation/activation_function/activation_function.hpp"
-#include "../../operation/norm/norm.hpp"
+#include "../../operation/parameter_norm_penalties/parameter_norm_penalty.hpp"
 
 /**
  * @brief the fully connected module is intended for creating a fully connected layer without activation function in the graph. It's the base class for the dense and output modules.
@@ -20,7 +20,7 @@ protected:
     std::shared_ptr<Variable> mpPaddingVariable; // used to pad the input with 1s for the bias
     std::shared_ptr<Variable> mpNormVariable; // used to compute a norm of the weights
 
-    static std::shared_ptr<NormVariant> mpsDefaultNorm; // default norm to use
+    static std::shared_ptr<ParameterNormPenaltyVariant> mpsDefaultNorm; // default norm to use
     std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization
 
 public:
@@ -40,9 +40,9 @@ public:
      * @brief set the default norm to use for regularization. Layers are initialized with this norm, if no other norm is specified.
      * @param norm the norm to use
      */
-    static void setDefaultNorm(NormVariant const & norm)
+    static void setDefaultNorm(ParameterNormPenaltyVariant const & norm)
     {
-        mpsDefaultNorm = std::make_shared<NormVariant>(norm);
+        mpsDefaultNorm = std::make_shared<ParameterNormPenaltyVariant>(norm);
     }
 
 };
@@ -85,6 +85,6 @@ void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
 }
 
 
-std::shared_ptr<NormVariant> FullyConnected::mpsDefaultNorm = nullptr;
+std::shared_ptr<ParameterNormPenaltyVariant> FullyConnected::mpsDefaultNorm = nullptr;
 
 #endif // FULLYCONNECTED_HPP

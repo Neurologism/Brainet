@@ -11,7 +11,7 @@ std::int32_t main()
     dataType test_input = read_idx("datasets/mnist/t10k-images.idx3-ubyte");
     dataType test_target = read_idx("datasets/mnist/t10k-labels.idx1-ubyte");
 
-    SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),800)}, Output(Softmax(), 10, CrossEntropy()));
+    SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),800)}, Output(Softmax(), 10, ErrorRate()));
 
     for (std::uint32_t i = 0; i < train_input.size(); i++)
     {
