@@ -1,5 +1,5 @@
-#ifndef COST_HPP
-#define COST_HPP
+#ifndef LOSS_HPP
+#define LOSS_HPP
 
 #include "../dependencies.hpp"
 #include "module.hpp"
@@ -21,10 +21,18 @@ public:
     /**
      * @brief add a loss function to the graph
      * @param lossFunction the operation representing the loss function.
+     * @note the surrogate loss function will be determined automatically
      */
     Loss(LossFunctionVariant lossFunction);
 
-    void remove();
+    /**
+     * @brief add a loss function to the graph
+     * @param lossFunction the operation representing the loss function.
+     * @param surrogateLossFunction the operation representing the surrogate loss function.
+     */
+    Loss(LossFunctionVariant lossFunction, SurrogateLossFunctionVariant surrogateLossFunction);
+
+    // void remove();
 
     /**
      * @brief used to initialize the module with the input and output variables.
@@ -37,7 +45,8 @@ public:
      * @brief function to get access to specific variables of the module.
      * @param index the index of the variable
      * @return the variable specified by the index
-     * @note 0: loss variable
+     * @note 0: surrogate loss variable
+     * @note 1: loss variable
      * @note 2: target variable
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
@@ -46,29 +55,45 @@ public:
 
 Loss::Loss(LossFunctionVariant lossFunction)
 {
+    if (std::holds_alternative<ErrorRate>(lossFunction)) // Error Rate & Cross Entropy
+    {
+        Loss(lossFunction, CrossEntropy());
+    }
+    else
+    {
+        throw std::invalid_argument("Loss::Loss: the loss function has no default surrogate loss function");
+    }
+}
+
+Loss::Loss(LossFunctionVariant lossFunction, SurrogateLossFunctionVariant surrogateLossFunction)
+{
     // add variables to the graph
     mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     mLossVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, LossFunctionVariant{lossFunction}), {mTargetVariable}, {})));
+
+    mSurrogateLossVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([](auto&& arg) {
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, SurrogateLossFunctionVariant{surrogateLossFunction}), {mLossVariable}, {})));
     
     // connections within the module
     mTargetVariable->getConsumers().push_back(mLossVariable);
+    mTargetVariable->getConsumers().push_back(mSurrogateLossVariable);
 }
 
-void Loss::remove()
-{
-    // delete other connections
-    for(auto input : mLossVariable->getInputs())
-    {
-        input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mLossVariable));
-    }
+// void Loss::remove()
+// {
+//     // delete other connections
+//     for(auto input : mCostVariable->getInputs())
+//     {
+//         input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mCostVariable));
+//     }
 
-    // delete the variables
-    GRAPH->removeVariable(mTargetVariable);
+//     // delete the variables
+//     GRAPH->removeVariable(mTargetVariable);
 
-    GRAPH->removeVariable(mLossVariable);
-}
+//     GRAPH->removeVariable(mCostVariable);
+// }
 
 
 void Loss::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs )
@@ -83,6 +108,7 @@ void Loss::__init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::v
     }
 
     mLossVariable->getInputs().push_back(initialInpus[0]);
+    mSurrogateLossVariable->getInputs().push_back(initialInpus[0]);
 }
 
 std::shared_ptr<Variable> Loss::getVariable(std::uint32_t index)
@@ -90,6 +116,9 @@ std::shared_ptr<Variable> Loss::getVariable(std::uint32_t index)
     switch (index)
     {
     case 0:
+        return mSurrogateLossVariable;
+        break;
+    case 1:
         return mLossVariable;
         break;
     case 2:
@@ -103,4 +132,4 @@ std::shared_ptr<Variable> Loss::getVariable(std::uint32_t index)
 
 
 
-#endif // COST_HPP
+#endif // LOSS_HPP
