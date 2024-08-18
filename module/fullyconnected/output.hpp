@@ -24,7 +24,6 @@ public:
      * @param norm the norm to use for regularization.
      */
     Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm);
-    Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm);
 
     /**
      * @brief add a output layer to the graph
@@ -32,7 +31,6 @@ public:
      * @param units the number of neurons in the layer.
      * @param costFunction the operation representing the loss function.
      */
-    Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction );
     Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction );
 
     ~Output() = default;
@@ -71,7 +69,6 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units) : FullyCon
 }
 
 Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm) : FullyConnected(units)
-Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm) : FullyConnected(units)
 {
     mpNorm = std::visit([](auto&& arg) {
         // Assuming all types in the variant can be dynamically casted to Operation*
@@ -79,7 +76,6 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterN
     Output(activationFunction, units);
 }
 
-Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction ) : Output(activationFunction, units)
 Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction ) : Output(activationFunction, units)
 {
     mpLoss = std::make_shared<Loss>(costFunction);

@@ -45,7 +45,7 @@ EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVaria
 {
     mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Average>(), inputVariables, {})));
 
-    mLossModule = std::make_shared<Module>(lossModule);
+    mLossModule = std::make_shared<Loss>(lossModule);
 
     // connections within the module
     mOutputVariable->getConsumers().push_back(mLossModule->getVariable(0)); // surrogate loss
