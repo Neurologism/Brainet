@@ -1,20 +1,20 @@
-#ifndef L1_HPP
-#define L1_HPP
+#ifndef L1_NORM_HPP
+#define L1_NORM_HPP
 
-#include "norm.hpp"
+#include "parameter_norm_penalty.hpp"
 
 /**
  * @brief Used to add a L1 norm penalty to a weight matrix. This is used to prevent overfitting.
  */
-class L1 : public Norm
+class L1Norm : public ParameterNormPenalty
 {
 public:
     /**
     * @brief add a L1 norm penalty to the graph
     * @param lambda the lambda value to be used
     */
-    L1(double lambda) : Norm(lambda) { mName = "L1"; };
-    ~L1() = default;
+    L1Norm(double lambda) : ParameterNormPenalty(lambda) { mName = "L1Norm"; };
+    ~L1Norm() = default;
     /**
     * @brief compute the L1 norm of the input tensor
     */
@@ -28,11 +28,11 @@ public:
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
 };
 
-void L1::f(std::vector<std::shared_ptr<Variable>>& inputs)
+void L1Norm::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
     if (inputs.size() != 1)
     {
-        throw std::runtime_error("L1: number of inputs is not 1");
+        throw std::runtime_error("L1Norm: number of inputs is not 1");
     }
 
     auto input = inputs[0]->getData();
@@ -53,15 +53,15 @@ void L1::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = result;
 }
 
-std::shared_ptr<Tensor<double>> L1::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor<double>> L1Norm::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
     if (inputs.size() != 1)
     {
-        throw std::runtime_error("L1: number of inputs is not 1");
+        throw std::runtime_error("L1Norm: number of inputs is not 1");
     }
     if (gradient->shape() != std::vector<size_t>({1}))
     {
-        throw std::runtime_error("L1: gradient shape is not 1");
+        throw std::runtime_error("L1Norm: gradient shape is not 1");
     }
 
     auto input = inputs[0]->getData();
@@ -92,4 +92,4 @@ std::shared_ptr<Tensor<double>> L1::bprop(std::vector<std::shared_ptr<Variable>>
     return result;
 }
 
-#endif // L1_HPP
+#endif // L1_NORM_HPP

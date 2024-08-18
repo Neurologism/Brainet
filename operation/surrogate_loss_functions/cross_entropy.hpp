@@ -1,7 +1,7 @@
 #ifndef CROSS_ENTROPY_HPP
 #define CROSS_ENTROPY_HPP
 
-#include "cost_function.hpp"
+#include "../operation.hpp"
 
 /**
  * @brief The CrossEntropy class is a cost function that is used to train a model using the negative log likelyhood.

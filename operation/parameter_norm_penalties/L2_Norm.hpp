@@ -1,19 +1,19 @@
-#ifndef L2_HPP
-#define L2_HPP
+#ifndef L2_NORM_HPP
+#define L2_NORM_HPP
 
-#include "norm.hpp"
+#include "parameter_norm_penalty.hpp"
 
 /**
  * @brief Used to add a L2 norm penalty to a weight matrix. This is used to prevent overfitting.
  */
-class L2 : public Norm
+class L2Norm : public ParameterNormPenalty
 {
 public:
     /**
      * @brief add a L2 norm penalty to the graph
      * @param lambda the lambda value to be used
      */
-    L2(double lambda) : Norm(lambda) {mName = "L2";};
+    L2Norm(double lambda) : ParameterNormPenalty(lambda) { mName = "L2Norm"; };
     /**
      * @brief compute the L2 norm of the input tensor
     */
@@ -27,11 +27,11 @@ public:
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
 };
 
-void L2::f(std::vector<std::shared_ptr<Variable>>& inputs)
+void L2Norm::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
     if (inputs.size() != 1)
     {
-        throw std::runtime_error("L2: number of inputs is not 1");
+        throw std::runtime_error("L2Norm: number of inputs is not 1");
     }
 
     auto input = inputs[0]->getData();
@@ -53,15 +53,15 @@ void L2::f(std::vector<std::shared_ptr<Variable>>& inputs)
 }
 
 
-std::shared_ptr<Tensor<double>> L2::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor<double>> L2Norm::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
     if (inputs.size() != 1)
     {
-        throw std::runtime_error("L2: number of inputs is not 1");
+        throw std::runtime_error("L2Norm: number of inputs is not 1");
     }
     if (gradient->shape() != std::vector<size_t>({1}))
     {
-        throw std::runtime_error("L2: gradient shape is not {1}");
+        throw std::runtime_error("L2Norm: gradient shape is not {1}");
     }
 
     auto input = inputs[0]->getData();
@@ -82,4 +82,4 @@ std::shared_ptr<Tensor<double>> L2::bprop(std::vector<std::shared_ptr<Variable>>
     return result;
 }
 
-#endif // L2_HPP
+#endif // L2_NORM_HPP

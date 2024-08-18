@@ -1,12 +1,12 @@
 #ifndef ERROR_RATE_HPP
 #define ERROR_RATE_HPP
 
-#include "performance_function.hpp"
+#include "loss_function.hpp" 
 
 /**
  * @brief the error rate operation is used to calculate the error rate of the model.
  */
-class ErrorRate : public PerformanceFunction
+class ErrorRate : public LossFunction
 {
 public:
     /**
