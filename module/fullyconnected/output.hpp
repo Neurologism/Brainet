@@ -1,8 +1,7 @@
 #ifndef OUTPUT_HPP
 #define OUTPUT_HPP
 
-#include "./fullyconnected.hpp"	
-#include "../loss.hpp"
+#include "fullyconnected.hpp"	
 #include "../loss.hpp"
 
 class Output : public FullyConnected
@@ -29,9 +28,9 @@ public:
      * @brief add a output layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
-     * @param costFunction the operation representing the loss function.
+     * @param lossFunction the operation representing the loss function.
      */
-    Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction );
+    Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant lossFunction );
 
     ~Output() = default;
 
@@ -76,9 +75,9 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, ParameterN
     Output(activationFunction, units);
 }
 
-Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant costFunction ) : Output(activationFunction, units)
+Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFunctionVariant lossFunction ) : Output(activationFunction, units)
 {
-    mpLoss = std::make_shared<Loss>(costFunction);
+    mpLoss = std::make_shared<Loss>(lossFunction);
 
     // connect the loss function to the output layer
 
@@ -87,11 +86,11 @@ Output::Output(OutputVariant activationFunction, std::uint32_t units, LossFuncti
     mpActivationVariable->getConsumers().push_back(mpLoss->getVariable(1)); // loss
 
     std::shared_ptr<Operation> activation_function = mpActivationVariable->getOperation();
-    std::shared_ptr<Operation> cost_function = mpLoss->getVariable(0)->getOperation();
-    if ( dynamic_cast<Softmax*>(activation_function.get()) != nullptr && dynamic_cast<CrossEntropy*>(cost_function.get()) != nullptr) // numerical stability
+    std::shared_ptr<Operation> loss_function = mpLoss->getVariable(0)->getOperation();
+    if ( dynamic_cast<Softmax*>(activation_function.get()) != nullptr && dynamic_cast<CrossEntropy*>(mpLoss->getVariable(0)->getOperation().get()) != nullptr )
     {
         ((Softmax*)activation_function.get())->useWithLog();
-        ((CrossEntropy*)cost_function.get())->useWithExp();
+        ((CrossEntropy*)loss_function.get())->useWithExp();
     }
 
 }

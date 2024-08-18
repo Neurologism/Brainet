@@ -2,6 +2,7 @@
 #define SURROGATE_LOSS_FUNCTION_HPP
 
 
+
 #include "mse.hpp" // variant for all cost functions
 #include "cross_entropy.hpp"
 
