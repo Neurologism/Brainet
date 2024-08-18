@@ -3,6 +3,7 @@
 
 #include "../operation.hpp"
 
+
 /**
  * @brief the performance class is used to evaluate the performance of the model.
  */
@@ -15,20 +16,12 @@ public:
     LossFunction() { mName = "PERFORMANCE"; };
     ~LossFunction() = default;
 
-    /**
-     * @brief backward pass is not supported for loss functions
-     */
-    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) override;
+    virtual void f(std::vector<std::shared_ptr<Variable>> &inputs) = 0;
+    virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) = 0;
 };
-
-std::shared_ptr<Tensor<double>> LossFunction::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient)
-{
-    throw std::runtime_error("LossFunction: performance metrics should not be used for backpropagation");
-}
 
 
 // performance function variant
-
 #include "error_rate.hpp"
 
 using LossFunctionVariant = std::variant<ErrorRate>;

@@ -21,6 +21,11 @@ public:
      * @note The first input tensor is the prediction and the second input tensor is the target.
      */
     void f(std::vector<std::shared_ptr<Variable>> &inputs) override;
+
+    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) override
+    {
+        throw std::runtime_error("ErrorRate: performance metrics should not be used for backpropagation");
+    }
 };
 
 void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
@@ -68,7 +73,7 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
     // {
     //     std::cout << "Digit " << i << " Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
     // }
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[0]->getData()->shape(0)));
+
 }
 
 #endif // ERROR_RATE_HPP
