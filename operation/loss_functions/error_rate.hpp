@@ -63,11 +63,12 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
         target[inputs[1]->getData()->at({i})]++;
 
     }
-    std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0)*100 << "%" << std::endl;
-    for (std::uint32_t i = 0; i < 10; i++)
-    {
-        std::cout << "Digit " << i << " Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
-    }
+    // std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0)*100 << "%" << std::endl;
+    // for (std::uint32_t i = 0; i < 10; i++)
+    // {
+    //     std::cout << "Digit " << i << " Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
+    // }
+    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[0]->getData()->shape(0)));
 }
 
 #endif // ERROR_RATE_HPP

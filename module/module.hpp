@@ -47,10 +47,9 @@ public:
 // code of all child classes
 #include "input.hpp"
 #include "fullyconnected/dense.hpp"
-#include "cost.hpp"
+#include "loss.hpp"
 #include "fullyconnected/output.hpp"
 #include "ensemble_module.hpp"
-#include "performance.hpp"
 
 using ModuleVariant = std::variant<Dense>;
 
