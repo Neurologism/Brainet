@@ -117,11 +117,11 @@ std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<
         {
             if (mUseWithLog)
             {
-                _gradient->set({i, j}, -1 / inputs[1]->getData()->at({i, j}) * (j == (std::uint32_t)inputs[0]->getData()->at({i})));
+                _gradient->set({i, j}, -1 / inputs[1]->getData()->at({i, j}) * (j == (std::uint32_t)inputs[0]->getData()->at({i})) / inputs[1]->getData()->shape(0));
             }
             else
             {
-                _gradient->set({i, j}, -1*(j == (std::uint32_t)inputs[0]->getData()->at({i})));
+                _gradient->set({i, j}, -1*(j == (std::uint32_t)inputs[0]->getData()->at({i})) / inputs[1]->getData()->shape(0));
             }
         }
     }

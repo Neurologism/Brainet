@@ -126,7 +126,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
         
         std::visit([&](auto&& arg) {
-            arg.update(mLearnableVariables, batchSize); }, optimizer); // update weights
+            arg.update(mLearnableVariables); }, optimizer); // update weights
 
 
         // validation

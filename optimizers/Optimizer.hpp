@@ -13,7 +13,7 @@ public:
     Optimizer() = default;
     virtual ~Optimizer() = default;
 
-    virtual void update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters, std::uint32_t batchSize) = 0;
+    virtual void update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) = 0;
 };
 
 
