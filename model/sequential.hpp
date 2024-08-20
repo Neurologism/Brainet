@@ -137,9 +137,9 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     }
 }
 
-void SequentialModel::train(Vector2D const & input, Vector2D const & label, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping, double split)
+void SequentialModel::train(Vector2D const & design_matrix, Vector2D const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping, double split)
 {
-    Model::train({input}, {label}, epochs, batchSize, optimizer, earlyStopping, split);
+    Model::train({design_matrix}, {labels}, epochs, batchSize, optimizer, earlyStopping, split);
 }
 
 void SequentialModel::test(Vector2D const & data, Vector2D const & label)
