@@ -6,7 +6,7 @@
 
 /**
  * @brief Matmul class used to perform the dot product of two matrices. This is usually a bottleneck in neural networks. 
- * Expecting to replace this with a more efficient implementation in the future. Credits to @s1m-ba for the implementation.
+ * Expecting to replace this with a more efficient CUDA implementation in the future.
 */
 class Matmul : public Operation
 {   

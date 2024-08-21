@@ -6,8 +6,7 @@
 #include "../graph.hpp"
 
 /**
- * @brief The Module class can be used to group multiple variables together. This is useful for adding substructures to the graph. It is mainly used to add something similar to layers to the graph.
- * It is intended that all loss functions add their variables to the graph in the constructor. 
+ * @brief The Module class can be used to group multiple variables together. This is useful for creating structures of variables with associated operations. 
  */
 class Module
 {

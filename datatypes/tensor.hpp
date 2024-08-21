@@ -96,6 +96,34 @@ public:
     void subtract(const size_t &index, const T &value);
 
     /**
+     * @brief This function is used to multiply a value with the tensor. To do so it uses a vector of indices.
+     * @param index The indices of the element.
+     * @param value The value to be multiplied.
+     */
+    void multiply(const ShapeVector &index, const T &value);
+
+    /**
+     * @brief This function is used to multiply a value with the tensor with a single index.
+     * @param index The index of the element.
+     * @param value The value to be multiplied.
+     */
+    void multiply(const size_t &index, const T &value);
+
+    /**
+     * @brief This function is used to divide the tensor by a value. To do so it uses a vector of indices.
+     * @param index The indices of the element.
+     * @param value The value to be divided by.
+     */
+    void divide(const ShapeVector &index, const T &value);
+
+    /**
+     * @brief This function is used to divide the tensor by a value with a single index.
+     * @param index The index of the element.
+     * @param value The value to be divided by.
+     */
+    void divide(const size_t &index, const T &value);
+
+    /**
      * @brief This function returns the shape of the tensor.
      * @return The shape of the tensor.
      */
@@ -224,6 +252,34 @@ void Tensor<T>::subtract(const size_t &index, const T &value)
     if (index >= mData.size())
         throw std::out_of_range("Index out of range");
     mData[index] -= value;
+}
+
+template <class T>
+void Tensor<T>::multiply(const ShapeVector &index, const T &value)
+{
+    mData[calculateIndex(index)] *= value;
+}
+
+template <class T>
+void Tensor<T>::multiply(const size_t &index, const T &value)
+{
+    if (index >= mData.size())
+        throw std::out_of_range("Index out of range");
+    mData[index] *= value;
+}
+
+template <class T>
+void Tensor<T>::divide(const ShapeVector &index, const T &value)
+{
+    mData[calculateIndex(index)] /= value;
+}
+
+template <class T>
+void Tensor<T>::divide(const size_t &index, const T &value)
+{
+    if (index >= mData.size())
+        throw std::out_of_range("Index out of range");
+    mData[index] /= value;
 }
 
 template <class T>

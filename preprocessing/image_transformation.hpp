@@ -78,4 +78,57 @@ public:
      */
 };
 
+std::vector<std::vector<double>> ImageTransformation::randomTransform(const data_type & input)
+{
+    std::vector<std::vector<double>> output = input;
+    output = randomRotation(output);
+    output = randomTranslation(output);
+    output = randomScaling(output);
+    output = randomShear(output);
+    output = randomFlip(output);
+    output = randomNoise(output);
+    output = randomBlur(output);
+    output = randomSharpen(output);
+    output = randomContrast(output);
+    return output;
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomRotation(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomTranslation(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomScaling(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomShear(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomFlip(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomNoise(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomBlur(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomSharpen(const data_type & input)
+{
+}
+
+std::vector<std::vector<double>> ImageTransformation::randomContrast(const data_type & input)
+{
+}
+
+
+
 #endif // IMAGETRANSFORMATION_HPP

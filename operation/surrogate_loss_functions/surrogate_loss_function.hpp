@@ -4,6 +4,7 @@
 
 
 #include "mse.hpp" // variant for all cost functions
+#include "mean_absolute_error.hpp"
 #include "cross_entropy.hpp"
 
 using SurrogateLossFunctionVariant = std::variant<MSE, CrossEntropy>;
