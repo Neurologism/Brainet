@@ -16,14 +16,29 @@ class SGD : public Optimizer
     double mIteration = 0;
 
 public:
-    SGD(double initialLearningRate, double finalLearningRate, double lastDecay);
-    SGD(double initialLearningRate, double lastDecay);
+    /**
+     * @brief Constructs a new SGD object.
+     * @param initialLearningRate The initial learning rate.
+     * @param finalLearningRate The final learning rate.
+     * @param lastDecay The number of iterations after which the learning rate will be the final learning rate.
+     */
+    SGD(double initialLearningRate, double finalLearningRate, std::uint32_t lastDecay);
+    /**
+     * @brief Constructs a new SGD object.
+     * @param initialLearningRate The initial learning rate.
+     * @param lastDecay The number of iterations after which the learning rate will be the final learning rate.
+     */
+    SGD(double initialLearningRate, std::uint32_t lastDecay);
     ~SGD() = default;
 
+    /**
+     * @brief Updates the learnable parameters using the stochastic gradient descent algorithm.
+     * @param rLearnableParameters The learnable parameters.
+     */
     void update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
 };
 
-SGD::SGD(double initialLearningRate, double finalLearningRate, double lastDecay) : mInitialLearningRate(initialLearningRate), mFinalLearningRate(finalLearningRate), mLastDecay(lastDecay)
+SGD::SGD(double initialLearningRate, double finalLearningRate, std::uint32_t lastDecay) : mInitialLearningRate(initialLearningRate), mFinalLearningRate(finalLearningRate), mLastDecay(lastDecay)
 {
     if(mInitialLearningRate <= 0 || mFinalLearningRate <= 0 || mLastDecay <= 0)
     {
@@ -35,7 +50,7 @@ SGD::SGD(double initialLearningRate, double finalLearningRate, double lastDecay)
     }
 }
 
-SGD::SGD(double initialLearningRate, double lastDecay) : SGD(initialLearningRate, initialLearningRate / 100, lastDecay)
+SGD::SGD(double initialLearningRate, std::uint32_t lastDecay) : SGD(initialLearningRate, initialLearningRate / 100, lastDecay)
 {
 }
 
