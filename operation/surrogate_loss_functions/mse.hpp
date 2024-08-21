@@ -77,7 +77,7 @@ std::shared_ptr<Tensor<double>> MSE::bprop(std::vector<std::shared_ptr<Variable>
     
     for(std::uint32_t i = 0; i < inputs[0]->getData()->capacity(); i++)
     {
-        _gradient->set(i, -(inputs[0]->getData()->at(i) - inputs[1]->getData()->at(i)) / inputs[0]->getData()->capacity()); // only divide by the size of 1 training example
+        _gradient->set(i, -(inputs[0]->getData()->at(i) - inputs[1]->getData()->at(i)) / inputs[0]->getData()->shape(1)); // only divide by the size of 1 training example
     }
 
     return _gradient;

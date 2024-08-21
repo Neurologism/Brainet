@@ -124,6 +124,15 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
         std::cout << "Iteration: " << iteration << "\t Loss: " << loss->at(0) << "\t Surrogate loss: " << surrogateLoss->at(0);
 
         GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
+
+        for(std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
+        {
+            std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(mLearnableVariables[i]);
+            for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
+            {
+                gradient->divide(j, batchSize);
+            }
+        }
         
         std::visit([&](auto&& arg) {
             arg.update(mLearnableVariables); }, optimizer); // update weights

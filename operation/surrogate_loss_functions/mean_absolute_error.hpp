@@ -78,11 +78,11 @@ std::shared_ptr<Tensor<double>> MeanAbsoluteError::bprop(std::vector<std::shared
     {
         if(inputs[0]->getData()->at(i) > inputs[1]->getData()->at(i))
         {
-            result->set(i, -gradient->at(0)/inputs[0]->getData()->capacity());
+            result->set(i, -gradient->at(0)/inputs[0]->getData()->shape(1));
         }
         else if(inputs[0]->getData()->at(i) < inputs[1]->getData()->at(i))
         {
-            result->set(i, gradient->at(0)/inputs[0]->getData()->capacity());
+            result->set(i, gradient->at(0)/inputs[0]->getData()->shape(1));
         }
         else
         {
