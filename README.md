@@ -1,11 +1,11 @@
 ﻿
 # Brainet
 
-Brainet is a Deep Learning Framework build within C++ and CUDA without use of external libraries.
-The vision of Brainet is to provide a transparent framework that allows full understanding of the underlying mechanisms of Deep Learning. Most of the current 
-Frameworks like TensorFlow, PyTorch or Caffe have a high level of abstraction that feels like a black box. Brainet isn't competing with these frameworks regarding performance, but rather aims to explain how everything works under the hood.
+Brainet is a Deep Learning Engine build within C++ and CUDA without use of external libraries.
+The vision of Brainet is to provide a transparent Framework that allows full understanding of the underlying mechanisms of Deep Learning. Most of the current 
+alternatives like TensorFlow, PyTorch or Caffe have a high level of abstraction that feels like a black box. Brainet isn't competing with these frameworks regarding performance, but rather aims to explain how everything works under the hood.
 To reach this goal Brainet relies on a simple codebase that is well documented. Additionally there will be a small book that 
-explains the design choices and the mechanisms of Brainet and deep learning frameworks in general.
+explains the design choices and the mechanisms of Brainet and deep learning in general.
 
 However, please note that the Project is still in a very early stage of development. So the codebase might be hard to understand and the supporting book isn't yet written. However I'm working on it and happy to provide you with explanations 
 how everything works, if you dare to reach out to me. :)
