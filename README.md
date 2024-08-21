@@ -1,8 +1,8 @@
 ﻿
 # Brainet
 
-Brainet is a Deep Learning Engine build within C++ and CUDA without use of external libraries.
-The vision of Brainet is to provide a transparent Framework that allows full understanding of the underlying mechanisms of Deep Learning. Most of the current 
+Brainet is a Deep Learning engine built within C++ and CUDA without use of external libraries.
+The goal is to provide a transparent framework that allows full understanding of the underlying mechanisms. Most of the current 
 alternatives like TensorFlow, PyTorch or Caffe have a high level of abstraction that feels like a black box. Brainet isn't competing with these frameworks regarding performance, but rather aims to explain how everything works under the hood.
 To reach this goal Brainet relies on a simple codebase that is well documented. Additionally there will be a small book that 
 explains the design choices and the mechanisms of Brainet and deep learning in general.
@@ -45,7 +45,7 @@ An example of how to train a 2-layer Neural Network on the MNIST dataset can be 
 
 To compile the example file run the following command in your terminal:
 ```bash
-g++ -o example example.cpp -std=c++17 -O3 -lcudart -lcublas -lcurand
+g++ -o example example.cpp -std=c++17 -O3
 ```
 
 To run the compiled file, run the following command in your terminal:
