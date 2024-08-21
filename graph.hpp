@@ -6,7 +6,7 @@
 #include "operation/operation.hpp"
 
 /**
- * @brief The graph class is a implementation of a computational graph. It is used to store the variables and operations and to execute the forward and backward pass.
+ * @brief The graph class is an implementation of a computational graph. It is used to store the variables and operations and to execute the forward and backward pass.
  */
 class Graph 
 {

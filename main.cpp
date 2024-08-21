@@ -1,7 +1,9 @@
 #pragma GCC optimize("O3")
 #include "brainet.hpp"
 
-
+/**
+ * file used for testing purposes
+ */
 std::int32_t main()
 {
     typedef std::vector<std::vector<double>> dataType;
@@ -13,20 +15,8 @@ std::int32_t main()
 
     SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),100)}, Output(Softmax(), 10, ErrorRate()));
 
-    for (std::uint32_t i = 0; i < train_input.size(); i++)
-    {
-        for (std::uint32_t j = 0; j < train_input[i].size(); j++)
-        {
-            train_input[i][j] /= 255;
-        }
-    }
-    for (std::uint32_t i = 0; i < test_input.size(); i++)
-    {
-        for (std::uint32_t j = 0; j < test_input[i].size(); j++)
-        {
-            test_input[i][j] /= 255;
-        }
-    }
+    preprocessing::normalize(train_input);
+    preprocessing::normalize(test_input);
 
     model.train( train_input, train_target, 10, 100, SGD(0.1,500), 20, 0.998 );
 

@@ -7,6 +7,13 @@
 #include "../optimizers/optimizer.hpp"
 #include "../preprocessing/split.hpp"
 
+/**
+ * @brief The Model class is intended to be used as a base class for all models.
+ * @details The Model class provides the basic functionality to train and test a model.
+ * It is intended to be extended by different model classes like SequentialModel or Ensemble that 
+ * provide simple interfaces to create and train models and offer a constructor to create the model.
+ * @note The Model class is abstract and cannot be instantiated.
+ */
 class Model
 {
 protected:

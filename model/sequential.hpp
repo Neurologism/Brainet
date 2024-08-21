@@ -4,7 +4,7 @@
 #include "model.hpp"
 
 /**
- * @brief the sequential model is intended for creating a sequential neural network. It's a container for the hiddenModules.
+ * @brief the sequential model is intended for creating a sequential neural network. It is a subclass of the Model class.
 */
 class SequentialModel : public Model
 {
@@ -19,7 +19,7 @@ protected:
 
 public:
     /**
-     * @brief add a sequential model of a neural network to the graph.
+     * @brief create a new sequential neural network model
      * @param input_layer the input layer of the model.
      * @param hidden_layers the hidden layers of the model.
      * @param output_layer the output layer of the model.

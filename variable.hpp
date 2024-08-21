@@ -9,7 +9,7 @@
 class Operation;
 
 /**
- * @brief The variable class is a implementation of a variable in a computational graph. It is used to store the data and owns a pointer to the operation that calculates the data.
+ * @brief The variable class is a implementation of a variable in a computational graph. It is used to store data and owns a pointer to the operation that calculates the data.
  */
 class Variable
 {

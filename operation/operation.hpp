@@ -9,7 +9,7 @@
 class Variable;
 
 /**
- * @brief Operation class is a wrapper class for the mathematical operations that are performed on the variables.
+ * @brief Operation class is a wrapper class for the mathematical operations that are performed to calculate the tensor value of a variable.
  */
 class Operation
 {

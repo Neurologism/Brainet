@@ -8,6 +8,8 @@
 #include "preprocessing/split.hpp"
 #include "model/model.hpp"
 #include "model/ensemble.hpp"
+#include "model/sequential.hpp"
+#include "preprocessing/normalize.hpp"
 
 
 #endif // BRAINET_HPP
