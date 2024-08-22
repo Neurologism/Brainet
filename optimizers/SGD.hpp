@@ -32,6 +32,12 @@ public:
     ~SGD() = default;
 
     /**
+     * @brief Initializes the optimizer.
+     * @param rLearnableParameters The learnable parameters.
+     */
+    void __init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
+
+    /**
      * @brief Updates the learnable parameters using the stochastic gradient descent algorithm.
      * @param rLearnableParameters The learnable parameters.
      */
@@ -52,6 +58,11 @@ SGD::SGD(double initialLearningRate, double finalLearningRate, std::uint32_t las
 
 SGD::SGD(double initialLearningRate, std::uint32_t lastDecay) : SGD(initialLearningRate, initialLearningRate / 100, lastDecay)
 {
+}
+
+void SGD::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+{
+
 }
 
 void SGD::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)

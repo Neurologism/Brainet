@@ -15,8 +15,8 @@ std::int32_t main()
 
     SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),100)}, Output(Softmax(), 10, ErrorRate()));
 
-    preprocessing::normalize(train_input);
-    preprocessing::normalize(test_input);
+    train_input = preprocessing::normalize(train_input);
+    test_input = preprocessing::normalize(test_input);
 
     model.train( train_input, train_target, 10, 100, SGD(0.1,500), 20, 0.998 );
 
