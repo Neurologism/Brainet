@@ -12,7 +12,6 @@ class Momentum : public Optimizer
     std::vector<Tensor<double>> mVelocity; // velocity over time
     double mLearningRate;
     double mMomentum;
-    bool mInitialized = false;
 
 public:
 
@@ -25,6 +24,12 @@ public:
     Momentum(double learningRate, double momentum = 0.9, std::vector<Tensor<double>> initialVelocity = {});
 
     ~Momentum() = default;
+
+    /**
+     * @brief Initializes the optimizer.
+     * @param rLearnableParameters The learnable parameters.
+     */
+    void __init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
 
     /**
      * @brief Updates the learnable parameters using the momentum algorithm. 
@@ -42,24 +47,23 @@ Momentum::Momentum(double learningRate, double momentum, std::vector<Tensor<doub
 
 }
 
+void Momentum::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+{
+    if (mVelocity.empty())
+    {
+        for (const auto & rLearnableParameter : rLearnableParameters)
+        {
+            mVelocity.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+        }
+    }
+    else if (mVelocity.size() != rLearnableParameters.size())
+    {
+        throw std::invalid_argument("Momentum::__init__: The number of learnable parameters must be equal to the number of velocity tensors");
+    }
+}
+
 void Momentum::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
-    if(!mInitialized)
-    {
-        if (mVelocity.empty())
-        {
-            for (const auto & rLearnableParameter : rLearnableParameters)
-            {
-                mVelocity.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
-            }
-        }
-        else if (mVelocity.size() != rLearnableParameters.size())
-        {
-            throw std::invalid_argument("Momentum::update: The number of learnable parameters must be equal to the number of velocity tensors");
-        }
-        mInitialized = true;
-    }
-
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
         std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
