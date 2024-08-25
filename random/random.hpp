@@ -20,7 +20,8 @@ protected:
 
 public:
 
-    virtual void createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
+    virtual void createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits);
+
     /**
      * @brief Generate a vector of random values.
      * @param size The size of the vector.
@@ -28,6 +29,13 @@ public:
      */
     std::vector<T> createRandomVector()
 };
+
+template <typename T>
+void Random<T>::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
+{
+    mInputUnits = inputUnits;
+    mOutputUnits = outputUnits;
+}
 
 
 template <typename T>
@@ -45,6 +53,8 @@ std::vector<T> Random<T>::createRandomVector()
 
 #include "uniform_distribution.hpp"
 #include "normal_distribution.hpp"
+#include "normalized_initialization.hpp"
+#include "he_initialization.hpp"
 
 using RandomVariant = std::variant<UniformDistribution<double>, NormalDistribution<double>, NormalizedInitialization, HeInitialization>;
 

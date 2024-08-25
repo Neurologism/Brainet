@@ -9,14 +9,28 @@
 class HeInitialization : public UniformDistribution<double>
 {
 public:
-
     /**
-     * @brief Construct a new He Initialization to fill a vector with random values.
+     * @brief Create a random engine to generate random values.
      * @param inputUnits The number of input units.
      * @param outputUnits The number of output units.
      */
-    HeInitialization(std::uint32_t inputUnits, std::uint32_t outputUnits);
+    void createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits) override;
+
+    /**
+     * @brief Construct a new He Initialization to fill a vector with random values.
+     */
+    HeInitialization() = default;
 };
+
+void HeInitialization::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
+{
+    UniformDistribution<double>::createRandomEngine(inputUnits, outputUnits);
+    mLowerBound = -std::sqrt(6.0 / (inputUnits));
+    mUpperBound = std::sqrt(6.0 / (outputUnits));
+    mGen = std::mt19937(mRd());
+    mDist = std::uniform_real_distribution<double>(mLowerBound, mUpperBound);
+}
+
 
 
 
