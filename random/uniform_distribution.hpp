@@ -9,14 +9,15 @@
 template <typename T>
 class UniformDistribution : public Random<T>
 {
-    std::random_device mRd;
-    std::mt19937 mGen;
-    std::uniform_real_distribution<T> mDis;
+    T mLowerBound;
+    T mUpperBound;
 
-    T generate_random() override;
+    T generate() override;
 
 public:
     
+    void createRandomEngine(std::uint32_t mInputUnits, std::uint32_t mOutputUnits);
+
     /**
     * @brief Construct a new Uniform Distribution to fill a vector with random values.
     * @param lowerBound The lower bound of the uniform distribution.
@@ -26,16 +27,18 @@ public:
 };
 
 template <typename T>
-T UniformDistribution<T>::generate_random()
+T UniformDistribution<T>::generate()
 {
-    return mDis(mGen);
+    std::uniform_real_distribution<T> dist(mLowerBound, mUpperBound);
+    return dist(mGen);
 }
 
 template <typename T>
 UniformDistribution<T>::UniformDistribution(T lowerBound, T upperBound)
 {
     mGen = std::mt19937(mRd());
-    mDis = std::uniform_real_distribution<T>(lowerBound, upperBound);
+    mLowerBound = lowerBound;
+    mUpperBound = upperBound;
 }
 
 class NormalizedInitialization

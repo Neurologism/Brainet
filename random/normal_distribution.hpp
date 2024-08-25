@@ -9,9 +9,8 @@
 template <typename T>
 class NormalDistribution : public Random<T>
 {
-    std::random_device mRd;
-    std::mt19937 mGen;
-    std::normal_distribution<T> mDis;
+    T mMean;
+    T mStdDev;
 
     T generate_random() override;
 
@@ -28,14 +27,16 @@ public:
 template <typename T>
 T NormalDistribution<T>::generate_random()
 {
-    return mDis(mGen);
+    std::normal_distribution<T> dist(mMean, mStdDev);
+    return dist(mGen);
 }
 
 template <typename T>
 NormalDistribution<T>::NormalDistribution(T mean, T stdDev)
 {
     mGen = std::mt19937(mRd());
-    mDis = std::normal_distribution<T>(mean, stdDev);
+    mMean = mean;
+    mStdDev = stdDev;
 }
 
 #endif // NORMAL_DISTRIBUTION_HPP

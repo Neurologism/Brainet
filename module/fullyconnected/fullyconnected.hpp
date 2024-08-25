@@ -6,6 +6,7 @@
 #include "../../operation/processing/padding.hpp"
 #include "../../operation/activation_function/activation_function.hpp"
 #include "../../operation/parameter_norm_penalties/parameter_norm_penalty.hpp"
+#include "../../random/random.hpp"
 
 /**
  * @brief the fully connected module is intended for creating a fully connected layer without activation function in the graph. It's the base class for the dense and output modules.
@@ -70,10 +71,7 @@ void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
     mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
 
     // initialize the weights randomly
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    double connections = inputUnits + mUnits;
-    std::uniform_real_distribution<double> dis(-std::sqrt(2/(connections)), std::sqrt(2/(connections)));
+
     for (std::uint32_t i = 0; i < inputUnits; i++) // dont initialize the bias
     {
         for (std::uint32_t j = 0; j < mUnits; j++)
