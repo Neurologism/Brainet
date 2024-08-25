@@ -1,12 +1,12 @@
 #ifndef NORMALIZED_INITIALIZATION_HPP
 #define NORMALIZED_INITIALIZATION_HPP
 
-#include "uniform_distribution.hpp"
+#include "uniform_distribution_initializer.hpp"
 
 /**
  * @brief Class to initialize a vector with random values from a normalized initialization.
  */
-class NormalizedInitialization : public UniformDistribution<double>
+class NormalizedInitialization : public UniformDistributionInitializer
 {
 public:
     /**
@@ -24,7 +24,7 @@ public:
 
 void NormalizedInitialization::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
-    UniformDistribution<double>::createRandomEngine(inputUnits, outputUnits);
+    UniformDistributionInitializer::createRandomEngine(inputUnits, outputUnits);
     mLowerBound = -std::sqrt(6.0 / (inputUnits + outputUnits));
     mUpperBound = std::sqrt(6.0 / (inputUnits + outputUnits));
     mGen = std::mt19937(mRd());

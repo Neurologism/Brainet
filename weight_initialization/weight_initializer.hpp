@@ -1,13 +1,12 @@
-#ifndef RANDOM_HPP
-#define RANDOM_HPP
+#ifndef WEIGHT_INITIALIZER_HPP
+#define WEIGHT_INITIALIZER_HPP
 
 #include "../dependencies.hpp"
 
 /**
  * @brief Base class to initialize a vector randomly.
  */
-template <typename T>
-class Random
+class WeightInitializer
 {
 protected:
 
@@ -16,7 +15,7 @@ protected:
     std::uint32_t mInputUnits;
     std::uint32_t mOutputUnits;
 
-    virtual T generate() = 0;
+    virtual double generate() = 0;
 
 public:
 
@@ -27,35 +26,33 @@ public:
      * @param size The size of the vector.
      * @return The vector of random values.
      */
-    std::vector<T> createRandomVector()
+    std::vector<double> createRandomVector();
 };
 
-template <typename T>
-void Random<T>::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
+void WeightInitializer::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
     mInputUnits = inputUnits;
     mOutputUnits = outputUnits;
 }
 
 
-template <typename T>
-std::vector<T> Random<T>::createRandomVector()
+std::vector<double> WeightInitializer::createRandomVector()
 {
-    std::vector<T> output(mInputUnits * mOutputUnits);
+    std::vector<double> output(mInputUnits * mOutputUnits);
 
     for (std::uint32_t i = 0; i < mInputUnits * mOutputUnits; i++)
     {
-        output[i] = generate_random();
+        output[i] = generate();
     }
 
     return output;
 }
 
-#include "uniform_distribution.hpp"
-#include "normal_distribution.hpp"
+#include "uniform_distribution_initializer.hpp"
+#include "normal_distribution_initializer.hpp"
 #include "normalized_initialization.hpp"
 #include "he_initialization.hpp"
 
-using RandomVariant = std::variant<UniformDistribution<double>, NormalDistribution<double>, NormalizedInitialization, HeInitialization>;
+using InitializationVariant = std::variant<UniformDistributionInitializer, NormalDistributionInitializer, NormalizedInitialization, HeInitialization>;
 
-#endif // RANDOM_HPP
+#endif // WEIGHT_INITIALIZER_HPP

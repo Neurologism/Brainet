@@ -6,7 +6,7 @@
 #include "../../operation/processing/padding.hpp"
 #include "../../operation/activation_function/activation_function.hpp"
 #include "../../operation/parameter_norm_penalties/parameter_norm_penalty.hpp"
-#include "../../random/random.hpp"
+#include "../../weight_initialization/weight_initializer.hpp"
 
 /**
  * @brief the fully connected module is intended for creating a fully connected layer without activation function in the graph. It's the base class for the dense and output modules.
@@ -20,6 +20,8 @@ protected:
     std::shared_ptr<Variable> mpActivationVariable; // activation function applied
     std::shared_ptr<Variable> mpPaddingVariable; // used to pad the input with 1s for the bias
     std::shared_ptr<Variable> mpNormVariable; // used to compute a norm of the weights
+
+    std::shared_ptr<WeightInitializer> mpWeightInitializer = std::make_shared<WeightInitializer>( NormalizedInitialization() ); // weight initializer to use
 
     static std::shared_ptr<ParameterNormPenaltyVariant> mpsDefaultNorm; // default norm to use
     std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization
@@ -71,14 +73,18 @@ void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
     mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
 
     // initialize the weights randomly
+    mpWeightInitializer->createRandomEngine(inputUnits, mUnits);
+    std::vector<double> weights = mpWeightInitializer->createRandomVector();
 
-    for (std::uint32_t i = 0; i < inputUnits; i++) // dont initialize the bias
+    for (std::uint32_t i = 0; i < inputUnits; i++) // load the weights into the weight matrix
     {
         for (std::uint32_t j = 0; j < mUnits; j++)
         {
-            mpWeightMatrixVariable->getData()->set({i,j},dis(gen));
+            mpWeightMatrixVariable->getData()->set({i, j}, weights[i*mUnits+j]);
         }
     }
+
+    
     
 }
 

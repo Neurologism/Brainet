@@ -2,7 +2,7 @@
 #define TENSOR_HPP
 
 #include "../dependencies.hpp"
-#include "../random/random.hpp"
+#include "../weight_initialization/weight_initializer.hpp"
 
 /**
  * @brief The tensor class is a implementation of a tensor. It is used to store data in a multidimensional array. To do this it uses a vector to store the data and a vector to store the shape of the tensor.
@@ -43,7 +43,7 @@ public:
      * @param dimensionality The dimensionality of the tensor.
      * @param random The random number generator to use.
      */
-    Tensor(const ShapeVector &dimensionality, Random<T> &random);
+    Tensor(const ShapeVector &dimensionality, Random &random);
 
     ~Tensor() = default;
 
@@ -205,7 +205,7 @@ Tensor<T>::Tensor(const ShapeVector &dimensionality, const T &value)
 }
 
 template <class T>
-Tensor<T>::Tensor(const ShapeVector &dimensionality, Random<T> &random)
+Tensor<T>::Tensor(const ShapeVector &dimensionality, Random &random)
 {
     mData = random.generate_random_vector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>())); // initialize the data vector
     mShape = dimensionality;                                                                                                       // set the shape of the tensor

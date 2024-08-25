@@ -1,12 +1,12 @@
 #ifndef HE_INITIALIZATION_HPP
 #define HE_INITIALIZATION_HPP
 
-#include "uniform_distribution.hpp"
+#include "uniform_distribution_initializer.hpp"
 
 /**
  * @brief Class to initialize a vector with random values from a He initialization.
  */
-class HeInitialization : public UniformDistribution<double>
+class HeInitialization : public UniformDistributionInitializer
 {
 public:
     /**
@@ -24,7 +24,7 @@ public:
 
 void HeInitialization::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
-    UniformDistribution<double>::createRandomEngine(inputUnits, outputUnits);
+    UniformDistributionInitializer::createRandomEngine(inputUnits, outputUnits);
     mLowerBound = -std::sqrt(6.0 / (inputUnits));
     mUpperBound = std::sqrt(6.0 / (outputUnits));
     mGen = std::mt19937(mRd());
