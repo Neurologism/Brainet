@@ -158,7 +158,7 @@ void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> co
 
         
         // early stopping
-        double currentLoss = validationLoss->at(0);
+        double currentLoss = validationSurrogateLoss->at(0);
 
         if (currentLoss < bestLoss)
         {

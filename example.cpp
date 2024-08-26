@@ -28,11 +28,11 @@ std::int32_t main()
     // 10 output neurons, Softmax activation function, ErrorRate as loss function
     SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),200)}, Output(Softmax(), 10, ErrorRate()));
 
-    preprocessing::normalize(train_input);
-    preprocessing::normalize(test_input);
+    train_input = preprocessing::normalize(train_input);
+    test_input = preprocessing::normalize(test_input);
 
     // train the model
-    model.train( train_input, train_target, 10, 100, SGD(0.1,500), 20, 0.998 );
+    model.train( train_input, train_target, 10, 100, SGD(0.1,150), 20, 0.996 );
 
     // test the model
     model.test(test_input,test_target);
