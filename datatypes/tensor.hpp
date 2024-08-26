@@ -38,13 +38,6 @@ public:
      */
     Tensor(const ShapeVector &dimensionality, const T &value);
 
-    /**
-     * @brief Construct a new Tensor object. The tensor is initialized with random values.
-     * @param dimensionality The dimensionality of the tensor.
-     * @param random The random number generator to use.
-     */
-    Tensor(const ShapeVector &dimensionality, Random &random);
-
     ~Tensor() = default;
 
     /**
@@ -202,13 +195,6 @@ Tensor<T>::Tensor(const ShapeVector &dimensionality, const T &value)
 {
     mData = DataVector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>()), value); // initialize the data vector
     mShape = dimensionality;                                                                                                // set the shape of the tensor
-}
-
-template <class T>
-Tensor<T>::Tensor(const ShapeVector &dimensionality, Random &random)
-{
-    mData = random.generate_random_vector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<size_t>())); // initialize the data vector
-    mShape = dimensionality;                                                                                                       // set the shape of the tensor
 }
 
 template <class T>

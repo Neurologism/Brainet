@@ -21,7 +21,7 @@ protected:
     std::shared_ptr<Variable> mpPaddingVariable; // used to pad the input with 1s for the bias
     std::shared_ptr<Variable> mpNormVariable; // used to compute a norm of the weights
 
-    std::shared_ptr<WeightInitializer> mpWeightInitializer = std::make_shared<WeightInitializer>( NormalizedInitialization() ); // weight initializer to use
+    std::shared_ptr<WeightInitializer> mpWeightInitializer = std::make_shared<NormalizedInitialization>(); // weight initializer
 
     static std::shared_ptr<ParameterNormPenaltyVariant> mpsDefaultNorm; // default norm to use
     std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization

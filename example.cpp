@@ -32,7 +32,7 @@ std::int32_t main()
     test_input = preprocessing::normalize(test_input);
 
     // train the model
-    model.train( train_input, train_target, 10, 100, SGD(0.1,500), 20, 0.998 );
+    model.train( train_input, train_target, 10, 100, SGD(0.1,150), 20, 0.996 );
 
     // test the model
     model.test(test_input,test_target);

@@ -9,6 +9,7 @@
 class UniformDistributionInitializer : public WeightInitializer
 {
 protected:
+
     double mLowerBound;
     double mUpperBound;
     std::uniform_real_distribution<double> mDist;
@@ -44,7 +45,8 @@ double UniformDistributionInitializer::generate()
 
 void UniformDistributionInitializer::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
-    WeightInitializer::createRandomEngine(inputUnits, outputUnits);
+    mInputUnits = inputUnits;
+    mOutputUnits = outputUnits;
     mGen = std::mt19937(mRd());
     mDist = std::uniform_real_distribution<double>(mLowerBound, mUpperBound);
 }

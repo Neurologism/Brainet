@@ -38,7 +38,8 @@ double NormalDistributionInitializer::generate()
 
 void NormalDistributionInitializer::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
-    WeightInitializer::createRandomEngine(inputUnits, outputUnits);
+    mInputUnits = inputUnits;
+    mOutputUnits = outputUnits;
     mGen = std::mt19937(mRd());
     mDist = std::normal_distribution<double>(mMean, mStdDev);
 }

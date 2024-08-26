@@ -8,6 +8,7 @@
  */
 class HeInitialization : public UniformDistributionInitializer
 {
+    double generate() override;
 public:
     /**
      * @brief Create a random engine to generate random values.
@@ -22,9 +23,15 @@ public:
     HeInitialization() = default;
 };
 
+double HeInitialization::generate()
+{
+    return mDist(mGen);
+}
+
 void HeInitialization::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
-    UniformDistributionInitializer::createRandomEngine(inputUnits, outputUnits);
+    mInputUnits = inputUnits;
+    mOutputUnits = outputUnits;
     mLowerBound = -std::sqrt(6.0 / (inputUnits));
     mUpperBound = std::sqrt(6.0 / (outputUnits));
     mGen = std::mt19937(mRd());

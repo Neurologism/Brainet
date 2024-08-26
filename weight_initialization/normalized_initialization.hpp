@@ -8,6 +8,7 @@
  */
 class NormalizedInitialization : public UniformDistributionInitializer
 {
+    double generate() override;
 public:
     /**
      * @brief Create a random engine to generate random values.
@@ -22,9 +23,15 @@ public:
     NormalizedInitialization() = default;
 };
 
+double NormalizedInitialization::generate()
+{
+    return mDist(mGen);
+}
+
 void NormalizedInitialization::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
 {
-    UniformDistributionInitializer::createRandomEngine(inputUnits, outputUnits);
+    mInputUnits = inputUnits;
+    mOutputUnits = outputUnits;
     mLowerBound = -std::sqrt(6.0 / (inputUnits + outputUnits));
     mUpperBound = std::sqrt(6.0 / (inputUnits + outputUnits));
     mGen = std::mt19937(mRd());

@@ -19,7 +19,7 @@ protected:
 
 public:
 
-    virtual void createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits);
+    virtual void createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits) = 0;
 
     /**
      * @brief Generate a vector of random values.
@@ -28,12 +28,6 @@ public:
      */
     std::vector<double> createRandomVector();
 };
-
-void WeightInitializer::createRandomEngine(std::uint32_t inputUnits, std::uint32_t outputUnits)
-{
-    mInputUnits = inputUnits;
-    mOutputUnits = outputUnits;
-}
 
 
 std::vector<double> WeightInitializer::createRandomVector()
