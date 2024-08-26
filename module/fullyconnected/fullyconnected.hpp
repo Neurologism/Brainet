@@ -84,7 +84,19 @@ void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
         }
     }
 
+    // initialize the bias
+    double bias = 0.0;
     
+    std::type_info const & type = typeid(mpActivationVariable->getOperation());
+    if (type == typeid(ReLU))
+    {
+        bias = 0.1;
+    }
+
+    for (std::uint32_t j = 0; j < mUnits; j++)
+    {
+        mpWeightMatrixVariable->getData()->set({inputUnits, j}, bias);
+    }
     
 }
 
