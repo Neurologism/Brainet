@@ -27,7 +27,7 @@ public:
 };
 
 
-#include "SGD.hpp"
+#include "sgd.hpp"
 
 using OptimizerVariant = std::variant<SGD>;
 
