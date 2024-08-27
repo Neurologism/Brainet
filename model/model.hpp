@@ -4,7 +4,7 @@
 #include "../graph.hpp"
 #include "../module/module.hpp"
 #include "../operation/activation_function/activation_function.hpp"
-#include "../optimizers/optimizer.hpp"
+#include "../optimizer/optimizer.hpp"
 #include "../preprocessing/split.hpp"
 
 /**

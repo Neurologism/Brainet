@@ -4,7 +4,7 @@
 // include all the headers here 
 
 #include "readers/idx_reader.hpp"
-#include "optimizers/optimizer.hpp"
+#include "optimizer/optimizer.hpp"
 #include "preprocessing/split.hpp"
 #include "model/model.hpp"
 #include "model/ensemble.hpp"
