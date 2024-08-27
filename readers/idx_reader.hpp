@@ -43,7 +43,7 @@ std::vector<std::vector<double>> read_idx(const std::string path)
             {
                 dimension[j] = std::byte(*file_iterator++);
             }
-            shape[i] = std::to_integer<size_t>(dimension[0]) << 24 | std::to_integer<size_t>(dimension[1]) << 16 | std::to_integer<size_t>(dimension[2]) << 8 | std::to_integer<size_t>(dimension[3]);
+            shape[i] = static_cast<size_t>(dimension[0]) << 24 | static_cast<size_t>(dimension[1]) << 16 | static_cast<size_t>(dimension[2]) << 8 | static_cast<size_t>(dimension[3]);
         }
 
         tensor = data_type(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<size_t>()), 0));
@@ -56,7 +56,7 @@ std::vector<std::vector<double>> read_idx(const std::string path)
             }
             for (std::uint32_t j = 0; j < tensor[i].size(); j++)
             {
-                tensor[i][j] = std::to_integer<int>(std::byte(*file_iterator++));
+                tensor[i][j] = static_cast<size_t>(std::byte(*file_iterator++));
                 
             }
         }
