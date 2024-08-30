@@ -11,6 +11,8 @@ Currently, the best place to start is the example.cpp file, which contains a sim
 
 ## Overview 
 The following image shows a high-level overview of the Brainet architecture which is the first step to transparency:
+
+
 ![alt text](image.png)
 
 
