@@ -10,7 +10,8 @@ Please note that the project is still in its early stages of development. As a r
 Currently, the best place to start is the example.cpp file, which contains a simple example of how to train a 2-layer neural network on the MNIST dataset.
 
 ## Overview 
-![high-level overview of the Brainet architecture](image.png)
+The following image shows a high-level overview of the Brainet architecture:
+![alt text](image.png)
 
 
 ## Performance
