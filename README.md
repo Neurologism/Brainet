@@ -1,17 +1,19 @@
 ﻿
 # Brainet
 
-Brainet is a Deep Learning engine built within C++ and CUDA without use of external libraries.
-The goal is to provide a transparent framework that allows full understanding of the underlying mechanisms. Most of the current 
-alternatives like TensorFlow, PyTorch or Caffe have a high level of abstraction that feels like a black box. Brainet isn't competing with these frameworks regarding performance, but rather aims to explain how everything works under the hood.
-To reach this goal Brainet relies on a simple codebase that is well documented. Additionally there will be a small book that 
-explains the design choices and the mechanisms of Brainet and deep learning in general.
+Brainet is a deep learning engine developed in C++ and CUDA, without relying on external libraries. Its primary goal is to offer a transparent framework that allows users to fully understand the underlying mechanisms. Unlike alternatives such as TensorFlow, PyTorch, or Caffe, which often feel like black boxes due to their high level of abstraction, Brainet focuses on explaining how everything works under the hood.
 
-However, please note that the Project is still in a very early stage of development. So the codebase might be hard to understand and the supporting book isn't yet written. However I'm working on it and happy to provide you with explanations 
-how everything works, if you dare to reach out to me. :)
+To achieve this, Brainet features a simple, well-documented codebase. Additionally, a small book will be available to explain the design choices and mechanisms of Brainet and deep learning in general.
 
-Currently the example.cpp file is the best place to start. It contains a simple example of how to train a 2-layer Neural Network on the MNIST dataset.
+Please note that the project is still in its early stages of development. As a result, the codebase might be challenging to understand, and the supporting book is not yet written. However, I am actively working on it and am happy to provide explanations if you reach out to me. 😊
 
+Currently, the best place to start is the example.cpp file, which contains a simple example of how to train a 2-layer neural network on the MNIST dataset.
+
+## Overview 
+The following image shows a high-level overview of the Brainet architecture which is the first step to transparency:
+
+
+![alt text](image.png)
 
 
 ## Performance
