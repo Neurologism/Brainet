@@ -8,26 +8,25 @@
  * @param path The path to the IDX file.
  * @return The data as a 2D vector.
  */
-std::vector<std::vector<double>> read_idx(const std::string path)
+inline std::vector<std::vector<double>> read_idx(const std::string& path)
 {
     typedef std::vector<std::vector<double>> data_type;
     std::ifstream file(std::filesystem::path(path), std::ios::binary);
 
     if (!file.is_open())
         throw std::invalid_argument("IDX_READER::read_idx: Could not open file");
-
-
+    
     // to understand the IDX file format see: http://yann.lecun.com/exdb/mnist/
 
 
     auto file_iterator = std::istreambuf_iterator<char>(file);
 	auto file_end = std::istreambuf_iterator<char>{};
 
-    std::array<std::byte, 4> magic;
+    std::array<std::byte, 4> magic{};
 
     for (std::uint32_t i = 0; i < 4; i++)
     {
-        magic[i] = std::byte(*file_iterator++);
+        magic[i] = static_cast<std::byte>(*file_iterator++);
     }
 
     data_type tensor;

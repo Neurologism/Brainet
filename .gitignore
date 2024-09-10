@@ -8,3 +8,5 @@
 .vs
 datasets/
 main.cpp
+CMakeLists.txt
+cmake-build-debug

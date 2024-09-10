@@ -20,5 +20,6 @@
 #include <bitset>
 #include <map>
 #include <array>
+#include <string>
 
 #endif // DEPENDENCIES_HPP

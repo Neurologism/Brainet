@@ -7,11 +7,11 @@
 std::int32_t main()
 {
     typedef std::vector<std::vector<double>> dataType;
-    dataType train_input = read_idx("mnist/train-images.idx3-ubyte");
-    dataType train_target = read_idx("mnist/train-labels.idx1-ubyte");
+    dataType train_input = read_idx("../mnist/train-images.idx3-ubyte");
+    dataType train_target = read_idx("../mnist/train-labels.idx1-ubyte");
 
-    dataType test_input = read_idx("mnist/t10k-images.idx3-ubyte");
-    dataType test_target = read_idx("mnist/t10k-labels.idx1-ubyte");
+    dataType test_input = read_idx("../mnist/t10k-images.idx3-ubyte");
+    dataType test_target = read_idx("../mnist/t10k-labels.idx1-ubyte");
 
     SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),100)}, Output(Softmax(), 10, ErrorRate()));
 
