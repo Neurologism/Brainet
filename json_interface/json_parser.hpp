@@ -13,6 +13,7 @@ namespace JSON
     /**
      * @brief This function performs a depth first search on the json graph.
      * @param node The node to start the search from.
+     * @param file The file stream.
      */
     void depthFirstSearch(JsonNode * node, std::ifstream & file)
     {
@@ -35,7 +36,8 @@ namespace JSON
                     file.get(ch);
                 }
 
-                while (ch != '}') // end of the json object
+                bool foundValue = false;
+                while (!foundValue)
                 {
                     file.get(ch);
                     switch (ch)
@@ -45,6 +47,7 @@ namespace JSON
                             auto child = std::make_unique<JsonNode>();
                             depthFirstSearch(child.get(), file);
                             node->m_children.emplace_back(key, std::move(child));
+                            foundValue = true;
                             break;
                         }
                         case '[':
@@ -52,11 +55,20 @@ namespace JSON
                             std::vector<std::unique_ptr<JsonNode>> children;
                             while (ch != ']')
                             {
+                                file.get(ch);
+                                while (ch != '{' && ch != ']')
+                                {
+                                    file.get(ch);
+                                }
+                                if (ch == ']')
+                                {
+                                    break;
+                                }
                                 auto child = std::make_unique<JsonNode>();
                                 depthFirstSearch(child.get(), file);
-                                children.push_back(std::move(child));
+                                node->m_children.emplace_back(key, std::move(child));
                             }
-                            node->m_children.emplace_back(key, children);
+                            foundValue = true;
                             break;
                         }
                         case '"':
@@ -69,21 +81,25 @@ namespace JSON
                                 file.get(ch);
                             }
                             node->m_children.emplace_back(key, value);
+                            foundValue = true;
                             break;
                         }
                         case 't':
                         {
                             node->m_children.emplace_back(key, true);
+                            foundValue = true;
                             break;
                         }
                         case 'f':
                         {
                             node->m_children.emplace_back(key, false);
+                            foundValue = true;
                             break;
                         }
                         case 'n':
                         {
-                            node->m_children.push_back(std::make_pair(key, nullptr));
+                            node->m_children.emplace_back(key, nullptr);
+                            foundValue = true;
                             break;
                         }
                         default:
@@ -92,12 +108,26 @@ namespace JSON
                             {
                                 std::string value;
                                 value.push_back(ch);
-                                while (std::isdigit(ch))
+                                bool isDouble = false;
+                                while (std::isdigit(ch) || ch == '.')
                                 {
+                                    if (ch == '.')
+                                    {
+                                        isDouble = true;
+                                    }
                                     value.push_back(ch);
                                     file.get(ch);
                                 }
-                                node->m_children.emplace_back(key, std::stoi(value));
+                                if (isDouble)
+                                {
+                                    node->m_children.emplace_back(key, std::stod(value));
+                                    foundValue = true;
+                                }
+                                else
+                                {
+                                    node->m_children.emplace_back(key, std::stoi(value));
+                                    foundValue = true;
+                                }
                             }
                             break;
                         }

@@ -10,7 +10,7 @@
 namespace JSON
 {
     struct JsonNode;
-    typedef std::variant<bool, int, double, std::string, std::vector<std::unique_ptr<JsonNode>>, std::unique_ptr<JsonNode>> JsonType;
+    typedef std::variant<bool, int, double, std::string, std::vector<std::unique_ptr<JsonNode>>, std::unique_ptr<JsonNode>, std::nullptr_t> JsonType;
 
     struct JsonNode
     {
