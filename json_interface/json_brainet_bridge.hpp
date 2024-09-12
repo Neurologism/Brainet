@@ -38,8 +38,21 @@ namespace JSON
             switch (std::get<std::string>(child->m_children[0].second))
             {
                 case "add":
-                    
+                {
 
+                }
+
+
+                case "train":
+                {
+
+                }
+
+
+                case "test":
+                {
+
+                }
             }
         }
     }

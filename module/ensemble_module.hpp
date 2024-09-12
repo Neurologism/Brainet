@@ -2,6 +2,7 @@
 #define ENSEMBLE_MODULE_HPP
 
 #include "module.hpp"
+#include "loss.hpp"
 #include "../operation/processing/average.hpp"
 
 
@@ -14,15 +15,16 @@ class EnsembleModule : private Module
     std::shared_ptr<Module> mLossModule; 
     
     // not supported
-    void __init__( std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs ) override {};
+    void __init__( std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs ) override {};
 
 public:
     /**
      * @brief constructor for the ensemble module
      * @param inputVariables the variables to average
+     * @param name the name of the module
      * @param lossModule the loss module to apply to the output
      */
-    EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Loss & lossModule);
+    EnsembleModule(const std::vector<std::shared_ptr<Variable>>& inputVariables, const std::string &name, const Loss & lossModule);
 
     // /**
     //  * @brief destructor for the ensemble module removes the module from the graph
@@ -41,7 +43,7 @@ public:
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 };
 
-EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVariables, const Loss & lossModule)
+inline EnsembleModule::EnsembleModule(const std::vector<std::shared_ptr<Variable>>& inputVariables, const std::string &name, const Loss & lossModule) : Module(name)
 {
     mOutputVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Average>(), inputVariables, {})));
 
@@ -53,43 +55,26 @@ EnsembleModule::EnsembleModule(std::vector<std::shared_ptr<Variable>> inputVaria
     mLossModule->__init__({mOutputVariable}, {});
 
     // other connections
-    for(auto inputVariable : inputVariables)
+    for(const auto& inputVariable : inputVariables)
     {
         inputVariable->getConsumers().push_back(mOutputVariable);
     }
 }
 
-// void EnsembleModule::remove()
-// {
-//     // delete other connections
-//     for(auto input : mOutputVariable->getInputs())
-//     {
-//         input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mOutputVariable));
-//     }
-
-//     // delete the variables
-//     GRAPH->removeVariable(mOutputVariable);
-// }
-
-std::shared_ptr<Variable> EnsembleModule::getVariable(std::uint32_t index)
+inline std::shared_ptr<Variable> EnsembleModule::getVariable(std::uint32_t index)
 {
     switch (index)
     {
     case 0:
         return mOutputVariable;
-        break;
     case 1:
         return mLossModule->getVariable(0);
-        break;
     case 2:
         return mLossModule->getVariable(1);
-        break;
     case 3:
         return mLossModule->getVariable(2);
-        break;
     default:
         throw std::invalid_argument("EnsembleModule::getVariable: index out of range");
-        break;
     }
 }
 

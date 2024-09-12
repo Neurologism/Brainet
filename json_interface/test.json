@@ -8,17 +8,14 @@
           "type": "dense",
           "parameters": [
             {
-              "name": "activation_function",
               "type": "relu",
               "parameters": [
                 {
-                  "name": "gradient",
                   "value": 0.01
                 }
               ]
             },
             {
-              "name": "units",
               "value": 200
             }
           ],
@@ -33,7 +30,6 @@
           "module-type": "input",
           "parameters": [
             {
-              "name": "units",
               "value": 100
             }
           ],
@@ -44,16 +40,13 @@
           "module-type": "output",
           "parameters": [
             {
-              "name": "activation_function",
               "type": "softmax",
               "parameters": []
             },
             {
-              "name": "units",
               "value": 10
             },
             {
-              "name": "loss",
               "type": "categorical_cross_entropy",
               "parameters": []
             }
@@ -74,25 +67,20 @@
       "type": "train",
       "parameters": [
         {
-          "name": "epochs",
           "value": 10
         },
         {
-          "name": "batch_size",
           "value": 32
         },
         {
-          "name": "optimizer",
           "type": "adam",
           "parameters": [
             {
-              "name": "learning_rate",
               "value": 0.01
             }
           ]
         },
         {
-          "name": "early_stopping",
           "value": 10
         }
 
@@ -101,7 +89,9 @@
 
 
     {
-        "type": "predict"
+        "type": "predict",
+        "parameters": [
+        ]
     }
   ],
   "general-information1": "This is a test file"

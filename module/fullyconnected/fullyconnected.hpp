@@ -1,7 +1,6 @@
 #ifndef FULLYCONNECTED_HPP
 #define FULLYCONNECTED_HPP
 
-#include "../module.hpp"
 #include "../../operation/matmul.hpp"
 #include "../../operation/processing/padding.hpp"
 #include "../../operation/activation_function/activation_function.hpp"
@@ -9,7 +8,9 @@
 #include "../../weight_initialization/weight_initializer.hpp"
 
 /**
- * @brief the fully connected module is intended for creating a fully connected layer without activation function in the graph. It's the base class for the dense and output modules.
+ * @brief The fully connected module is intended
+ for creating a fully connected layer without activation function in the graph.
+ It's the base class for the dense and output modules.
  */
 class FullyConnected : public Module
 {
@@ -30,8 +31,9 @@ public:
     /**
      * @brief add a fully connected layer to the graph
      * @param units the number of neurons in the layer
+     * @param name the name of the module
      */
-    FullyConnected( std::uint32_t units);
+    explicit FullyConnected( std::uint32_t units, const std::string &name = "" );
 
     /**
      * @brief initialize the weight matrix of the layer with random values
@@ -40,7 +42,8 @@ public:
     void createWeightMatrix(std::uint32_t inputUnits);
 
     /**
-     * @brief set the default norm to use for regularization. Layers are initialized with this norm, if no other norm is specified.
+     * @brief Set the default norm to use for regularization.
+     * Layers are initialized with this norm if no other norm is specified.
      * @param norm the norm to use
      */
     static void setDefaultNorm(ParameterNormPenaltyVariant const & norm)
@@ -50,7 +53,7 @@ public:
 
 };
 
-FullyConnected::FullyConnected(std::uint32_t units)
+inline FullyConnected::FullyConnected(const std::uint32_t units, const std::string &name) : Module(name)
 {
     mUnits = units; // set the number of neurons in the layer
 
@@ -63,12 +66,12 @@ FullyConnected::FullyConnected(std::uint32_t units)
     mpMatmulVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Matmul>(Matmul()), {mpPaddingVariable,mpWeightMatrixVariable}, {})));
 
 
-    // conections within the module
+    // connections within the module
     mpPaddingVariable->getConsumers().push_back(mpMatmulVariable);
     mpWeightMatrixVariable->getConsumers().push_back(mpMatmulVariable);
 }
 
-void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
+inline void FullyConnected::createWeightMatrix(std::uint32_t inputUnits)
 {
     mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
 

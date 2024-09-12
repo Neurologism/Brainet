@@ -1,12 +1,15 @@
 #ifndef DENSE_HPP
 #define DENSE_HPP
 
+#include <operation/processing/dropout.hpp>
+
 #include "fullyconnected.hpp"
 
 /**
- * @brief the dense module is intended for creating a dense (fully connected) layer in the graph. It owns 1 input and 1 output variable.
+ * @brief The dense module is intended for creating a dense (fully connected) layer in the graph.
+ * It owns one input and one output variable.
  */
-class Dense : public FullyConnected
+class Dense final : public FullyConnected
 {
     std::shared_ptr<Variable> mpDropoutVariable;
 
@@ -15,18 +18,22 @@ public:
      * @brief add a dense layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
+     * @param name the name of the module
+     * @param dropout the dropout rate of the layer
      */
-    Dense(HiddenVariant activationFunction, std::uint32_t units, double dropout = 1.0);
+    Dense(const HiddenVariant &activationFunction, std::uint32_t units, const std::string& name = "", const double& dropout = 1.0);
 
     /**
      * @brief add a dense layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
+     * @param name the name of the module
+     * @param dropout the dropout rate of the layer
      */
-    Dense(HiddenVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm, double dropout = 1.0);
+    Dense(const HiddenVariant& activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm, const std::string& name = "", double dropout = 1.0);
 
-    ~Dense() = default;
+    ~Dense() override = default;
 
     /**
      * @brief function to get access to specific variables of the module.
@@ -41,19 +48,19 @@ public:
 
     /**
      * @brief function to initialize the module
-     * @param initialInpus the initial input variables
+     * @param initialInputs the initial input variables
      * @param initialOutputs the initial output variables
      */
-    void __init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
+    void __init__(std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
 };
 
-Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, double dropout) : FullyConnected(units)
+inline Dense::Dense(const HiddenVariant &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) : FullyConnected(units, name)
 {
     // turning the variant into a shared pointer to the operation class
     // Use std::visit to handle the variant
-    std::shared_ptr<Operation> activationFunctionPtr = std::visit([](auto&& arg) {
-        // Assuming all types in the variant can be dynamically casted to Operation*
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, HiddenVariant{activationFunction});
+    const std::shared_ptr<Operation> activationFunctionPtr = std::visit([]<typename T0>(T0&& arg) {
+        // Assuming all types in the variant can be dynamically cast to Operation*
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, HiddenVariant{activationFunction});
 
     mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(activationFunctionPtr, {mpMatmulVariable}, {}))); 
     
@@ -65,43 +72,38 @@ Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, double dropo
    
 }
 
-Dense::Dense(HiddenVariant activationFunction, std::uint32_t units, ParameterNormPenaltyVariant norm, double dropout) : Dense(activationFunction, units, dropout)
+inline Dense::Dense(const HiddenVariant& activationFunction, const std::uint32_t units, ParameterNormPenaltyVariant norm, const std::string& name, const double dropout) : Dense(activationFunction, units, name, dropout)
 {
-    mpNorm = std::visit([](auto&& arg) {
-        // Assuming all types in the variant can be dynamically casted to Operation*
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, norm);
+    mpNorm = std::visit([]<typename T0>(T0&& arg) {
+        // Assuming all types in the variant can be dynamically cast to Operation*
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, norm);
     
 }
 
-std::shared_ptr<Variable> Dense::getVariable(std::uint32_t index)
+inline std::shared_ptr<Variable> Dense::getVariable(const std::uint32_t index)
 {
     switch (index)
     {
     case 0:
         return mpPaddingVariable;
-        break;
     case 1:
         return mpDropoutVariable;
-        break;
     case 2:
         return mpWeightMatrixVariable;
-        break;
     case 3:
         if (mpNormVariable == nullptr)
         {
             throw std::invalid_argument("Dense::getVariable: norm variable not initialized");
         }
         return mpNormVariable;
-        break;
     default:
         throw std::invalid_argument("Dense::getVariable: index out of range");
-        break;
     }
 }
 
-void Dense::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::vector<std::shared_ptr<Variable>> initialOutputs)
+void Dense::__init__(const std::vector<std::shared_ptr<Variable>> initialInputs, const std::vector<std::shared_ptr<Variable>> initialOutputs)
 {
-    if (initialInpus.size() != 1)
+    if (initialInputs.size() != 1)
     {
         throw std::invalid_argument("Dense::__init__: the number of input variables must be 1");
     }
@@ -110,14 +112,14 @@ void Dense::__init__(std::vector<std::shared_ptr<Variable>> initialInpus, std::v
         throw std::invalid_argument("Dense::__init__: the number of output variables must be 1");
     }
 
-    mpPaddingVariable->getInputs().push_back(initialInpus[0]);
+    mpPaddingVariable->getInputs().push_back(initialInputs[0]);
         
     // init default norm
     if(mpNorm == nullptr && mpsDefaultNorm != nullptr)
     {
-        mpNorm = std::visit([](auto&& arg) {
-            // Assuming all types in the variant can be dynamically casted to Operation*
-            return std::shared_ptr<Operation>(std::make_shared<std::decay_t<decltype(arg)>>(arg));}, *mpsDefaultNorm);
+        mpNorm = std::visit([]<typename T0>(T0&& arg) {
+            // Assuming all types in the variant can be dynamically cast to Operation*
+            return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, *mpsDefaultNorm);
     }
     
     if (mpNorm != nullptr) // adding norm to activation function
