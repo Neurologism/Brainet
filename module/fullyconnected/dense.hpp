@@ -46,12 +46,8 @@ public:
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 
-    /**
-     * @brief function to initialize the module
-     * @param initialInputs the initial input variables
-     * @param initialOutputs the initial output variables
-     */
-    void __init__(std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs) override;
+    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
+    void addOutput(const std::shared_ptr<Variable> &output) override;
 };
 
 inline Dense::Dense(const HiddenVariant &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) : FullyConnected(units, name)
@@ -101,35 +97,28 @@ inline std::shared_ptr<Variable> Dense::getVariable(const std::uint32_t index)
     }
 }
 
-void Dense::__init__(const std::vector<std::shared_ptr<Variable>> initialInputs, const std::vector<std::shared_ptr<Variable>> initialOutputs)
+inline void Dense::addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize)
 {
-    if (initialInputs.size() != 1)
-    {
-        throw std::invalid_argument("Dense::__init__: the number of input variables must be 1");
-    }
-    if (initialOutputs.size() != 1)
-    {
-        throw std::invalid_argument("Dense::__init__: the number of output variables must be 1");
+    mpPaddingVariable->getInputs().push_back(input);
+
+    // Initialize default norm if not already set
+    if (!mpNorm && mpsDefaultNorm) {
+        mpNorm = std::visit([]<typename T0>(T0&& arg) {
+            return std::make_shared<std::decay_t<T0>>(std::forward<T0>(arg));
+        }, *mpsDefaultNorm);
     }
 
-    mpPaddingVariable->getInputs().push_back(initialInputs[0]);
-        
-    // init default norm
-    if(mpNorm == nullptr && mpsDefaultNorm != nullptr)
-    {
-        mpNorm = std::visit([]<typename T0>(T0&& arg) {
-            // Assuming all types in the variant can be dynamically cast to Operation*
-            return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, *mpsDefaultNorm);
-    }
-    
     if (mpNorm != nullptr) // adding norm to activation function
     {
-        mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));  
+        mpNormVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(mpNorm, {mpWeightMatrixVariable}, {})));
         mpWeightMatrixVariable->getConsumers().push_back(mpNormVariable);
     }
-
-
-    mpDropoutVariable->getConsumers().push_back(initialOutputs[0]);
 }
+
+inline void Dense::addOutput(const std::shared_ptr<Variable> &output)
+{
+    mpDropoutVariable->getConsumers().push_back(output);
+}
+
 
 #endif // DENSE_HPP

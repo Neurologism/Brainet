@@ -27,6 +27,8 @@ protected:
     static std::shared_ptr<ParameterNormPenaltyVariant> mpsDefaultNorm; // default norm to use
     std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization
 
+    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
+    void addOutput(const std::shared_ptr<Variable> &output) override;
 public:
     /**
      * @brief add a fully connected layer to the graph

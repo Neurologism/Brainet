@@ -16,7 +16,7 @@ namespace JSON
         throw std::runtime_error("The format of the json file is invalid.");
     }
     /**
-     * @brief This function parses the json file and runs the brainet model accordingly.
+     * @brief This function parses the JSON file and runs the brainet model accordingly.
      * @param file The file to parse.
      */
     inline void convertJsonToBrainet(const std::string & file)

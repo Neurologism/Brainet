@@ -20,11 +20,18 @@ public:
     virtual ~Module() = default;
 
     /**
-     * @brief used to initialize the module. This is used to add initial connections to other modules.
-     * @param initialInputs the input variables
-     * @param initialOutputs the output variables
+     * @brief add an input to the module
+     * @param input the input variable
+     * @param inputSize the size of the input
      */
-    virtual void __init__( std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs ) = 0;
+    virtual void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) = 0;
+
+    /**
+     * @brief add an output to the module
+     * @param output the output variable
+     */
+    virtual void addOutput(const std::shared_ptr<Variable>& output) = 0;
+
 
     /**
      * @brief function to get access to specific variables of the module.

@@ -9,13 +9,14 @@
 /**
  * @brief the ensemble module is used to average the output of multiple Variables and apply a loss function to the output.
  */
-class EnsembleModule : private Module
+class EnsembleModule final : private Module
 {
     std::shared_ptr<Variable> mOutputVariable; 
     std::shared_ptr<Module> mLossModule; 
     
     // not supported
-    void __init__( std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs ) override {};
+    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override {}
+    void addOutput(const std::shared_ptr<Variable>& output) override {}
 
 public:
     /**
@@ -25,11 +26,6 @@ public:
      * @param lossModule the loss module to apply to the output
      */
     EnsembleModule(const std::vector<std::shared_ptr<Variable>>& inputVariables, const std::string &name, const Loss & lossModule);
-
-    // /**
-    //  * @brief destructor for the ensemble module removes the module from the graph
-    //  */
-    // void remove();
 
     /**
      * @brief function to get access to specific variables of the module.
@@ -52,7 +48,7 @@ inline EnsembleModule::EnsembleModule(const std::vector<std::shared_ptr<Variable
     // connections within the module
     mOutputVariable->getConsumers().push_back(mLossModule->getVariable(0)); // surrogate loss
     mOutputVariable->getConsumers().push_back(mLossModule->getVariable(1)); // loss
-    mLossModule->__init__({mOutputVariable}, {});
+    mLossModule->addInput(mOutputVariable, 0);
 
     // other connections
     for(const auto& inputVariable : inputVariables)

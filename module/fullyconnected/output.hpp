@@ -52,10 +52,8 @@ public:
      */
     std::shared_ptr<Variable> getVariable(std::uint32_t index);
 
-    /**
-     * @brief used to initialize the module with the input and output variables.
-     */
-    void __init__(const std::vector<std::shared_ptr<Variable>> &initialInputs, const std::vector<std::shared_ptr<Variable>>& initialOutputs) const;
+    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
+    void addOutput(const std::shared_ptr<Variable> &output) override;
 };
 
 inline Output::Output(const OutputVariant &activationFunction, const std::uint32_t units, const std::string& name) : FullyConnected(units, name)
@@ -139,19 +137,15 @@ inline std::shared_ptr<Variable> Output::getVariable(const std::uint32_t index)
     }
 }
 
-inline void Output::__init__(const std::vector<std::shared_ptr<Variable>> &initialInputs, const std::vector<std::shared_ptr<Variable>>& initialOutputs) const
+inline void Output::addInput(const std::shared_ptr<Variable> &input, const std::uint32_t & inputSize)
 {
-    if (initialInputs.size() != 1)
-    {
-        throw std::invalid_argument("Output::__init__: the number of input variables must be 1");
-    }
-    if (!initialOutputs.empty())
-    {
-        throw std::invalid_argument("Output::__init__: the number of output variables must be 0");
-    }
-
-    mpPaddingVariable->getInputs().push_back(initialInputs[0]);
+    mpPaddingVariable->getInputs().push_back(input);
+    createWeightMatrix(inputSize);
 }
 
+inline void Output::addOutput(const std::shared_ptr<Variable>& output)
+{
+    throw std::runtime_error("Output::addOutput: output module cannot have outputs");
+}
 
 #endif // OUTPUT_HPP

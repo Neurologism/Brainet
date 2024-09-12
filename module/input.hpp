@@ -8,7 +8,9 @@
 #include "../operation/processing/dropout.hpp"
 
 /**
- * @brief this can store the input data of the model. Initialize with a pointer to the data and update the data when needed. This owns only 1 variable and does nothing else.
+ * @brief This can store the input data of the model.
+ * Initialize with a pointer to the data and update the data when needed.
+ This owns only one variable and does nothing else.
  * Preprocessing could be added at this point in the future.
  */
 class Input final : public Module
@@ -36,12 +38,9 @@ public:
 
     ~Input() override = default;
 
-    /**
-     * @brief used to initialize the module with the input and output variables.
-     * @param initialInputs the initial input variables
-     * @param initialOutputs the initial output variables
-     */
-    void __init__( std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
+    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
+
+    void addOutput(const std::shared_ptr<Variable> &output) override;
 
     /**
      * @brief gives access to all variables of the module.
@@ -69,20 +68,14 @@ inline Input::Input(std::uint32_t units, const Noise& noise, double dropout) : I
     mNoiseVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Noise>(noise), {mInputVariable}, {mDropoutVariable})));
 }
 
-
-void Input::__init__(const std::vector<std::shared_ptr<Variable>> initialInputs, const std::vector<std::shared_ptr<Variable>> initialOutputs)
+inline void Input::addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize)
 {
-    if (!initialInputs.empty())
+    if (mInputVariable == nullptr)
     {
-        throw std::runtime_error("Input module cannot have inputs");
+        throw std::runtime_error("Input::addInput: input variable not initialized");
     }
 
-    if (initialOutputs.size() != 1)
-    {
-        throw std::runtime_error("Input module must have exactly one output");
-    }
-
-    if(mNoiseVariable != nullptr)
+    if (mNoiseVariable != nullptr)
     {
         mInputVariable->getConsumers().push_back(mNoiseVariable);
         mDropoutVariable->getInputs().push_back(mNoiseVariable);
@@ -91,8 +84,17 @@ void Input::__init__(const std::vector<std::shared_ptr<Variable>> initialInputs,
     {
         mInputVariable->getConsumers().push_back(mDropoutVariable);
         mDropoutVariable->getInputs().push_back(mInputVariable);
-    }   
-    mDropoutVariable->getConsumers().push_back(initialOutputs[0]);
+    }
+}
+
+inline void Input::addOutput(const std::shared_ptr<Variable> &output)
+{
+    if (mDropoutVariable == nullptr)
+    {
+        throw std::runtime_error("Input::addOutput: dropout variable not initialized");
+    }
+
+    mDropoutVariable->getConsumers().push_back(output);
 }
 
 inline std::shared_ptr<Variable> Input::getVariable(const std::uint32_t index)

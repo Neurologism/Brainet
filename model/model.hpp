@@ -16,19 +16,41 @@
  */
 class Model
 {
+
 protected:
-
-    typedef std::vector<std::vector<double>> Vector2D;
-
     // everything needed for the graph
     std::vector<std::shared_ptr<Variable>> mLearnableVariables; // all variables that can be learned by the learning algorithm
-    std::vector<std::shared_ptr<Variable>> mInputVariables;     // all variables that are used as input for the data
-    std::vector<std::shared_ptr<Variable>> mTargetVariables;    // all variables that are used as input for the labels
     std::vector<std::shared_ptr<Variable>> mOutputVariables;    // all variables that are used as output 
     std::vector<std::shared_ptr<Variable>> mLossVariables;      // all variables that are used as output for the loss
     std::vector<std::shared_ptr<Variable>> mBackpropVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
 
-    virtual ~Model(){};
+
+    std::vector<std::shared_ptr<Module>> mModules; // all modules of the model
+    std::map<std::string, std::shared_ptr<Module>> mModuleMap; // map to access modules by name
+
+
+public:
+
+    void addModule(const ModuleVariant &module)
+    {
+        const std::shared_ptr<Module> modulePtr = std::visit([]<typename T0>(T0&& arg) {
+            // Assuming all types in the variant can be dynamically cast to OPERATION*
+            return std::shared_ptr<Module>(std::make_shared<std::decay_t<T0>>(arg));}, ModuleVariant{module});
+
+        mModules.push_back(modulePtr);
+        mModuleMap[modulePtr->getName()] = modulePtr;
+    }
+
+    static void connectModules(const std::shared_ptr<Module> &startModule, const std::shared_ptr<Module> &endModule)
+    {
+        startModule->addInput(endModule->getVariable(1), endModule->getUnits());
+        endModule->addOutput(startModule->getVariable(0));
+    }
+
+    void connectModules(const std::string &startModule, const std::string &endModule)
+    {
+        connectModules(mModuleMap[startModule], mModuleMap[endModule]);
+    }
 
     /**
      * @brief function to train the model
@@ -41,7 +63,7 @@ protected:
      * @param split the split between training and validation data
      * @note the function will split the data into training and validation data per default
      */
-    void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration = 20, double split = 0.8 );
+    void train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration = 20);
 
     /**
      * @brief function to test the model
@@ -56,24 +78,6 @@ protected:
 
 void Model::train(std::vector<Vector2D> const & inputs, std::vector<Vector2D> const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStoppingIteration, double split)
 {
-    for (std::uint32_t i = 1; i < inputs.size(); i++)
-    {
-        if (inputs[i].size() != inputs[0].size())
-        {
-            throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
-        }
-    }
-    for (std::uint32_t i = 1; i < labels.size(); i++)
-    {
-        if (labels[i].size() != labels[0].size())
-        {
-            throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
-        }
-    }
-    if ( inputs[0].size() != labels[0].size())
-    {
-        throw std::invalid_argument("Model::train: the size of all inputs and labels must be the same");
-    }
 
     Dropout::deactivateAveraging();
 

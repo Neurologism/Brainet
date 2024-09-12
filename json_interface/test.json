@@ -4,7 +4,6 @@
       "type": "add",
       "modules": [
         {
-          "name": "module1",
           "type": "dense",
           "parameters": [
             {
@@ -17,27 +16,25 @@
             },
             {
               "value": 200
-            }
-          ],
-          "input": [
+            },
             {
-              "name": "module2"
+                "value": "module1"
             }
           ]
         },
         {
-          "name": "module2",
-          "module-type": "input",
+          "type": "input",
           "parameters": [
             {
               "value": 100
+            },
+            {
+                "value": "module2"
             }
-          ],
-          "input": []
+          ]
         },
         {
-          "name": "module3",
-          "module-type": "output",
+          "type": "output",
           "parameters": [
             {
               "type": "softmax",
@@ -49,19 +46,24 @@
             {
               "type": "categorical_cross_entropy",
               "parameters": []
-            }
-          ],
-          "input": [
+            },
             {
-              "name": "module1"
+              "value": "module3"
             }
           ]
         }
+      ],
+      "connections": [
+        {
+          "from": "module2",
+          "to": "module1"
+        },
+        {
+          "from": "module1",
+          "to": "module3"
+        }
       ]
     },
-
-
-
 
     {
       "type": "train",
@@ -86,7 +88,6 @@
 
       ]
     },
-
 
     {
         "type": "predict",

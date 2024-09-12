@@ -9,14 +9,6 @@
 class SequentialModel : public Model
 {
     typedef std::vector<std::vector<double>> Vector2D;
-
-    std::vector<std::shared_ptr<Module>> mModules; // storing the hiddenModules in the order they were added
-
-
-
-protected:
-
-
 public:
     /**
      * @brief create a new sequential neural network model
@@ -58,33 +50,12 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     // connect Layers in Graph
     // assumes for all modules that getVariable(0) is the input variable and getVariable(1) is the output variable
 
-    inputLayer->__init__({}, {hiddenModules.front()->getVariable(0)});
-    
-    for(std::uint32_t i = 1; i < mModules.size()-1; i++)
+    connectModules(inputLayer, hiddenModules[0]);
+    for (std::uint32_t i = 0; i < hiddenModules.size() - 1; i++)
     {
-        mModules[i]->__init__({mModules[i-1]->getVariable(1)}, {mModules[i+1]->getVariable(0)});
+        connectModules(hiddenModules[i], hiddenModules[i+1]);
     }
-
-    outputLayer->__init__({hiddenModules.back()->getVariable(1)}, {});
-
-
-    // load weight matrices
-
-    for (std::uint32_t i = 0; i < hiddenModules.size(); i++)  
-    {
-        FullyConnected* dense = dynamic_cast<FullyConnected*>(hiddenModules[i].get());
-        if (dense != nullptr) 
-        {
-            if (i == 0)
-            {
-                dense->createWeightMatrix(inputLayer->getUnits());
-            }
-            else
-            {
-                dense->createWeightMatrix(hiddenModules[i-1]->getUnits());
-            }
-        }
-    }
+    connectModules(hiddenModules.back(), outputLayer);
 
     FullyConnected* output = dynamic_cast<FullyConnected*>(outputLayer.get());
     if (output != nullptr) 
@@ -112,13 +83,10 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     }
     mLearnableVariables.push_back(outputLayer->getVariable(2));         // weight matrix
 
-    mInputVariables.push_back(inputLayer->getVariable(0));              // input
-
     mOutputVariables.push_back(outputLayer->getVariable(1));            // model output
 
     try
     {
-        mTargetVariables.push_back(outputLayer->getVariable(6));        // target
         mLossVariables.push_back(outputLayer->getVariable(5));          // loss
         mLossVariables.push_back(outputLayer->getVariable(4));          // surrogate loss
         mBackpropVariables.push_back(outputLayer->getVariable(4));      // surrogate loss

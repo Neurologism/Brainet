@@ -34,14 +34,18 @@ public:
      */
     Loss(const LossFunctionVariant &lossFunction, const SurrogateLossFunctionVariant &surrogateLossFunction, const std::string & name = "");
 
-    // void remove();
+    /**
+     * @brief add an input to the graph
+     * @param input the input variable
+     * @param inputSize the size of the input
+     */
+    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
 
     /**
-     * @brief used to initialize the module with the input and output variables.
-     * @param initialInputs the input variables
-     * @param initialOutputs the output variables
+     * @brief add an output to the graph
+     * @param output the output variable
      */
-    void __init__( std::vector<std::shared_ptr<Variable>> initialInputs, std::vector<std::shared_ptr<Variable>> initialOutputs ) override;
+    void addOutput(const std::shared_ptr<Variable>& output) override;
 
     /**
      * @brief function to get access to specific variables of the module.
@@ -57,7 +61,7 @@ public:
 
 inline Loss::Loss(const LossFunctionVariant& lossFunction, const std::string & name) : Module(name)
 {
-    if (std::holds_alternative<ErrorRate>(lossFunction)) // Error Rate & Cross Entropy
+    if (std::holds_alternative<ErrorRate>(lossFunction)) // Error Rate & Cross-Entropy
     {
         createVariables(lossFunction, CrossEntropy());
     }
@@ -88,34 +92,24 @@ inline void Loss::createVariables(const LossFunctionVariant &lossFunction, const
     mTargetVariable->getConsumers().push_back(mSurrogateLossVariable);
 }
 
-// void Loss::remove()
-// {
-//     // delete other connections
-//     for(auto input : mCostVariable->getInputs())
-//     {
-//         input->getConsumers().erase(std::find(input->getConsumers().begin(), input->getConsumers().end(), mCostVariable));
-//     }
-
-//     // delete the variables
-//     GRAPH->removeVariable(mTargetVariable);
-
-//     GRAPH->removeVariable(mCostVariable);
-// }
-
-
-void Loss::__init__(const std::vector<std::shared_ptr<Variable>> initialInputs, const std::vector<std::shared_ptr<Variable>> initialOutputs )
+inline void Loss::addInput(const std::shared_ptr<Variable>& input, const std::uint32_t &inputSize)
 {
-    if (initialInputs.size() != 1)
+    if (mLossVariable == nullptr)
     {
-        throw std::invalid_argument("Loss::__init__: the number of input variables must be 1");
+        throw std::runtime_error("Loss::addInput: loss variable not initialized");
     }
-    if (!initialOutputs.empty())
+    if (mSurrogateLossVariable == nullptr)
     {
-        throw std::invalid_argument("Loss::__init__: the number of output variables must be 0");
+        throw std::runtime_error("Loss::addInput: surrogate loss variable not initialized");
     }
 
-    mLossVariable->getInputs().push_back(initialInputs[0]);
-    mSurrogateLossVariable->getInputs().push_back(initialInputs[0]);
+    mLossVariable->getInputs().push_back(input);
+    mSurrogateLossVariable->getInputs().push_back(input);
+}
+
+inline void Loss::addOutput(const std::shared_ptr<Variable>& output)
+{
+    throw std::runtime_error("Loss::addOutput: loss module cannot have outputs");
 }
 
 inline std::shared_ptr<Variable> Loss::getVariable(const std::uint32_t index)
