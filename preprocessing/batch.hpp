@@ -34,6 +34,32 @@ namespace preprocessing
         }
     }
 
+    /**
+     * @brief This function creates a batch from the input and target data and adds noise to the input data.
+     * @param data The input data.
+     * @param labels The target data.
+     * @param batchSize The size of the batch.
+     * @param dataBatch The 2D vector to store the input batch.
+     * @param labelBatch The 2D vector to store the target batch.
+     * @param mean The mean of the noise.
+     * @param stddev The standard deviation of the noise.
+     */
+    inline void createBatch(const dataType &data, const dataType &labels, const std::uint32_t &batchSize, dataType &dataBatch, dataType &labelBatch, const double &mean, const double &stddev)
+    {
+        createBatch(data, labels, batchSize, dataBatch, labelBatch);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::normal_distribution<double> dist(mean, stddev);
+
+        for (auto & i : dataBatch)
+        {
+            for (double & j : i)
+            {
+                j += dist(gen);
+            }
+        }
+    }
+
 }
 
 

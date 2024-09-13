@@ -7,6 +7,7 @@
 
 #include "module.hpp"
 #include "../preprocessing/split.hpp"
+#include "preprocessing/batch.hpp"
 
 /**
  * @brief The Dataset class is used to store the data for storing the training and test data of datasets.
@@ -35,9 +36,9 @@ public:
     [[nodiscard]] std::uint32_t getTrainingSize() const { return mTrainingData.size(); }
     [[nodiscard]] std::uint32_t getValidationSize() const { return mValidationData.size(); }
 
-    void loadTrainingBatch(std::uint32_t batchSize);
-    void loadValidationBatch(std::uint32_t batchSize);
-    void loadTestSet();
+    void loadTrainingBatch(std::uint32_t batchSize) const;
+    void loadValidationSet() const;
+    void loadTestSet() const;
 };
 
 
@@ -54,13 +55,25 @@ inline Dataset::Dataset(const dataType &trainingData, const dataType &trainingLa
     mLabelVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 }
 
-void Dataset::loadTrainingBatch(std::uint32_t batchSize)
+inline void Dataset::loadTrainingBatch(const std::uint32_t batchSize) const
 {
     dataType dataBatch;
     dataType labelBatch;
     preprocessing::createBatch(mTrainingData, mTrainingLabels, batchSize, dataBatch, labelBatch);
-    mDataVariable->setData(dataBatch);
-    mLabelVariable->setData(labelBatch);
+    mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(dataBatch)));
+    mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(labelBatch)));
+}
+
+inline void Dataset::loadValidationSet() const
+{
+    mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mValidationData)));
+    mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mValidationLabels)));
+}
+
+inline void Dataset::loadTestSet() const
+{
+    mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestData)));
+    mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestLabels)));
 }
 
 #endif //DATASET_HPP

@@ -1,16 +1,31 @@
 #ifndef DENSE_HPP
 #define DENSE_HPP
 
-#include <operation/processing/dropout.hpp>
-
-#include "fullyconnected.hpp"
+#include "../operation/processing/dropout.hpp"
+#include "../operation/matmul.hpp"
+#include "../operation/processing/padding.hpp"
+#include "../operation/activation_function/activation_function.hpp"
+#include "../operation/parameter_norm_penalties/parameter_norm_penalty.hpp"
+#include "../weight_initialization/weight_initializer.hpp"
 
 /**
  * @brief The dense module is intended for creating a dense (fully connected) layer in the graph.
  * It owns one input and one output variable.
  */
-class Dense final : public FullyConnected
+class Dense final : public Module
 {
+    // storing index of the variables in the graph
+    std::shared_ptr<Variable> mpWeightMatrixVariable; // learnable parameters of the layer (weights + bias)
+    std::shared_ptr<Variable> mpMatmulVariable; // multiplication of the input and the weights
+    std::shared_ptr<Variable> mpActivationVariable; // activation function applied
+    std::shared_ptr<Variable> mpPaddingVariable; // used to pad the input with 1s for the bias
+    std::shared_ptr<Variable> mpNormVariable; // used to compute a norm of the weights
+
+    std::shared_ptr<WeightInitializer> mpWeightInitializer = std::make_shared<NormalizedInitialization>(); // weight initializer
+
+    static std::shared_ptr<ParameterNormPenaltyVariant> mpsDefaultNorm; // default norm to use
+    std::shared_ptr<Operation> mpNorm = nullptr; // norm to use for regularization
+
     std::shared_ptr<Variable> mpDropoutVariable;
 
 public:
@@ -57,6 +72,10 @@ public:
 
     void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
     void addOutput(const std::shared_ptr<Variable> &output) override;
+
+    void createWeightMatrix(std::uint32_t inputUnits);
+
+    static void setDefaultNorm(ParameterNormPenaltyVariant const &norm);
 };
 
 inline Dense::Dense(const HiddenVariant &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) :
@@ -68,13 +87,21 @@ Dense(std::visit([]<typename T0>(T0&& arg) {
 }
 
 
-inline Dense::Dense(const std::shared_ptr<Operation> &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) : FullyConnected(units, name)
+inline Dense::Dense(const std::shared_ptr<Operation> &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) : Module(name)
 {
-    mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(activationFunction, {mpMatmulVariable}, {})));
+    mUnits = units; // set the number of neurons in the layer
+
+    // create the variables
+    mpPaddingVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Padding>(Padding(0,1,1))))); // pad for weights
+    mpWeightMatrixVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {}))); // nullptr because there is no operation
+    mpMatmulVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Matmul>(Matmul()), {mpPaddingVariable,mpWeightMatrixVariable})));
+    mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(activationFunction, {mpMatmulVariable})));
     
-    mpDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)), {mpActivationVariable}, {})));
+    mpDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)), {mpActivationVariable})));
 
     // connections within the module
+    mpPaddingVariable->getConsumers().push_back(mpMatmulVariable);
+    mpWeightMatrixVariable->getConsumers().push_back(mpMatmulVariable);
     mpMatmulVariable->getConsumers().push_back(mpActivationVariable); 
     mpActivationVariable->getConsumers().push_back(mpDropoutVariable);
    
@@ -132,5 +159,43 @@ inline void Dense::addOutput(const std::shared_ptr<Variable> &output)
     mpDropoutVariable->getConsumers().push_back(output);
 }
 
+inline void Dense::createWeightMatrix(std::uint32_t inputUnits)
+{
+    mpWeightMatrixVariable->getData() = std::make_shared<Tensor<double>>(Tensor<double>({inputUnits+1, mUnits})); // initialize the weights randomly
+
+    // initialize the weights randomly
+    mpWeightInitializer->createRandomEngine(inputUnits, mUnits);
+    std::vector<double> weights = mpWeightInitializer->createRandomVector();
+
+    for (std::uint32_t i = 0; i < inputUnits; i++) // load the weights into the weight matrix
+    {
+        for (std::uint32_t j = 0; j < mUnits; j++)
+        {
+            mpWeightMatrixVariable->getData()->set({i, j}, weights[i*mUnits+j]);
+        }
+    }
+
+    // initialize the bias
+    double bias = 0.0;
+
+    std::type_info const & type = typeid(mpActivationVariable->getOperation());
+    if (type == typeid(ReLU))
+    {
+        bias = 0.1;
+    }
+
+    for (std::uint32_t j = 0; j < mUnits; j++)
+    {
+        mpWeightMatrixVariable->getData()->set({inputUnits, j}, bias);
+    }
+}
+
+inline void Dense::setDefaultNorm(ParameterNormPenaltyVariant const & norm)
+{
+    mpsDefaultNorm = std::make_shared<ParameterNormPenaltyVariant>(norm);
+}
+
+
+std::shared_ptr<ParameterNormPenaltyVariant> FullyConnected::mpsDefaultNorm = nullptr;
 
 #endif // DENSE_HPP

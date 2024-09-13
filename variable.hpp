@@ -2,14 +2,13 @@
 #define VARIABLE_HPP
 
 #include "datatypes/tensor.hpp"
-#include "datatypes/matrix.hpp"
-#include "datatypes/vector.hpp"
 #include "operation/operation.hpp"
 
 class Operation;
 
 /**
- * @brief The variable class is a implementation of a variable in a computational graph. It is used to store data and owns a pointer to the operation that calculates the data.
+ * @brief The variable class is an implementation of a variable in a computational graph.
+ * It is used to store data and owns a pointer to the operation that calculates the data.
  */
 class Variable
 {
@@ -28,7 +27,7 @@ public:
      * @param children The children of the variable.
      * @param data The initial data of the variable.
      */
-    Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents = {}, const std::vector<std::shared_ptr<Variable>> &children = {}, const std::shared_ptr<Tensor<double>> &data = nullptr);
+    explicit Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents = {}, const std::vector<std::shared_ptr<Variable>> &children = {}, const std::shared_ptr<Tensor<double>> &data = nullptr);
 
     ~Variable() = default;
 
@@ -66,7 +65,7 @@ public:
      * @brief This function returns the id of the variable.
      * @return std::uint32_t The id of the variable.
      */
-    std::uint32_t getId() const;
+    [[nodiscard]] std::uint32_t getId() const;
 };
 
 inline Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents, const std::vector<std::shared_ptr<Variable>> &children, const std::shared_ptr<Tensor<double>> &data)

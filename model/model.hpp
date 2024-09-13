@@ -89,37 +89,38 @@ inline void Model::train(const Dataset &dataset, const std::uint32_t &epochs, co
 
     for(std::uint32_t iteration = 0; iteration < trainingIterations; iteration++)
     {
+        // forward pass
+        dataset.loadTrainingBatch(batchSize);
+        GRAPH->forward(graphInputs);
 
-
-        GRAPH->forward(graphInputs); // forward pass
-
-
-        std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData(); 
-        std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
+        // log results
+        const std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
+        const std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
         
         std::cout << "Iteration: " << iteration << "\t Loss: " << loss->at(0) << "\t Surrogate loss: " << surrogateLoss->at(0);
 
+        // backward pass
         GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
 
-        for(std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
+        // normalize the gradient
+        for(const auto & mLearnableVariable : mLearnableVariables)
         {
-            std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(mLearnableVariables[i]);
-            for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
+            const std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(mLearnableVariable);
+            for (std::uint32_t j = 0; j < mLearnableVariable->getData()->capacity(); j++)
             {
                 gradient->divide(j, batchSize);
             }
         }
-        
+
+        // update weights
         std::visit([&](auto&& arg) {
-            arg.update(mLearnableVariables); }, optimizer); // update weights
+            arg.update(mLearnableVariables); }, optimizer);
 
+        // validation pass
+        dataset.loadValidationSet();
+        GRAPH->forward(graphInputs);
 
-        // validation
-        mInputVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationData));
-        mTargetVariables[0]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(validationLabel)); // support multiple inputs and labels in the future
-
-        GRAPH->forward(graphInputs); // forward pass
-
+        // log validation results
         std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
         std::shared_ptr<Tensor<double>> validationSurrogateLoss = mLossVariables[1]->getData();
 
@@ -157,32 +158,20 @@ inline void Model::train(const Dataset &dataset, const std::uint32_t &epochs, co
             }
             break;
         }
-        
     }
 
     std::cout<< "Training finished." << std::endl;
 }
 
-void Model::test(const Dataset &dataset)
+inline void Model::test(const Dataset &dataset)
 {
-
     Dropout::activateAveraging();
-
-    const std::uint32_t dataSamples = inputs[0].size();
 
     std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
     graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
-    for (std::uint32_t i = 0; i < inputs.size(); i++)
-    {
-        mInputVariables[i]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(inputs[i]));
-    }
-    for (std::uint32_t i = 0; i < labels.size(); i++)
-    {
-        mTargetVariables[i]->getData() = std::make_shared<Tensor<double>>(Matrix<double>(labels[i]));
-    }
-
+    dataset.loadTestSet();
     GRAPH->forward(graphInputs); // forward pass
 
     std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
