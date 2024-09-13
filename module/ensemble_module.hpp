@@ -9,7 +9,7 @@
 /**
  * @brief the ensemble module is used to average the output of multiple Variables and apply a loss function to the output.
  */
-class EnsembleModule final : private Module
+class EnsembleModule final : Module
 {
     std::shared_ptr<Variable> mOutputVariable; 
     std::shared_ptr<Module> mLossModule; 

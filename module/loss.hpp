@@ -1,9 +1,9 @@
 #ifndef LOSS_HPP
 #define LOSS_HPP
 
-#include "../dependencies.hpp"
 #include "../operation/loss_functions/loss_function.hpp"
 #include "../operation/surrogate_loss_functions/surrogate_loss_function.hpp"
+#include "module.hpp"
 
 /**
  * @brief the loss module is intended for calculating the loss as well as the surrogate loss of the model.

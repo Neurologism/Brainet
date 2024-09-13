@@ -8,11 +8,7 @@
           "parameters": [
             {
               "type": "relu",
-              "parameters": [
-                {
-                  "value": 0.01
-                }
-              ]
+              "param0": 0.01
             },
             {
               "value": 200
@@ -29,7 +25,7 @@
               "value": 100
             },
             {
-                "value": "module2"
+              "value": "module2"
             }
           ]
         },
@@ -37,15 +33,13 @@
           "type": "output",
           "parameters": [
             {
-              "type": "softmax",
-              "parameters": []
+              "type": "softmax"
             },
             {
               "value": 10
             },
             {
-              "type": "categorical_cross_entropy",
-              "parameters": []
+              "type": "error_rate"
             },
             {
               "value": "module3"
@@ -76,11 +70,7 @@
         },
         {
           "type": "adam",
-          "parameters": [
-            {
-              "value": 0.01
-            }
-          ]
+          "param0": 0.01
         },
         {
           "value": 10

@@ -1,10 +1,10 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
-#include <utility>
-
+#include "input.hpp"
 #include "../dependencies.hpp"
 #include "../variable.hpp"
+#include "fullyconnected/output.hpp"
 
 /**
  * @brief The Module class can be used to group multiple variables together. This is useful for creating structures of variables with associated operations. 
@@ -12,7 +12,8 @@
 class Module
 {
 protected:
-    std::uint32_t mUnits = -1; // stores the input size of the module (should be set in the constructor) move to child classes?
+    std::uint32_t mUnits = -1; // stores the input size of the module
+    // (should be set in the constructor) moves to child classes?
     std::string mName; // stores the name of the module used for simple identification
 
 public:
@@ -65,6 +66,7 @@ public:
 // code of all child classes
 #include "fullyconnected/dense.hpp"
 
-using ModuleVariant = std::variant<Dense>;
+using ModuleVariant = std::variant<Input, Dense, Output>;
+using HiddenModuleVariant = std::variant<Dense>;
 
 #endif // MODULE_HPP

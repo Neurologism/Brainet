@@ -6,6 +6,7 @@
 #include "../../operation/activation_function/activation_function.hpp"
 #include "../../operation/parameter_norm_penalties/parameter_norm_penalty.hpp"
 #include "../../weight_initialization/weight_initializer.hpp"
+#include "../module.hpp"
 
 /**
  * @brief The fully connected module is intended

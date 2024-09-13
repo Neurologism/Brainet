@@ -27,6 +27,15 @@ public:
      * @brief add a dense layer to the graph
      * @param activationFunction the operation representing the activation function.
      * @param units the number of neurons in the layer.
+     * @param name the name of the module
+     * @param dropout the dropout rate of the layer
+     */
+    Dense(const std::shared_ptr<Operation> &activationFunction, std::uint32_t units, const std::string& name = "", const double& dropout = 1.0);
+
+    /**
+     * @brief add a dense layer to the graph
+     * @param activationFunction the operation representing the activation function.
+     * @param units the number of neurons in the layer.
      * @param norm the norm to use for regularization.
      * @param name the name of the module
      * @param dropout the dropout rate of the layer
@@ -50,15 +59,18 @@ public:
     void addOutput(const std::shared_ptr<Variable> &output) override;
 };
 
-inline Dense::Dense(const HiddenVariant &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) : FullyConnected(units, name)
+inline Dense::Dense(const HiddenVariant &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) :
+Dense(std::visit([]<typename T0>(T0&& arg) {
+    // Assuming all types in the variant can be dynamically cast to Operation*
+    return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, activationFunction), units, name, dropout)
 {
-    // turning the variant into a shared pointer to the operation class
-    // Use std::visit to handle the variant
-    const std::shared_ptr<Operation> activationFunctionPtr = std::visit([]<typename T0>(T0&& arg) {
-        // Assuming all types in the variant can be dynamically cast to Operation*
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, HiddenVariant{activationFunction});
 
-    mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(activationFunctionPtr, {mpMatmulVariable}, {}))); 
+}
+
+
+inline Dense::Dense(const std::shared_ptr<Operation> &activationFunction, const std::uint32_t units, const std::string& name, const double& dropout) : FullyConnected(units, name)
+{
+    mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(activationFunction, {mpMatmulVariable}, {})));
     
     mpDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)), {mpActivationVariable}, {})));
 
