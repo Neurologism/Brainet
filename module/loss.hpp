@@ -7,7 +7,6 @@
 
 /**
  * @brief the loss module is intended for calculating the loss as well as the surrogate loss of the model.
- 
  */
 class Loss final : public Module
 {
