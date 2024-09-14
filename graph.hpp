@@ -18,16 +18,16 @@ class Graph
     
     /**
      * @brief This function builds the gradient table for the variable focus. It is a recursive function that calculates the gradient of the focus variable with respect to all other variables in the graph.
-     * To do this it uses dynamic programming.
-     * @param focus The variable for which the gradient is calculated.
+     * To do this, it uses dynamic programming.
+     * @param pFocus The variable for which the gradient is calculated.
      * @param gradTable The gradient table that stores already calculated gradients.
      */
-    void mBuildGrad(VariablePtr pFocus, GradTable & pGradTable);
+    static void mBuildGrad(VariablePtr pFocus, GradTable & gradTable);
     /**
      * @brief This function performs a topological sort on the graph and returns the sorted variables.
      * @return std::vector<VariablePtr> The sorted variables.
      */
-    std::vector<VariablePtr> mTopoSort( std::vector<VariablePtr> & inputVariables );
+    std::vector<VariablePtr> mTopologicalSort( std::vector<VariablePtr> & inputVariables ) const;
 
 public:
     Graph() = default;
@@ -37,11 +37,12 @@ public:
      * @brief This function simply executes the operations of the graph in topological order.
      * @param inputVariables The Variables from which the data is propagated through the graph.
      */
-    void forward(std::vector<VariablePtr> & inputVariables);
+    void forward(std::vector<VariablePtr> & inputVariables) const;
 
     /**
-     * @brief This function calculates the gradients of the target variables with respect to the variables in the differentiate vector.
-     * It utilizes the well know general backpropagation algorithm and is implemented in a dynamic programming fashion.
+     * @brief This function calculates the gradients of the target variables with respect to the variables in the differentiated vector.
+     * It uses the well-known general backpropagation algorithm
+     * and is implemented in a dynamic programming fashion.
      * @param targetVariables The variables for which the gradients are calculated.
      * @param outputVariables The target variables are computed with respect to the output variables.
      * @return The gradients of the target variables in the same order as the target variables.
@@ -59,33 +60,32 @@ public:
      * @param pVar The variable for which the gradient is calculated.
      * @return The gradient of the variable.
      */
-    std::shared_ptr<Tensor<double>> getGradient(VariablePtr pVar);
+    std::shared_ptr<Tensor<double>> getGradient(const VariablePtr& pVar);
 
     /**
      * @brief This function adds a variable to the graph.
-     * @param var The variable to be added.
-     * @return VariablePtr The added variable.
+     * @param pVar The variable to be added.
      */
     VariablePtr addVariable(const VariablePtr & pVar);
 
     /**
      * @brief This function removes a variable from the graph.
-     * @param var The variable to be removed.
+     * @param pVar The variable to be removed.
      */
     void removeVariable(const VariablePtr & pVar);
-}; 
+};
 
 
-std::vector<std::shared_ptr<Variable>> Graph::mTopoSort( std::vector<VariablePtr> & inputVariables )
+inline std::vector<std::shared_ptr<Variable>> Graph::mTopologicalSort( std::vector<VariablePtr> & inputVariables ) const
 {
     std::vector<VariablePtr> pSorted;
     std::vector<bool> visited(mVariableVec.size(), false);
-    // depth first search
-    std::function<void(VariablePtr)> dfs = [&](VariablePtr pVar) 
+    // depth-first search
+    std::function<void(VariablePtr)> dfs = [&](const VariablePtr& pVar)
     {
         if(visited[pVar->getId()]) return;
         visited[pVar->getId()] = true;
-        for (VariablePtr pChild : pVar->getConsumers())
+        for (const VariablePtr& pChild : pVar->getConsumers())
         {
             if (!visited[pChild->getId()])
             {
@@ -95,20 +95,20 @@ std::vector<std::shared_ptr<Variable>> Graph::mTopoSort( std::vector<VariablePtr
         pSorted.push_back(pVar);
     };
 
-    for (VariablePtr pVar : inputVariables) // call for all variables
+    for (const VariablePtr& pVar : inputVariables) // call for all variables
     {
         if (!visited[pVar->getId()])
         {
             dfs(pVar);
         }
     }
-    std::reverse(pSorted.begin(), pSorted.end()); // reverse the order to get the topological order
+    std::ranges::reverse(pSorted); // reverse the order to get the topological order
 
     std::vector<VariablePtr> selectedVariables;
-    for (VariablePtr pVar : pSorted) // remove all variables that are not descendats of only input variables
+    for (const VariablePtr& pVar : pSorted) // remove all variables that are not descendants of only input variables
     {
         bool isDescendant = true;
-        for (VariablePtr pInput : pVar->getInputs())
+        for (const VariablePtr& pInput : pVar->getInputs())
         {
             if ( visited[pInput->getId()] == false )
             {
@@ -126,10 +126,9 @@ std::vector<std::shared_ptr<Variable>> Graph::mTopoSort( std::vector<VariablePtr
     return selectedVariables;
 }
 
-void Graph::forward(std::vector<VariablePtr> & inputVariables)
+inline void Graph::forward(std::vector<VariablePtr> & inputVariables) const
 {
-    std::vector<VariablePtr> pSorted = mTopoSort( inputVariables ); // sort the variables topologically and get only the variables that are descendants of the input variables
-    for (VariablePtr var : pSorted)
+    for (std::vector<VariablePtr> pSorted = mTopologicalSort( inputVariables ); const VariablePtr& var : pSorted)
     {
         if (var->getOperation() != nullptr) // if the variable has an operation, execute it
         {
@@ -138,12 +137,12 @@ void Graph::forward(std::vector<VariablePtr> & inputVariables)
     }
 }
 
-void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & outputVariables)
+inline void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & outputVariables)
 {
     mGradTable.clear(); // clear the gradient table
     GradTable gradTable; // the gradient table for the variables
 
-    for(VariablePtr pVar : outputVariables) // initialize the gradient table with the output variables
+    for(const VariablePtr& pVar : outputVariables) // initialize the gradient table with the output variables
     {
         gradTable[pVar] = std::make_shared<Tensor<double>>(Tensor<double>(pVar->getData()->shape())); // initialize the gradient table with the output variables
         for(std::uint32_t i = 0; i < pVar->getData()->capacity(); i++)
@@ -152,23 +151,23 @@ void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<Var
         }
     }
 
-    for (VariablePtr pVar : targetVariables) // calculate the gradients for all target variables
+    for (const VariablePtr& pVar : targetVariables) // calculate the gradients for all target variables
     {
         mBuildGrad(pVar, gradTable); // build the gradient table for the target variables
         mGradTable[pVar] = gradTable[pVar]; // store the gradients in the global gradient table
     }
 }
 
-void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable)
+inline void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable) // NOLINT
 {
     // error handling
-    if (gradTable.find(pFocus) != gradTable.end()) // if the gradient is already calculated, return
+    if (gradTable.contains(pFocus)) // if the gradient is already calculated, return
     {
         return;
     }
     if (pFocus->getConsumers().empty())
     {
-        return; // empty consumers -> leaf node (should handle no gradient in backprop)
+        return; // empty consumers → leaf node (should handle no gradient in backprop)
     }
     if (pFocus->getConsumers().empty())
     {
@@ -180,7 +179,7 @@ void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable)
     }
     
     std::shared_ptr<Tensor<double>> pGradient;
-    for (std::uint32_t i = 0; i < pFocus->getConsumers().size(); i++) // the sum of the gradients of the consumers is the gradient of the variable
+    for (std::uint32_t i = 0; i < pFocus->getConsumers().size(); i++) // the sum the consumer gradients is the gradient of the variable
     {
         // load stuff
         VariablePtr pConsumer = pFocus->getConsumers().at(i);
@@ -207,30 +206,32 @@ void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable)
     gradTable[pFocus] = pGradient;
 }
 
-std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
+inline std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
 {
     return mVariableVec;
 }
 
-std::shared_ptr<Tensor<double>> Graph::getGradient(VariablePtr pVar)
+inline std::shared_ptr<Tensor<double>> Graph::getGradient(const VariablePtr& pVar)
 {
-    if(mGradTable.find(pVar) == mGradTable.end()) throw std::runtime_error("Variable not in gradient table");
+    if(!mGradTable.contains(pVar)) throw std::runtime_error("Variable not in gradient table");
     return mGradTable[pVar];
 }
 
-std::shared_ptr<Variable> Graph::addVariable(const VariablePtr & pVar)
+inline std::shared_ptr<Variable> Graph::addVariable(const VariablePtr & pVar)
 {
     mVariableVec.push_back(pVar); 
-    if(pVar->getOperation()!=nullptr)pVar->getOperation()->setVariable(mVariableVec.back()); // address of variable has changed -> invalidation of pointers; not nice but works
+    if(pVar->getOperation()!=nullptr)pVar->getOperation()->setVariable(mVariableVec.back()); // address of variable has changed →
+    // invalidation of pointers;
+    // not nice but works
     return mVariableVec.back();
 }
 
-void Graph::removeVariable(const VariablePtr & pVar)
+inline void Graph::removeVariable(const VariablePtr & pVar)
 {
-    mVariableVec.erase(std::find(mVariableVec.begin(), mVariableVec.end(), pVar));
+    mVariableVec.erase(std::ranges::find(mVariableVec, pVar));
 }
 
-std::shared_ptr<Graph> GRAPH = std::make_shared<Graph>(); // global graph object
+inline auto GRAPH = std::make_shared<Graph>(); // global graph object
 
 
 #endif // GRAPH_HPP

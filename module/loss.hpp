@@ -10,7 +10,6 @@
  */
 class Loss final : public Module
 {
-    std::shared_ptr<Variable> mTargetVariable; // storing the target
     std::shared_ptr<Variable> mLossVariable; // storing the loss
     std::shared_ptr<Variable> mSurrogateLossVariable; // storing the surrogate loss
 
@@ -34,28 +33,16 @@ public:
     Loss(const LossFunctionVariant &lossFunction, const SurrogateLossFunctionVariant &surrogateLossFunction, const std::string & name = "");
 
     /**
-     * @brief add an input to the graph
+     * @brief add an input to the loss module
      * @param input the input variable
-     * @param inputSize the size of the input
      */
-    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override;
+    void addDataInput(const std::shared_ptr<Variable> &input) const;
+    void addLabelInput(const std::shared_ptr<Variable> &input) const;
 
-    /**
-     * @brief add an output to the graph
-     * @param output the output variable
-     */
-    void addOutput(const std::shared_ptr<Variable>& output) override;
-
-    /**
-     * @brief function to get access to specific variables of the module.
-     * @param index the index of the variable
-     * @return the variable specified by the index
-     * @note 0: surrogate loss variable
-     * @note 1: loss variable
-     * @note 2: target variable
-     */
-    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
-    
+    std::vector<std::shared_ptr<Variable>> getInputs() override;
+    std::vector<std::shared_ptr<Variable>> getOutputs() override;
+    std::vector<std::shared_ptr<Variable>> getLearnableVariables() override;
+    std::vector<std::shared_ptr<Variable>> getGradientVariables() override;
 };
 
 inline Loss::Loss(const LossFunctionVariant& lossFunction, const std::string & name) : Module(name)
@@ -78,20 +65,15 @@ inline Loss::Loss(const LossFunctionVariant &lossFunction, const SurrogateLossFu
 inline void Loss::createVariables(const LossFunctionVariant &lossFunction, const SurrogateLossFunctionVariant &surrogateLossFunction)
 {
     // add variables to the graph
-    mTargetVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 
     mLossVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([]<typename T0>(T0&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, LossFunctionVariant{lossFunction}), {mTargetVariable}, {})));
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, LossFunctionVariant{lossFunction}))));
 
     mSurrogateLossVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::visit([]<typename T0>(T0&& arg) {
-        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, SurrogateLossFunctionVariant{surrogateLossFunction}), {mTargetVariable}, {})));
-    
-    // connections within the module
-    mTargetVariable->getConsumers().push_back(mLossVariable);
-    mTargetVariable->getConsumers().push_back(mSurrogateLossVariable);
+        return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, SurrogateLossFunctionVariant{surrogateLossFunction}))));
 }
 
-inline void Loss::addInput(const std::shared_ptr<Variable>& input, const std::uint32_t &inputSize)
+inline void Loss::addDataInput(const std::shared_ptr<Variable>& input) const
 {
     if (mLossVariable == nullptr)
     {
@@ -102,28 +84,47 @@ inline void Loss::addInput(const std::shared_ptr<Variable>& input, const std::ui
         throw std::runtime_error("Loss::addInput: surrogate loss variable not initialized");
     }
 
-    mLossVariable->getInputs().push_back(input);
-    mSurrogateLossVariable->getInputs().push_back(input);
+    if (mLossVariable->getInputs().empty())mLossVariable->getInputs().resize(2);
+    mLossVariable->getInputs().at(1) = input;
+    if (mSurrogateLossVariable->getInputs().empty())mSurrogateLossVariable->getInputs().resize(2);
+    mSurrogateLossVariable->getInputs().at(1) = input;
 }
 
-inline void Loss::addOutput(const std::shared_ptr<Variable>& output)
+inline void Loss::addLabelInput(const std::shared_ptr<Variable>& input) const
 {
-    throw std::runtime_error("Loss::addOutput: loss module cannot have outputs");
-}
-
-inline std::shared_ptr<Variable> Loss::getVariable(const std::uint32_t index)
-{
-    switch (index)
+    if (mLossVariable == nullptr)
     {
-    case 0:
-        return mSurrogateLossVariable;
-    case 1:
-        return mLossVariable;
-    case 2:
-        return mTargetVariable;
-    default:
-        throw std::invalid_argument("Loss::getVariable: index out of range");
+        throw std::runtime_error("Loss::addInput: loss variable not initialized");
     }
+    if (mSurrogateLossVariable == nullptr)
+    {
+        throw std::runtime_error("Loss::addInput: surrogate loss variable not initialized");
+    }
+
+    if (mLossVariable->getInputs().empty())mLossVariable->getInputs().resize(2);
+    mLossVariable->getInputs().at(0) = input;
+    if (mSurrogateLossVariable->getInputs().empty())mSurrogateLossVariable->getInputs().resize(2);
+    mSurrogateLossVariable->getInputs().at(0) = input;
+}
+
+inline std::vector<std::shared_ptr<Variable>> Loss::getInputs()
+{
+    return {mLossVariable, mSurrogateLossVariable};
+}
+
+inline std::vector<std::shared_ptr<Variable>> Loss::getOutputs()
+{
+    return {};
+}
+
+inline std::vector<std::shared_ptr<Variable>> Loss::getLearnableVariables()
+{
+    return {};
+}
+
+inline std::vector<std::shared_ptr<Variable>> Loss::getGradientVariables()
+{
+    return {mSurrogateLossVariable};
 }
 
 

@@ -12,7 +12,7 @@
 /**
  * @brief The Dataset class is used to store the data for storing the training and test data of datasets.
  */
-class Dataset final : Module
+class Dataset final : public Module
 {
     std::shared_ptr<Variable> mDataVariable; // storing the data
     std::shared_ptr<Variable> mLabelVariable; // storing the labels
@@ -25,13 +25,9 @@ class Dataset final : Module
     dataType mTestData;
     dataType mTestLabels;
 
-    // not implemented
-    void addInput(const std::shared_ptr<Variable> &input, const std::uint32_t &inputSize) override {}
-    void addOutput(const std::shared_ptr<Variable> &output) override {}
 public:
     Dataset(const dataType &trainingData, const dataType &trainingLabels, const std::uint32_t &validationSplit, const dataType &testData, const dataType &testLabels, const std::string &name);
 
-    std::shared_ptr<Variable> getVariable(std::uint32_t index) override;
 
     [[nodiscard]] std::uint32_t getTrainingSize() const { return mTrainingData.size(); }
     [[nodiscard]] std::uint32_t getValidationSize() const { return mValidationData.size(); }
@@ -39,6 +35,14 @@ public:
     void loadTrainingBatch(std::uint32_t batchSize) const;
     void loadValidationSet() const;
     void loadTestSet() const;
+
+    void addDataOutput(const std::shared_ptr<Variable> &output) const;
+    void addLabelOutput(const std::shared_ptr<Variable> &output) const;
+
+    std::vector<std::shared_ptr<Variable>> getInputs() override;
+    std::vector<std::shared_ptr<Variable>> getOutputs() override;
+    std::vector<std::shared_ptr<Variable>> getLearnableVariables() override;
+    std::vector<std::shared_ptr<Variable>> getGradientVariables() override;
 };
 
 
@@ -75,5 +79,36 @@ inline void Dataset::loadTestSet() const
     mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestData)));
     mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestLabels)));
 }
+
+inline void Dataset::addDataOutput(const std::shared_ptr<Variable> &output) const
+{
+    mDataVariable->getConsumers().push_back(output);
+}
+
+inline void Dataset::addLabelOutput(const std::shared_ptr<Variable> &output) const
+{
+    mLabelVariable->getConsumers().push_back(output);
+}
+
+inline std::vector<std::shared_ptr<Variable>> Dataset::getInputs()
+{
+    return {};
+}
+
+inline std::vector<std::shared_ptr<Variable>> Dataset::getOutputs()
+{
+    return {mDataVariable, mLabelVariable};
+}
+
+inline std::vector<std::shared_ptr<Variable>> Dataset::getLearnableVariables()
+{
+    return {};
+}
+
+inline std::vector<std::shared_ptr<Variable>> Dataset::getGradientVariables()
+{
+    return {};
+}
+
 
 #endif //DATASET_HPP
