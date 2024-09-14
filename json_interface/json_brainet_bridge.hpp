@@ -68,7 +68,25 @@ namespace JSON
         throw std::runtime_error("This should never be reached.");
     }
 
-    inline
+    inline OptimizerVariant createOptimizer(const std::unique_ptr<JsonNode> & node)
+    {
+        if (node->m_children[0].first != "type")
+        {
+            invalidJson();
+        }
+        switch (std::get<std::string>(node->m_children[0].second))
+        {
+            case "sgd":
+            {
+                return SGD(std::get<double>(node->m_children[1].second), std::get<std::uint32_t>(node->m_children[2].second));
+            }
+            default:
+            {
+                invalidJson();
+            }
+        }
+        throw std::runtime_error("This should never be reached.");
+    }
 
 
     /**
@@ -106,17 +124,13 @@ namespace JSON
                         auto params = std::get<std::vector<std::unique_ptr<JsonNode>>>(grandChild->m_children[1].second);
                         switch (std::get<std::string>(grandChild->m_children[0].second))
                         {
-                            case "input":
-                            {
-                                model.addModule(Input(std::get<std::uint32_t>(params[0]->m_children[1].second), std::get<std::string>(params[1]->m_children[1].second)));
-                            }
                             case "dense":
                             {
                                 model.addModule(Dense(createOperation(params[0]), std::get<std::uint32_t>(params[1]->m_children[1].second), std::get<std::string>(params[2]->m_children[1].second)));
                             }
-                            case "output":
+                            case "loss":
                             {
-                                model.addModule(Output(createOperation(params[0]), std::get<std::uint32_t>(params[1]->m_children[1].second), createLoss(params[2]), std::get<std::string>(params[3]->m_children[1].second)));
+                                model.addModule(Loss(createLoss(params[2]), std::get<std::string>(params[3]->m_children[1].second)));
                             }
                             default:
                             {
@@ -138,13 +152,25 @@ namespace JSON
 
                 case "train":
                 {
-                    model.train(
+                    typedef std::vector<std::vector<double>> dataType;
+                    const dataType train_input = read_idx("../mnist/train-images.idx3-ubyte");
+                    const dataType train_target = read_idx("../mnist/train-labels.idx1-ubyte");
+
+                    dataType test_input = read_idx("../mnist/t10k-images.idx3-ubyte");
+                    dataType test_target = read_idx("../mnist/t10k-labels.idx1-ubyte");
+                    model.train(Dataset(train_input, train_target, 0.998, test_input, test_target), std::get<std::string>(child->m_children[1].second), std::get<std::string>(child->m_children[2].second), std::get<std::uint32_t>(child->m_children[3].second), std::get<std::uint32_t>(child->m_children[4].second), createOptimizer(std::get<std::unique_ptr<JsonNode>>(child->m_children[5].second)), std::get<std::uint32_t>(child->m_children[6].second));
                 }
 
 
                 case "test":
                 {
+                    typedef std::vector<std::vector<double>> dataType;
+                    const dataType train_input = read_idx("../mnist/train-images.idx3-ubyte");
+                    const dataType train_target = read_idx("../mnist/train-labels.idx1-ubyte");
 
+                    dataType test_input = read_idx("../mnist/t10k-images.idx3-ubyte");
+                    dataType test_target = read_idx("../mnist/t10k-labels.idx1-ubyte");
+                    model.test(Dataset(train_input, train_target, 0.998, test_input, test_target), std::get<std::string>(child->m_children[1].second), std::get<std::string>(child->m_children[2].second));
                 }
 
                 default:

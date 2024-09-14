@@ -32,13 +32,6 @@ public:
      */
     Loss(const LossFunctionVariant &lossFunction, const SurrogateLossFunctionVariant &surrogateLossFunction, const std::string & name = "");
 
-    /**
-     * @brief add an input to the loss module
-     * @param input the input variable
-     */
-    void addDataInput(const std::shared_ptr<Variable> &input) const;
-    void addLabelInput(const std::shared_ptr<Variable> &input) const;
-
     std::vector<std::shared_ptr<Variable>> getInputs() override;
     std::vector<std::shared_ptr<Variable>> getOutputs() override;
     std::vector<std::shared_ptr<Variable>> getLearnableVariables() override;
@@ -73,40 +66,6 @@ inline void Loss::createVariables(const LossFunctionVariant &lossFunction, const
         return std::shared_ptr<Operation>(std::make_shared<std::decay_t<T0>>(arg));}, SurrogateLossFunctionVariant{surrogateLossFunction}))));
 }
 
-inline void Loss::addDataInput(const std::shared_ptr<Variable>& input) const
-{
-    if (mLossVariable == nullptr)
-    {
-        throw std::runtime_error("Loss::addInput: loss variable not initialized");
-    }
-    if (mSurrogateLossVariable == nullptr)
-    {
-        throw std::runtime_error("Loss::addInput: surrogate loss variable not initialized");
-    }
-
-    if (mLossVariable->getInputs().empty())mLossVariable->getInputs().resize(2);
-    mLossVariable->getInputs().at(1) = input;
-    if (mSurrogateLossVariable->getInputs().empty())mSurrogateLossVariable->getInputs().resize(2);
-    mSurrogateLossVariable->getInputs().at(1) = input;
-}
-
-inline void Loss::addLabelInput(const std::shared_ptr<Variable>& input) const
-{
-    if (mLossVariable == nullptr)
-    {
-        throw std::runtime_error("Loss::addInput: loss variable not initialized");
-    }
-    if (mSurrogateLossVariable == nullptr)
-    {
-        throw std::runtime_error("Loss::addInput: surrogate loss variable not initialized");
-    }
-
-    if (mLossVariable->getInputs().empty())mLossVariable->getInputs().resize(2);
-    mLossVariable->getInputs().at(0) = input;
-    if (mSurrogateLossVariable->getInputs().empty())mSurrogateLossVariable->getInputs().resize(2);
-    mSurrogateLossVariable->getInputs().at(0) = input;
-}
-
 inline std::vector<std::shared_ptr<Variable>> Loss::getInputs()
 {
     return {mLossVariable, mSurrogateLossVariable};
@@ -114,7 +73,7 @@ inline std::vector<std::shared_ptr<Variable>> Loss::getInputs()
 
 inline std::vector<std::shared_ptr<Variable>> Loss::getOutputs()
 {
-    return {};
+    return {mLossVariable, mSurrogateLossVariable};
 }
 
 inline std::vector<std::shared_ptr<Variable>> Loss::getLearnableVariables()

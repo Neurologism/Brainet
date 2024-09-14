@@ -19,10 +19,8 @@ class Model
 protected:
     // everything needed for the graph
     std::vector<std::shared_ptr<Variable>> mLearnableVariables; // all variables that can be learned by the learning algorithm
-    std::vector<std::shared_ptr<Variable>> mOutputVariables;    // all variables that are used as output 
+    std::vector<std::shared_ptr<Variable>> mGradientVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
     std::vector<std::shared_ptr<Variable>> mLossVariables;      // all variables that are used as output for the loss
-    std::vector<std::shared_ptr<Variable>> mBackpropVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
-
 
     std::vector<std::shared_ptr<Module>> mModules; // all modules of the model
     std::map<std::string, std::shared_ptr<Module>> mModuleMap; // map to access modules by name
@@ -38,12 +36,25 @@ public:
 
         mModules.push_back(modulePtr);
         mModuleMap[modulePtr->getName()] = modulePtr;
+
+        auto learnableVariables = modulePtr->getLearnableVariables();
+        mLearnableVariables.insert(mLearnableVariables.end(), learnableVariables.begin(), learnableVariables.end());
+        auto gradientVariables = modulePtr->getGradientVariables();
+        mGradientVariables.insert(mGradientVariables.end(), gradientVariables.begin(), gradientVariables.end());
+        if (std::dynamic_pointer_cast<Loss>(modulePtr) != nullptr)
+        {
+            auto lossVariables = modulePtr->getOutputs();
+            mLossVariables.insert(mLossVariables.end(), lossVariables.begin(), lossVariables.end());
+        }
     }
 
     static void connectModules(const std::shared_ptr<Module> &startModule, const std::shared_ptr<Module> &endModule)
     {
-        startModule->addInput(endModule->getVariable(1), endModule->getUnits());
-        endModule->addOutput(startModule->getVariable(0));
+        connectVariables(startModule->getOutputs()[0], endModule->getInputs()[0]);
+        if (std::dynamic_pointer_cast<Loss>(endModule) != nullptr)
+        {
+            connectVariables(startModule->getOutputs()[0], endModule->getInputs()[1]);
+        }
     }
 
     void connectModules(const std::string &startModule, const std::string &endModule)
@@ -54,31 +65,36 @@ public:
     /**
      * @brief function to train the model
      * @param dataset the dataset to train the model
+     * @param inputModule the name of the input module
+     * @param lossModule the name of the loss module
      * @param epochs the number of epochs
      * @param batchSize the size of the batch
      * @param optimizer the optimizer to use
      * @param earlyStoppingIteration the number of iterations to wait for early stopping
      */
-    void train(const Dataset &dataset, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingIteration = 20);
+    void train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingIteration);
 
     /**
      * @brief function to test the model
      * @note the function will print the error of the model
      */
-    void test(const Dataset &dataset);
+    void test(Dataset &dataset, const std::string& inputModule, const std::string& lossModule);
 
     friend class Ensemble;
 };
 
-inline void Model::train(const Dataset &dataset, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingIteration)
+inline void Model::train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingIteration)
 {
-
     Dropout::deactivateAveraging();
+
+    connectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
+    connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
+    connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[1]);
+
 
     const std::uint32_t trainingIterations = epochs * dataset.getTrainingSize() / batchSize;
 
-    std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
-    graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+    std::vector<std::shared_ptr<Variable>> graphInputs = dataset.getOutputs();
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
     std::cout << std::setprecision(5) << std::fixed;
@@ -100,7 +116,7 @@ inline void Model::train(const Dataset &dataset, const std::uint32_t &epochs, co
         std::cout << "Iteration: " << iteration << "\t Loss: " << loss->at(0) << "\t Surrogate loss: " << surrogateLoss->at(0);
 
         // backward pass
-        GRAPH->backprop( mLearnableVariables, mBackpropVariables); // backward pass
+        GRAPH->backprop( mLearnableVariables, mGradientVariables); // backward pass
 
         // normalize the gradient
         for(const auto & mLearnableVariable : mLearnableVariables)
@@ -135,9 +151,9 @@ inline void Model::train(const Dataset &dataset, const std::uint32_t &epochs, co
             bestLoss = currentLoss;
             
             bestParameters.clear();
-            for (std::shared_ptr<Variable> parameter : mLearnableVariables)
+            for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
             {
-                bestParameters.push_back({});
+                bestParameters.emplace_back();
                 for (std::uint32_t i = 0; i < parameter->getData()->capacity(); i++)
                 {
                     bestParameters.back().push_back(parameter->getData()->at(i));
@@ -161,31 +177,42 @@ inline void Model::train(const Dataset &dataset, const std::uint32_t &epochs, co
     }
 
     std::cout<< "Training finished." << std::endl;
+
+    disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
+    disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
+    disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[1]);
 }
 
-inline void Model::test(const Dataset &dataset)
+inline void Model::test(Dataset &dataset, const std::string& inputModule, const std::string& lossModule)
 {
     Dropout::activateAveraging();
 
-    std::vector<std::shared_ptr<Variable>> graphInputs = mInputVariables;
-    graphInputs.insert(graphInputs.end(), mTargetVariables.begin(), mTargetVariables.end());
+    connectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
+    connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
+    connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[1]);
+
+    std::vector<std::shared_ptr<Variable>> graphInputs = dataset.getOutputs();
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
     dataset.loadTestSet();
     GRAPH->forward(graphInputs); // forward pass
 
-    std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
-    std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
+    const std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
+    const std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
 
     std::cout << "Test loss: " << loss->at(0) << "\t Test surrogate loss: " << surrogateLoss->at(0) << std::endl;
+
+    disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
+    disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
+    disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[1]);
 }
 
 
 // ModelVariant
 
-#include "sequential.hpp"
-
-using ModelVariant = std::variant<SequentialModel>;
+// #include "sequential.hpp"
+//
+// using ModelVariant = std::variant<SequentialModel>;
 
 
 #endif // MODEL_HPP

@@ -4,6 +4,11 @@
 #include "model.hpp"
 #include "../module/ensemble_module.hpp"
 
+
+/////////////////////////////////////
+/// Not working
+////////////////////////////////////
+
 /**
  * @brief the ensemble module is intended for creating an ensemble of models in the graph. This is useful for techniques like bagging or boosting.
  */

@@ -1,7 +1,7 @@
 #ifndef WEIGHT_INITIALIZER_HPP
 #define WEIGHT_INITIALIZER_HPP
 
-#include "../dependencies.hpp"
+#include "../../dependencies.hpp"
 
 /**
  * @brief Base class to initialize a vector randomly.

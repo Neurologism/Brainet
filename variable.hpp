@@ -115,6 +115,18 @@ inline std::uint32_t Variable::getId() const
     return mId;
 }
 
+inline void connectVariables(const std::shared_ptr<Variable> &parent, const std::shared_ptr<Variable> &child)
+{
+    parent->getConsumers().push_back(child);
+    child->getInputs().push_back(parent);
+}
+
+inline void disconnectVariables(const std::shared_ptr<Variable> &parent, const std::shared_ptr<Variable> &child)
+{
+    std::erase(parent->getConsumers(), child);
+    std::erase(child->getInputs(), parent);
+}
+
 std::uint32_t Variable::msCounter = 0; // initialize the static counter
 
 #endif // VARIABLE_HPP

@@ -28,11 +28,11 @@ public:
     virtual void f(std::vector<std::shared_ptr<Variable>> &inputs) = 0;
 
     /**
-     * @brief derivative of the function
+     * @brief the derivative of the function
      * assumes that the gradient is already calculated for the output variables
      * @param inputs the parents of the variable
      * @param focus this is the only variable everything else is constant
-     * @param gradient the sum of the gradients of the consumers
+     * @param gradient the sum of the consumers gradients
      */
     virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) = 0;
 

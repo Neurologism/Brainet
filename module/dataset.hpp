@@ -26,7 +26,7 @@ class Dataset final : public Module
     dataType mTestLabels;
 
 public:
-    Dataset(const dataType &trainingData, const dataType &trainingLabels, const std::uint32_t &validationSplit, const dataType &testData, const dataType &testLabels, const std::string &name);
+    Dataset(const dataType &trainingData, const dataType &trainingLabels, const double &validationSplit, const dataType &testData, const dataType &testLabels, const std::string &name = "");
 
 
     [[nodiscard]] std::uint32_t getTrainingSize() const { return mTrainingData.size(); }
@@ -36,9 +36,6 @@ public:
     void loadValidationSet() const;
     void loadTestSet() const;
 
-    void addDataOutput(const std::shared_ptr<Variable> &output) const;
-    void addLabelOutput(const std::shared_ptr<Variable> &output) const;
-
     std::vector<std::shared_ptr<Variable>> getInputs() override;
     std::vector<std::shared_ptr<Variable>> getOutputs() override;
     std::vector<std::shared_ptr<Variable>> getLearnableVariables() override;
@@ -46,12 +43,12 @@ public:
 };
 
 
-inline Dataset::Dataset(const dataType &trainingData, const dataType &trainingLabels, const std::uint32_t &validationSplit, const Dataset::dataType &testData, const Dataset::dataType &testLabels, const std::string &name) : Module(name)
+inline Dataset::Dataset(const dataType &trainingData, const dataType &trainingLabels, const double &validationSplit, const Dataset::dataType &testData, const Dataset::dataType &testLabels, const std::string &name) : Module(name)
 {
     if (trainingData.size() != trainingLabels.size()) throw std::runtime_error("data and labels have different sizes");
     if (testData.size() != testLabels.size()) throw std::runtime_error("data and labels have different sizes");
 
-    preprocessing::splitData(trainingData, trainingLabels, validationSplit, mTrainingData, mTrainingLabels, mValidationData, mValidationLabels);
+    preprocessing::splitData(trainingData, trainingLabels, validationSplit, mTrainingData, mValidationData, mTrainingLabels, mValidationLabels);
     mTestData = testData;
     mTestLabels = testLabels;
 
@@ -78,16 +75,6 @@ inline void Dataset::loadTestSet() const
 {
     mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestData)));
     mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestLabels)));
-}
-
-inline void Dataset::addDataOutput(const std::shared_ptr<Variable> &output) const
-{
-    mDataVariable->getConsumers().push_back(output);
-}
-
-inline void Dataset::addLabelOutput(const std::shared_ptr<Variable> &output) const
-{
-    mLabelVariable->getConsumers().push_back(output);
 }
 
 inline std::vector<std::shared_ptr<Variable>> Dataset::getInputs()

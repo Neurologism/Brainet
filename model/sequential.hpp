@@ -64,45 +64,7 @@ SequentialModel::SequentialModel(Input input_layer, std::vector<ModuleVariant> h
     }
 
 
-    // store special variables
-    for (auto & module : hiddenModules)
-    {
-        if (dynamic_cast<Dense*>(module.get()) != nullptr) 
-        {
-            // module is an object of class Dense
-            mLearnableVariables.push_back(module->getVariable(2));      // weight matrix
-            try
-            {
-                mBackpropVariables.push_back(module->getVariable(3));   // norm
-            }
-            catch(const std::exception& e)
-            {
-                // no norm variable
-            }
-        }
-    }
-    mLearnableVariables.push_back(outputLayer->getVariable(2));         // weight matrix
 
-    mOutputVariables.push_back(outputLayer->getVariable(1));            // model output
-
-    try
-    {
-        mLossVariables.push_back(outputLayer->getVariable(5));          // loss
-        mLossVariables.push_back(outputLayer->getVariable(4));          // surrogate loss
-        mBackpropVariables.push_back(outputLayer->getVariable(4));      // surrogate loss
-    }
-    catch(const std::exception& e)
-    {
-        // no cost module
-    }
-    try
-    {
-        mBackpropVariables.push_back(outputLayer->getVariable(3));      // norm
-    }
-    catch(const std::exception& e)
-    {
-        // no norm variable
-    }
 }
 
 void SequentialModel::train(Vector2D const & design_matrix, Vector2D const & labels, std::uint32_t const epochs, std::uint32_t const batchSize, OptimizerVariant optimizer, std::uint32_t const earlyStopping, double split)
