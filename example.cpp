@@ -18,25 +18,28 @@ using namespace std;
 std::int32_t main()
 {
     typedef std::vector<std::vector<double>> dataType;
-    dataType train_input = read_idx("mnist/train-images.idx3-ubyte");
-    dataType train_target = read_idx("mnist/train-labels.idx1-ubyte");
+    dataType train_input = read_idx("../mnist/train-images.idx3-ubyte");
+    dataType train_target = read_idx("../mnist/train-labels.idx1-ubyte");
 
-    dataType test_input = read_idx("mnist/t10k-images.idx3-ubyte");
-    dataType test_target = read_idx("mnist/t10k-labels.idx1-ubyte");
+    dataType test_input = read_idx("../mnist/t10k-images.idx3-ubyte");
+    dataType test_target = read_idx("../mnist/t10k-labels.idx1-ubyte");
 
-    // 200 neurons in the hidden layer, ReLU activation function
-    // 10 output neurons, Softmax activation function, ErrorRate as loss function
-    SequentialModel model(Input(train_input[0].size()), { Dense(ReLU(),200)}, Output(Softmax(), 10, ErrorRate()));
+    Model model;
 
     train_input = preprocessing::normalize(train_input);
     test_input = preprocessing::normalize(test_input);
 
-    // train the model
-    model.train( train_input, train_target, 10, 100, SGD(0.1,150), 20, 0.996 );
+    model.addModule(Dense(ReLU(),100, "dense1"));
+    model.addModule(Dense(Softmax(),10, "output"));
+    model.addModule(Loss(ErrorRate(), "loss"));
 
-    // test the model
-    model.test(test_input,test_target);
+    model.connectModules("dense1", "output");
+    model.connectModules("output", "loss");
 
+    Dataset dataset(train_input, train_target, 0.998, test_input, test_target);
+
+    model.train(dataset, "dense1", "loss", 10, 128, SGD(0.1,500), 10);
+    model.test( dataset, "dense1", "loss");
 
     return 0; 
 }

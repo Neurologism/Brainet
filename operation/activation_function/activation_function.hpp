@@ -32,9 +32,9 @@ public:
     virtual double activationFunctionDerivative(double x) = 0;
 };
 
-void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
+inline void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
 {
-    // always check for right number of inputs
+    // always check for the right number of inputs
     if (inputs.size() != 1)
     {
         throw std::invalid_argument("ActivationFunction::f: Invalid number of input variables.");
@@ -50,9 +50,9 @@ void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = _data; // store the result in the variable
 }
 
-std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+inline std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
 {
-    // always check for right number of inputs
+    // always check for the right number of inputs
     if (inputs.size() != 1)
     {
         throw std::invalid_argument("ActivationFunction::bprop: Invalid number of input variables.");
@@ -78,7 +78,6 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
 #include "sigmoid.hpp"
 #include "softmax.hpp"
 
-using HiddenVariant = std::variant<ReLU, HyperbolicTangent, Sigmoid>; // probably change later to one variant for all activation functions
-using OutputVariant = std::variant<Linear, Sigmoid, Softmax>; 
+using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Sigmoid, Linear, Sigmoid, Softmax>;
 
 #endif // ACTIVATIONFUNCTION_HPP

@@ -30,12 +30,12 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
         throw std::runtime_error("ErrorRate: number of inputs is not 2");
     }
 
-    if (inputs[0]->getData()->shape(1) != 1)
+    if (inputs[1]->getData()->shape(1) != 1)
     {
         throw std::runtime_error("ErrorRate: the target tensor must be 1D");
     }
 
-    if (inputs[1]->getData()->shape(0) != inputs[0]->getData()->shape(0))
+    if (inputs[0]->getData()->shape(0) != inputs[1]->getData()->shape(0))
     {
         throw std::runtime_error("ErrorRate: the size of the prediction and target tensor must be the same");
     }
@@ -43,32 +43,32 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
     double error = 0;
     std::vector<std::uint32_t> prediction(10);
     std::vector<std::uint32_t> target(10);
-    for (std::uint32_t i = 0; i < inputs[1]->getData()->shape(0); i++)
+    for (std::uint32_t i = 0; i < inputs[0]->getData()->shape(0); i++)
     {
-        double max = inputs[1]->getData()->at({i, 0});
+        double max = inputs[0]->getData()->at({i, 0});
         std::uint32_t maxIndex = 0;
-        for (std::uint32_t j = 1; j < inputs[1]->getData()->shape(1); j++)
+        for (std::uint32_t j = 1; j < inputs[0]->getData()->shape(1); j++)
         {
-            if (inputs[1]->getData()->at({i, j}) > max)
+            if (inputs[0]->getData()->at({i, j}) > max)
             {
-                max = inputs[1]->getData()->at({i, j});
+                max = inputs[0]->getData()->at({i, j});
                 maxIndex = j;
             }
         }
-        if (maxIndex != inputs[0]->getData()->at({i}))
+        if (maxIndex != inputs[1]->getData()->at({i}))
         {
             error++;
         }
         prediction[maxIndex]++;
-        target[inputs[0]->getData()->at({i})]++;
+        target[inputs[1]->getData()->at({i})]++;
 
     }
-    // std::cout << "Test error rate: " << error / inputs[1]->getData()->shape(0)*100 << "%" << std::endl;
+    // std::cout << "Test error rate: " << error / inputs[0]->getData()->shape(0)*100 << "%" << std::endl;
     // for (std::uint32_t i = 0; i < 10; i++)
     // {
     //     std::cout << "Digit " << i << " Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
     // }
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[1]->getData()->shape(0)*100));
+    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[0]->getData()->shape(0)*100));
 }
 
 #endif // ERROR_RATE_HPP

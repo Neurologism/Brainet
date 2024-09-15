@@ -2,14 +2,13 @@
 #define VARIABLE_HPP
 
 #include "datatypes/tensor.hpp"
-#include "datatypes/matrix.hpp"
-#include "datatypes/vector.hpp"
 #include "operation/operation.hpp"
 
 class Operation;
 
 /**
- * @brief The variable class is a implementation of a variable in a computational graph. It is used to store data and owns a pointer to the operation that calculates the data.
+ * @brief The variable class is an implementation of a variable in a computational graph.
+ * It is used to store data and owns a pointer to the operation that calculates the data.
  */
 class Variable
 {
@@ -28,7 +27,7 @@ public:
      * @param children The children of the variable.
      * @param data The initial data of the variable.
      */
-    Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents = {}, const std::vector<std::shared_ptr<Variable>> &children = {}, const std::shared_ptr<Tensor<double>> &data = nullptr);
+    explicit Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents = {}, const std::vector<std::shared_ptr<Variable>> &children = {}, const std::shared_ptr<Tensor<double>> &data = nullptr);
 
     ~Variable() = default;
 
@@ -37,6 +36,12 @@ public:
      * @return std::shared_ptr<Operation> The operation that calculates the data.
      */
     std::shared_ptr<Operation> getOperation();
+
+    /**
+     * @brief This function sets the operation that calculates the data.
+     * @param op The new operation that calculates the data.
+     */
+    void setOperation(const std::shared_ptr<Operation> &op);
 
     /**
      * @brief This function returns the children of the variable.
@@ -57,13 +62,19 @@ public:
     std::shared_ptr<Tensor<double>> &getData();
 
     /**
+     * @brief This function sets the data of the variable.
+     * @param data The new data of the variable.
+     */
+    void setData(const std::shared_ptr<Tensor<double>> &data);
+
+    /**
      * @brief This function returns the id of the variable.
      * @return std::uint32_t The id of the variable.
      */
-    std::uint32_t getId();
+    [[nodiscard]] std::uint32_t getId() const;
 };
 
-Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents, const std::vector<std::shared_ptr<Variable>> &children, const std::shared_ptr<Tensor<double>> &data)
+inline Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents, const std::vector<std::shared_ptr<Variable>> &children, const std::shared_ptr<Tensor<double>> &data)
 {
     mId = msCounter++;
     mpOperation = op;
@@ -80,29 +91,51 @@ Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::
     }
 };
 
-std::shared_ptr<Operation> Variable::getOperation()
+inline std::shared_ptr<Operation> Variable::getOperation()
 {
     return mpOperation;
 }
 
-std::vector<std::shared_ptr<Variable>> &Variable::getConsumers()
+inline void Variable::setOperation(const std::shared_ptr<Operation> &op)
+{
+    mpOperation = op;
+}
+
+inline std::vector<std::shared_ptr<Variable>> &Variable::getConsumers()
 {
     return mChildren;
 }
 
-std::vector<std::shared_ptr<Variable>> &Variable::getInputs()
+inline std::vector<std::shared_ptr<Variable>> &Variable::getInputs()
 {
     return mParents;
 }
 
-std::shared_ptr<Tensor<double>> &Variable::getData()
+inline std::shared_ptr<Tensor<double>> &Variable::getData()
 {
     return mpDataTensor;
 }
 
-std::uint32_t Variable::getId()
+inline void Variable::setData(const std::shared_ptr<Tensor<double>> &data)
+{
+    mpDataTensor = data;
+}
+
+inline std::uint32_t Variable::getId() const
 {
     return mId;
+}
+
+inline void connectVariables(const std::shared_ptr<Variable> &parent, const std::shared_ptr<Variable> &child)
+{
+    parent->getConsumers().push_back(child);
+    child->getInputs().push_back(parent);
+}
+
+inline void disconnectVariables(const std::shared_ptr<Variable> &parent, const std::shared_ptr<Variable> &child)
+{
+    std::erase(parent->getConsumers(), child);
+    std::erase(child->getInputs(), parent);
 }
 
 std::uint32_t Variable::msCounter = 0; // initialize the static counter
