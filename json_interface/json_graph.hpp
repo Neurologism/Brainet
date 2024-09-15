@@ -10,16 +10,16 @@
 namespace JSON
 {
     struct JsonNode;
-    typedef std::variant<bool, int, double, std::string, std::vector<std::unique_ptr<JsonNode>>, std::unique_ptr<JsonNode>, std::nullptr_t> JsonType;
+    typedef std::variant<bool, int, double, std::string, std::vector<JsonNode>, JsonNode> JsonType;
 
     struct JsonNode
     {
-        std::vector<std::pair<std::string, JsonType>> m_children;
+        std::map<std::string, JsonType> m_children;
     };
 
     struct JsonGraph
     {
-        std::unique_ptr<JsonNode> m_root;
+        JsonNode m_root;
     };
 }
 #endif //JSON_GRAPH_HPP

@@ -11,14 +11,14 @@
 namespace JSON
 {
     /**
-     * @brief This function performs a depth first search on the json graph.
+     * @brief This function performs a depth-first search on the JSON graph.
      * @param node The node to start the search from.
      * @param file The file stream.
      */
-    void depthFirstSearch(JsonNode * node, std::ifstream & file)
+    inline void depthFirstSearch(JsonNode &node, std::ifstream & file) //NOLINT
     {
         char ch = '{';
-        while (ch != '}') // end of the json object
+        while (ch != '}') // end of the JSON object
         {
             file.get(ch);
             if (ch == '"')
@@ -44,29 +44,23 @@ namespace JSON
                     {
                         case '{':
                         {
-                            auto child = std::make_unique<JsonNode>();
-                            depthFirstSearch(child.get(), file);
-                            node->m_children.emplace_back(key, std::move(child));
+                            node.m_children[key] = JsonNode();
+                            depthFirstSearch(std::get<JsonNode>(node.m_children[key]), file);
                             foundValue = true;
                             break;
                         }
                         case '[':
                         {
-                            std::vector<std::unique_ptr<JsonNode>> children;
+                            node.m_children[key] = std::vector<JsonNode>();
                             while (ch != ']')
                             {
                                 file.get(ch);
-                                while (ch != '{' && ch != ']')
+                                if (ch != '{')
                                 {
-                                    file.get(ch);
+                                    continue;
                                 }
-                                if (ch == ']')
-                                {
-                                    break;
-                                }
-                                auto child = std::make_unique<JsonNode>();
-                                depthFirstSearch(child.get(), file);
-                                node->m_children.emplace_back(key, std::move(child));
+                                std::get<std::vector<JsonNode>>(node.m_children[key]).emplace_back();
+                                depthFirstSearch(std::get<std::vector<JsonNode>>(node.m_children[key]).back(), file);
                             }
                             foundValue = true;
                             break;
@@ -80,25 +74,19 @@ namespace JSON
                                 value.push_back(ch);
                                 file.get(ch);
                             }
-                            node->m_children.emplace_back(key, value);
+                            node.m_children[key] = value;
                             foundValue = true;
                             break;
                         }
                         case 't':
                         {
-                            node->m_children.emplace_back(key, true);
+                            node.m_children[key] = true;
                             foundValue = true;
                             break;
                         }
                         case 'f':
                         {
-                            node->m_children.emplace_back(key, false);
-                            foundValue = true;
-                            break;
-                        }
-                        case 'n':
-                        {
-                            node->m_children.emplace_back(key, nullptr);
+                            node.m_children[key] = false;
                             foundValue = true;
                             break;
                         }
@@ -107,7 +95,6 @@ namespace JSON
                             if (std::isdigit(ch))
                             {
                                 std::string value;
-                                value.push_back(ch);
                                 bool isDouble = false;
                                 while (std::isdigit(ch) || ch == '.')
                                 {
@@ -120,14 +107,13 @@ namespace JSON
                                 }
                                 if (isDouble)
                                 {
-                                    node->m_children.emplace_back(key, std::stod(value));
-                                    foundValue = true;
+                                    node.m_children[key] = std::stod(value);
                                 }
                                 else
                                 {
-                                    node->m_children.emplace_back(key, std::stoi(value));
-                                    foundValue = true;
+                                    node.m_children[key] = std::stoi(value);
                                 }
+                                foundValue = true;
                             }
                             break;
                         }
@@ -153,10 +139,7 @@ namespace JSON
             file.get(ch);
         }
 
-        auto root = std::make_unique<JsonNode>();
-        depthFirstSearch(root.get(), file);
-        graph.m_root = std::move(root);
-
+        depthFirstSearch(graph.m_root, file);
 
         return graph;
     }

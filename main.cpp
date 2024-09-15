@@ -6,6 +6,7 @@
  */
 std::int32_t main()
 {
+    // load mnist dataset
     typedef std::vector<std::vector<double>> dataType;
     dataType train_input = read_idx("../mnist/train-images.idx3-ubyte");
     dataType train_target = read_idx("../mnist/train-labels.idx1-ubyte");
@@ -13,10 +14,14 @@ std::int32_t main()
     dataType test_input = read_idx("../mnist/t10k-images.idx3-ubyte");
     dataType test_target = read_idx("../mnist/t10k-labels.idx1-ubyte");
 
-    Model model;
-
     train_input = preprocessing::normalize(train_input);
     test_input = preprocessing::normalize(test_input);
+
+    Dataset dataset(train_input, train_target, 0.998, test_input, test_target);
+
+
+    // create and run model
+    Model model;
 
     model.addModule(Dense(ReLU(),100, "dense1"));
     model.addModule(Dense(Softmax(),10, "output"));
@@ -25,9 +30,7 @@ std::int32_t main()
     model.connectModules("dense1", "output");
     model.connectModules("output", "loss");
 
-    Dataset dataset(train_input, train_target, 0.998, test_input, test_target);
-
-    model.train(dataset, "dense1", "loss", 10, 100, SGD(0.1,500), 10);
+    model.train(dataset, "dense1", "loss", 10, 128, SGD(0.1,500), 10);
     model.test( dataset, "dense1", "loss");
 
     return 0; 

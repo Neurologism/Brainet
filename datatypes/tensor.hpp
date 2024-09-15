@@ -2,7 +2,6 @@
 #define TENSOR_HPP
 
 #include "../dependencies.hpp"
-#include "../weight_initialization/weight_initializer.hpp"
 
 /**
  * @brief The tensor class is a implementation of a tensor. It is used to store data in a multidimensional array. To do this it uses a vector to store the data and a vector to store the shape of the tensor.
