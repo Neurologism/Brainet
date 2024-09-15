@@ -38,6 +38,12 @@ public:
     std::shared_ptr<Operation> getOperation();
 
     /**
+     * @brief This function sets the operation that calculates the data.
+     * @param op The new operation that calculates the data.
+     */
+    void setOperation(const std::shared_ptr<Operation> &op);
+
+    /**
      * @brief This function returns the children of the variable.
      * @return std::vector<std::shared_ptr<Variable>> The children of the variable.
      */
@@ -88,6 +94,11 @@ inline Variable::Variable(const std::shared_ptr<Operation> &op, const std::vecto
 inline std::shared_ptr<Operation> Variable::getOperation()
 {
     return mpOperation;
+}
+
+inline void Variable::setOperation(const std::shared_ptr<Operation> &op)
+{
+    mpOperation = op;
 }
 
 inline std::vector<std::shared_ptr<Variable>> &Variable::getConsumers()

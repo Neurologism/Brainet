@@ -1,0 +1,106 @@
+{
+  "project": {
+    "_id": "string",
+    "name": "string",
+    "description": "string",
+    "owner_id": "string",
+    "visibility": "string",
+    "created_on": 0,
+    "last_edited": 0,
+    "operations": {
+      "add": {
+        "modules": [
+          {
+            "type": "dense",
+            "parameters": [
+              {
+                "type": "object",
+                "value": "relu"
+              },
+              {
+                "type": "parameter",
+                "value": 200
+              },
+              {
+                "type": "parameter",
+                "value": "module1"
+              }
+            ]
+          },
+          {
+            "type": "input",
+            "parameters": [
+              {
+                "type": "parameter",
+                "value": 100
+              },
+              {
+                "type": "parameter",
+                "value": "module2"
+              }
+            ]
+          },
+          {
+            "type": "output",
+            "parameters": [
+              {
+                "type": "object",
+                "value": "softmax",
+                "params": []
+              },
+              {
+                "type": "parameter",
+                "value": 10
+              },
+              {
+                "type": "object",
+                "value": "error_rate",
+                "params": []
+              },
+              {
+                "type": "parameter",
+                "value": "module3"
+              }
+            ]
+          }
+        ],
+        "connections": [
+          {
+            "from": "module2",
+            "to": "module1"
+          },
+          {
+            "from": "module1",
+            "to": "module3"
+          }
+        ]
+      },
+
+
+      "train": {
+        "parameters": [
+          {
+            "type": "parameter",
+            "value": 10
+          },
+          {
+            "type": "parameter",
+            "value": 32
+          },
+          {
+            "type": "object",
+            "value": "adam",
+            "params": [{ "type": "parameter", "value": 0.01 }] // params ist optional (wird ja nur bei manchen objekten benötigt)
+          },
+          {
+            "type": "parameter",
+            "value": 10
+          }
+        ]
+      },
+      "predict": {
+        "parameters": []
+      }
+    }
+  }
+}

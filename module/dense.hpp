@@ -84,13 +84,14 @@ inline Dense::Dense(const std::shared_ptr<Operation> &activationFunction, const 
     mpDropoutVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Dropout>(Dropout(dropout)))));
     mpPaddingVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Padding>(Padding(0,1,1)), {mpDropoutVariable}))); // pad for weights
 
-    mpWeightMatrixVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<WeightMatrixInitializer>(WeightMatrixInitializer(size, std::make_shared<NormalizedInitialization>(), std::dynamic_pointer_cast<ReLU>(activationFunction) ? 0.1 : 0)))));
+    mpWeightMatrixVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<WeightMatrixInitializer>(WeightMatrixInitializer(size, std::make_shared<NormalizedInitialization>(), std::dynamic_pointer_cast<ReLU>(activationFunction) ? 0.1 : 0)), {mpPaddingVariable})));
     mpMatmulVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(std::make_shared<Matmul>(Matmul()), {mpPaddingVariable,mpWeightMatrixVariable})));
     mpActivationVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(activationFunction, {mpMatmulVariable})));
 
     // connections within the module
     mpDropoutVariable->getConsumers().push_back(mpPaddingVariable);
     mpPaddingVariable->getConsumers().push_back(mpMatmulVariable);
+    mpPaddingVariable->getConsumers().push_back(mpWeightMatrixVariable);
     mpWeightMatrixVariable->getConsumers().push_back(mpMatmulVariable);
     mpMatmulVariable->getConsumers().push_back(mpActivationVariable);
 
