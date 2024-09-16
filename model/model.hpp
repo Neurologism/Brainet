@@ -170,11 +170,14 @@ inline void Model::train(Dataset &dataset, const std::string& inputModule, const
         {
             // std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
             // std::cout << "Best validation loss: " << bestLoss << std::endl;
-            for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
+            if (!bestParameters.empty())
             {
-                for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
+                for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
                 {
-                    mLearnableVariables[i]->getData()->set(j, bestParameters[i][j]);
+                    for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
+                    {
+                        mLearnableVariables[i]->getData()->set(j, bestParameters[i][j]);
+                    }
                 }
             }
             break;
