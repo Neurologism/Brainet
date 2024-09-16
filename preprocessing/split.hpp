@@ -46,8 +46,6 @@ namespace preprocessing
             validationInput.push_back(input[indices[i]]);
             validationTarget.push_back(target[indices[i]]);
         }
-
-        std::cout << "Data split into " << trainInput.size() << " training samples and " << validationInput.size() << " validation samples." << std::endl;
     }
 } // namespace preprocessing
 #endif // SPLIT_HPP
