@@ -6,5 +6,6 @@
 
 int main(int argc, char *argv[])
 {
+    std::ios::sync_with_stdio(false);
     JSON::convertJsonToBrainet("../json_interface/task.json");
 }
