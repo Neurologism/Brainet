@@ -112,8 +112,11 @@ inline void Model::train(Dataset &dataset, const std::string& inputModule, const
         // log results
         const std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
         const std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
-        
-        std::cout << "Iteration: " << iteration << "\t Loss: " << loss->at(0) << "\t Surrogate loss: " << surrogateLoss->at(0);
+
+        std::cout << "{\n";
+        std::cout << " \t \"iteration\": " << iteration << ",\n";
+        std::cout << " \t \"loss\": " << loss->at(0) << ",\n";
+        std::cout << " \t \"surrogate_loss\": " << surrogateLoss->at(0) << "\n";
 
         // backward pass
         GRAPH->backprop( mLearnableVariables, mGradientVariables); // backward pass
@@ -140,7 +143,9 @@ inline void Model::train(Dataset &dataset, const std::string& inputModule, const
         std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
         std::shared_ptr<Tensor<double>> validationSurrogateLoss = mLossVariables[1]->getData();
 
-        std::cout << "\t Validation loss: " << validationLoss->at(0) << "\t Validation surrogate loss: " << validationSurrogateLoss->at(0) << std::endl;
+        std::cout << " \t \"validation_loss\": " << validationLoss->at(0) << ",\n";
+        std::cout << " \t \"validation_surrogate_loss\": " << validationSurrogateLoss->at(0) << "\n";
+        std::cout << "}"<< std::endl;
 
         
         // early stopping
@@ -163,8 +168,8 @@ inline void Model::train(Dataset &dataset, const std::string& inputModule, const
         }
         else if ( lastImprovement + earlyStoppingIteration <= iteration)
         {
-            std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
-            std::cout << "Best validation loss: " << bestLoss << std::endl;
+            // std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
+            // std::cout << "Best validation loss: " << bestLoss << std::endl;
             for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
             {
                 for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
@@ -176,7 +181,7 @@ inline void Model::train(Dataset &dataset, const std::string& inputModule, const
         }
     }
 
-    std::cout<< "Training finished." << std::endl;
+    // std::cout<< "Training finished." << std::endl;
 
     disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
@@ -200,7 +205,10 @@ inline void Model::test(Dataset &dataset, const std::string& inputModule, const 
     const std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
     const std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
 
-    std::cout << "Test loss: " << loss->at(0) << "\t Test surrogate loss: " << surrogateLoss->at(0) << std::endl;
+    std::cout << "{\n";
+    std::cout << " \t \"test_loss\": " << loss->at(0) << ",\n";
+    std::cout << " \t \"test_surrogate_loss\": " << surrogateLoss->at(0) << "\n";
+    std::cout << "}"<< std::endl;
 
     disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
