@@ -5,7 +5,7 @@
 #ifndef JSON_PARSER_HPP
 #define JSON_PARSER_HPP
 
-#include "../dependencies.hpp"
+#include "dependencies.hpp"
 #include "json_graph.hpp"
 
 namespace JSON

@@ -6,7 +6,7 @@
 #define JSON_BRAINET_BRIDGE_HPP
 
 #include "json_parser.hpp"
-#include "../brainet.hpp"
+#include "brainet.hpp"
 
 namespace JSON
 {
