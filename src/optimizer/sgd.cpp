@@ -19,7 +19,7 @@ SGD::SGD(double initialLearningRate, std::uint32_t lastDecay) : SGD(initialLearn
 {
 }
 
-void SGD::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void SGD::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
 
 }

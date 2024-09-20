@@ -11,18 +11,18 @@ AdaGrad::AdaGrad(double learningRate, double delta, std::vector<Tensor<double>> 
     }
 }
 
-void AdaGrad::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void AdaGrad::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mSquaredGradients.empty())
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mSquaredGradients.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mSquaredGradients.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mSquaredGradients.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("AdaGrad::__init__: The number of squared gradients must be equal to the number of learnable parameters");
+        throw std::invalid_argument("AdaGrad::init: The number of squared gradients must be equal to the number of learnable parameters");
     }
 }
 

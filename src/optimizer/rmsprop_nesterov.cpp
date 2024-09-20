@@ -11,7 +11,7 @@ RMSPropNesterov::RMSPropNesterov(double learningRate, double decayRate, double d
     }
 }
 
-void RMSPropNesterov::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void RMSPropNesterov::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mCache.empty())
     {
@@ -22,7 +22,7 @@ void RMSPropNesterov::__init__(const std::vector<std::shared_ptr<Variable>> & rL
     }
     else if (mCache.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("RMSPropNesterov::__init__: The size of the cache must be equal to the number of learnable parameters");
+        throw std::invalid_argument("RMSPropNesterov::init: The size of the cache must be equal to the number of learnable parameters");
     }
 
     if (mVelocity.empty())
@@ -34,7 +34,7 @@ void RMSPropNesterov::__init__(const std::vector<std::shared_ptr<Variable>> & rL
     }
     else if (mVelocity.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("RMSPropNesterov::__init__: The size of the velocity must be equal to the number of learnable parameters");
+        throw std::invalid_argument("RMSPropNesterov::init: The size of the velocity must be equal to the number of learnable parameters");
     }
 
     for ( std::size_t i = 0; i < rLearnableParameters.size(); i++)

@@ -12,7 +12,7 @@ Momentum::Momentum(double learningRate, double momentum, std::vector<Tensor<doub
 
 }
 
-void Momentum::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void Momentum::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mVelocity.empty())
     {
@@ -23,7 +23,7 @@ void Momentum::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnabl
     }
     else if (mVelocity.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("Momentum::__init__: The number of learnable parameters must be equal to the number of velocity tensors");
+        throw std::invalid_argument("Momentum::init: The number of learnable parameters must be equal to the number of velocity tensors");
     }
 }
 

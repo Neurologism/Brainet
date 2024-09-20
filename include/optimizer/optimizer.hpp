@@ -17,7 +17,7 @@ public:
      * @brief Initializes the optimizer.
      * @param rLearnableParameters The learnable parameters.
      */
-    virtual void __init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) = 0;
+    virtual void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) = 0;
 
     /**
      * @brief Updates the learnable parameters using the optimization algorithm.
