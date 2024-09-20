@@ -26,10 +26,4 @@ public:
     virtual void update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) = 0;
 };
 
-
-#include "sgd.hpp"
-
-using OptimizerVariant = std::variant<SGD>;
-
-
 #endif // OPTIMIZER_HPP

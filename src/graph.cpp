@@ -4,7 +4,7 @@
 
 #include "graph.hpp"
 
-inline std::vector<std::shared_ptr<Variable>> Graph::mTopologicalSort( std::vector<VariablePtr> & inputVariables ) const
+std::vector<std::shared_ptr<Variable>> Graph::mTopologicalSort( std::vector<VariablePtr> & inputVariables ) const
 {
     std::vector<VariablePtr> pSorted;
     std::vector<bool> visited(mVariableVec.size(), false);
@@ -54,7 +54,7 @@ inline std::vector<std::shared_ptr<Variable>> Graph::mTopologicalSort( std::vect
     return selectedVariables;
 }
 
-inline void Graph::forward(std::vector<VariablePtr> & inputVariables) const
+void Graph::forward(std::vector<VariablePtr> & inputVariables) const
 {
     for (std::vector<VariablePtr> pSorted = mTopologicalSort( inputVariables ); const VariablePtr& var : pSorted)
     {
@@ -65,7 +65,7 @@ inline void Graph::forward(std::vector<VariablePtr> & inputVariables) const
     }
 }
 
-inline void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & outputVariables)
+void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & outputVariables)
 {
     mGradTable.clear(); // clear the gradient table
     GradTable gradTable; // the gradient table for the variables
@@ -86,7 +86,7 @@ inline void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vec
     }
 }
 
-inline void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable) // NOLINT
+void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable) // NOLINT
 {
     // error handling
     if (gradTable.contains(pFocus)) // if the gradient is already calculated, return
@@ -134,18 +134,18 @@ inline void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable) // NOLI
     gradTable[pFocus] = pGradient;
 }
 
-inline std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
+std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
 {
     return mVariableVec;
 }
 
-inline std::shared_ptr<Tensor<double>> Graph::getGradient(const VariablePtr& pVar)
+std::shared_ptr<Tensor<double>> Graph::getGradient(const VariablePtr& pVar)
 {
     if(!mGradTable.contains(pVar)) throw std::runtime_error("Variable not in gradient table");
     return mGradTable[pVar];
 }
 
-inline std::shared_ptr<Variable> Graph::addVariable(const VariablePtr & pVar)
+std::shared_ptr<Variable> Graph::addVariable(const VariablePtr & pVar)
 {
     mVariableVec.push_back(pVar);
     if(pVar->getOperation()!=nullptr)pVar->getOperation()->setVariable(mVariableVec.back()); // address of variable has changed →
@@ -154,7 +154,7 @@ inline std::shared_ptr<Variable> Graph::addVariable(const VariablePtr & pVar)
     return mVariableVec.back();
 }
 
-inline void Graph::removeVariable(const VariablePtr & pVar)
+void Graph::removeVariable(const VariablePtr & pVar)
 {
     mVariableVec.erase(std::ranges::find(mVariableVec, pVar));
 }

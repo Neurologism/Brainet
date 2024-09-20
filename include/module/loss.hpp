@@ -1,7 +1,7 @@
 #ifndef LOSS_HPP
 #define LOSS_HPP
 
-#include "../operation/loss_functions/loss_function.hpp"
+#include "../operation/loss_functions/loss_variant.hpp"
 #include "../operation/surrogate_loss_functions/surrogate_loss_function.hpp"
 #include "module.hpp"
 

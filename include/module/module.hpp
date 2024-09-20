@@ -25,11 +25,4 @@ public:
     std::string getName();
 };
 
-// code of all child classes
-#include "dataset.hpp"
-#include "layer.hpp"
-#include "loss.hpp"
-
-using ModuleVariant = std::variant<Dense, Loss, Dataset>;
-
 #endif // MODULE_HPP

@@ -51,9 +51,9 @@ std::shared_ptr<Tensor<double>> ParametricReLU::bprop(std::vector<std::shared_pt
             sum += input < 0 ? input * gradient->at(i) : 0;
         }
         // store the result
-        this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1},sum));
+        return std::make_shared<Tensor<double>>(Tensor<double>({1},sum));
     }
-    else if(focus == inputs[1])
+    if(focus == inputs[1])
     {
         // calculate the gradient of the input
         double slope = inputs[0]->getData()->at(0);
@@ -65,10 +65,10 @@ std::shared_ptr<Tensor<double>> ParametricReLU::bprop(std::vector<std::shared_pt
             result->set(i, input >= 0 ? gradient->at(i) : slope * gradient->at(i));
         }
         // store the result
-        this->getVariable()->getData() = result;
+        return result;
     }
-    else
-    {
-        throw std::runtime_error("ParametricReLU operation has no focus");
-    }
+
+
+    throw std::runtime_error("ParametricReLU operation has no focus");
+
 }

@@ -2,8 +2,8 @@
 #define MODEL_HPP
 
 #include "graph.hpp"
-#include "module/module.hpp"
-#include "optimizer/optimizer.hpp"
+#include "module/module_variant.hpp"
+#include "optimizer/optimizer_variant.hpp"
 #include "module/dataset.hpp"
 
 /**

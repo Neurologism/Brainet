@@ -32,15 +32,4 @@ public:
     virtual double activationFunctionDerivative(double x) = 0;
 };
 
-// include all the activation functions to create an ActivationFunction_VARIANT
-
-#include "rectified_linear_unit.hpp"
-#include "hyperbolic_tangent.hpp"
-#include "linear.hpp"
-#include "heavyside_step.hpp"
-#include "sigmoid.hpp"
-#include "softmax.hpp"
-
-using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Sigmoid, Linear, Sigmoid, Softmax>;
-
 #endif // ACTIVATIONFUNCTION_HPP

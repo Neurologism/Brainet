@@ -3,11 +3,11 @@ project(brainet)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src, ${CMAKE_SOURCE_DIR}/json_interface)
 
 add_executable(brainet
+        include/datatypes/tensor.hpp
         json_interface/run_json.cpp
         src/variable.cpp
         src/model.cpp
@@ -18,10 +18,7 @@ add_executable(brainet
         include/dependencies.hpp
         src/reader.cpp
         include/reader.hpp
-        src/datatypes/tensor.cpp
-        src/datatypes/matrix.cpp
         include/datatypes/matrix.hpp
-        src/datatypes/vector.cpp
         src/preprocessing/preprocessing.cpp
         include/preprocessing/preprocessing.hpp
         src/module/dataset.cpp
@@ -70,4 +67,10 @@ add_executable(brainet
         src/optimizer/nesterov_momentum.cpp
         src/optimizer/rmsprop.cpp
         src/optimizer/rmsprop_nesterov.cpp
+        include/brainet.hpp
+        include/module/module_variant.hpp
+        include/operation/activation_function/activation_function_variant.hpp
+        include/operation/parameter_norm_penalties/norm_variant.hpp
+        include/operation/loss_functions/loss_variant.hpp
+        include/optimizer/optimizer_variant.hpp
 )

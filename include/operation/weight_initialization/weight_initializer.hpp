@@ -29,11 +29,4 @@ public:
     std::vector<double> createRandomVector();
 };
 
-#include "uniform_distribution_initializer.hpp"
-#include "normal_distribution_initializer.hpp"
-#include "normalized_initialization.hpp"
-#include "he_initialization.hpp"
-
-using InitializationVariant = std::variant<UniformDistributionInitializer, NormalDistributionInitializer, NormalizedInitialization, HeInitialization>;
-
 #endif // WEIGHT_INITIALIZER_HPP

@@ -24,11 +24,4 @@ public:
     virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) = 0;
 };
 
-
-#include "L1_Norm.hpp"
-#include "L2_Norm.hpp"
-
-using ParameterNormPenaltyVariant = std::variant<L1Norm, L2Norm>;
-
-
 #endif // PARAMETER_NORM_PENALTY_HPP

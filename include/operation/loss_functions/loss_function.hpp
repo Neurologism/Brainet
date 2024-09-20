@@ -20,10 +20,5 @@ public:
     std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) override;
 };
 
-// loss function variant
-#include "error_rate.hpp"
-
-using LossFunctionVariant = std::variant<ErrorRate>;
-
 
 #endif // LOSS_FUNCTION_HPP

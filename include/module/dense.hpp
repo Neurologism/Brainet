@@ -4,8 +4,8 @@
 #include "../operation/processing/dropout.hpp"
 #include "../operation/matmul.hpp"
 #include "../operation/processing/padding.hpp"
-#include "../operation/activation_function/activation_function.hpp"
-#include "../operation/parameter_norm_penalties/parameter_norm_penalty.hpp"
+#include "../operation/activation_function/activation_function_variant.hpp"
+#include "../operation/parameter_norm_penalties/norm_variant.hpp"
 #include "../operation/weight_initialization/weight_matrix_initializer.hpp"
 #include "layer.hpp"
 

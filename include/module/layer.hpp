@@ -23,8 +23,4 @@ protected:
     [[nodiscard]] std::uint32_t getSize() const;
 };
 
-#include "dense.hpp"
-
-using LayerVariant = std::variant<Dense>;
-
 #endif //LAYER_HPP

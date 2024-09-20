@@ -5,9 +5,13 @@
 #ifndef WEIGHT_MATRIX_INITIALIZER_HPP
 #define WEIGHT_MATRIX_INITIALIZER_HPP
 
-#include "../operation.hpp"
-#include "weight_initializer.hpp"
-#include "../activation_function/activation_function.hpp"
+#include "operation/operation.hpp"
+#include "uniform_distribution_initializer.hpp"
+#include "normal_distribution_initializer.hpp"
+#include "normalized_initialization.hpp"
+#include "he_initialization.hpp"
+
+using InitializationVariant = std::variant<UniformDistributionInitializer, NormalDistributionInitializer, NormalizedInitialization, HeInitialization>;
 
 /**
   * @brief The WeightMatrixInitializer class is used to initialize a matrix in the first forward pass assuming the operation of the child is a matrix multiplication.

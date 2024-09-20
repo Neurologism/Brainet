@@ -50,7 +50,7 @@ Reader::data_type Reader::read_idx(const std::string& path)
             }
             for (double & j : i)
             {
-                j = static_cast<auto>(static_cast<std::byte>(*file_iterator++));
+                j = static_cast<double>(static_cast<std::byte>(*file_iterator++));
             }
         }
     }
