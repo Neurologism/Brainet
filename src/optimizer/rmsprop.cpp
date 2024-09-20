@@ -11,7 +11,7 @@ RMSProp::RMSProp(double learningRate, double decayRate, double delta, std::vecto
     }
 }
 
-void RMSProp::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void RMSProp::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mCache.empty())
     {
@@ -22,7 +22,7 @@ void RMSProp::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnable
     }
     else if (mCache.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("RMSProp::__init__: The size of the cache must be equal to the number of learnable parameters");
+        throw std::invalid_argument("RMSProp::init: The size of the cache must be equal to the number of learnable parameters");
     }
 }
 

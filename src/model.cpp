@@ -55,9 +55,12 @@ void Model::connectModules(const std::string &startModule, const std::string &en
     connectModules(mModuleMap[startModule], mModuleMap[endModule]);
 }
 
-void Model::train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingIteration)
+void Model::train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingPatience)
 {
     Dropout::deactivateAveraging();
+
+    std::visit([&](auto&& arg) {
+            arg.init(mLearnableVariables); }, optimizer);
 
     Variable::connectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     Variable::connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
@@ -138,7 +141,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
             }
             lastImprovement = iteration;
         }
-        else if ( lastImprovement + earlyStoppingIteration <= iteration)
+        else if ( lastImprovement + earlyStoppingPatience <= iteration)
         {
             // std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
             // std::cout << "Best validation loss: " << bestLoss << std::endl;

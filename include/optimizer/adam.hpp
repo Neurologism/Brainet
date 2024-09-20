@@ -36,7 +36,7 @@ public:
      * @brief Initializes the optimizer.
      * @param rLearnableParameters The learnable parameters.
      */
-    void __init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
+    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
 
     /**
      * @brief Updates the learnable parameters using the Adam algorithm.

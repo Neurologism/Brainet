@@ -4,11 +4,11 @@ project(brainet)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src, ${CMAKE_SOURCE_DIR}/json_interface)
 
-add_executable(brainet
+set(COMMON_SOURCES
         include/datatypes/tensor.hpp
-        json_interface/run_json.cpp
         src/variable.cpp
         src/model.cpp
         include/model.hpp
@@ -74,3 +74,7 @@ add_executable(brainet
         include/operation/loss_functions/loss_variant.hpp
         include/optimizer/optimizer_variant.hpp
 )
+
+add_executable(example ${COMMON_SOURCES} tests/example.cpp)
+add_executable(example2 ${COMMON_SOURCES} tests/example2.cpp)
+add_executable(json ${COMMON_SOURCES} json_interface/run_json.cpp)

@@ -44,9 +44,9 @@ public:
      * @param epochs the number of epochs
      * @param batchSize the size of the batch
      * @param optimizer the optimizer to use
-     * @param earlyStoppingIteration the number of iterations to wait for early stopping
+     * @param earlyStoppingPatience the number of iterations to wait for early stopping
      */
-    void train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingIteration);
+    void train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingPatience);
 
     /**
      * @brief function to test the model

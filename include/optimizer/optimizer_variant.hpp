@@ -5,6 +5,7 @@
 #ifndef OPTIMIZER_VARIANT_HPP
 #define OPTIMIZER_VARIANT_HPP
 
+#include "adam.hpp"
 #include "sgd.hpp"
 
 using OptimizerVariant = std::variant<SGD>;

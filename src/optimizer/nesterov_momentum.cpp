@@ -3,7 +3,7 @@
 //
 #include "optimizer/nesterov_momentum.hpp"
 
-void NesterovMomentum::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void NesterovMomentum::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mVelocity.empty())
     {
@@ -14,7 +14,7 @@ void NesterovMomentum::__init__(const std::vector<std::shared_ptr<Variable>> & r
     }
     else if (mVelocity.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("NesterovMomentum::__init__: The size of the velocity vector must be equal to the size of the learnable parameters vector");
+        throw std::invalid_argument("NesterovMomentum::init: The size of the velocity vector must be equal to the size of the learnable parameters vector");
     }
 
     for ( std::size_t i = 0; i < rLearnableParameters.size(); i++)

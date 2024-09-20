@@ -11,30 +11,30 @@ Adam::Adam(double learningRate, double decayRate1, double decayRate2, double del
     }
 }
 
-void Adam::__init__(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
+void Adam::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mFirstMomentEstimates.empty())
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mFirstMomentEstimates.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mFirstMomentEstimates.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mFirstMomentEstimates.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("Adam::__init__: The number of first moment estimates must match the number of learnable parameters");
+        throw std::invalid_argument("Adam::init: The number of first moment estimates must match the number of learnable parameters");
     }
 
     if (mSecondMomentEstimates.empty())
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mSecondMomentEstimates.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mSecondMomentEstimates.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mSecondMomentEstimates.size() != rLearnableParameters.size())
     {
-        throw std::invalid_argument("Adam::__init__: The number of second moment estimates must match the number of learnable parameters");
+        throw std::invalid_argument("Adam::init: The number of second moment estimates must match the number of learnable parameters");
     }
 }
 

@@ -7,5 +7,5 @@
 .Brainet
 .vs
 datasets/
-tests/main.cpp
+tests/example2.cpp
 cmake-build-debug

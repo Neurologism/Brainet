@@ -12,6 +12,6 @@
 #include "sigmoid.hpp"
 #include "softmax.hpp"
 
-using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Sigmoid, Linear, Sigmoid, Softmax>;
+using ActivationVariant = std::variant<ReLU, HyperbolicTangent, Linear, Sigmoid, Softmax>;
 
 #endif //ACTIVATION_FUNCTION_VARIANT_HPP
