@@ -5,7 +5,7 @@
 #ifndef JSON_GRAPH_HPP
 #define JSON_GRAPH_HPP
 
-#include "../dependencies.hpp"
+#include "dependencies.hpp"
 
 namespace JSON
 {
