@@ -67,7 +67,7 @@ std::vector<std::shared_ptr<Variable>> Dense::getOutputs()
 
 std::vector<std::shared_ptr<Variable>> Dense::getLearnableVariables()
 {
-    if (mpNorm != nullptr)
+    if (mpNormVariable != nullptr)
     {
         return {mpWeightMatrixVariable, mpNormVariable};
     }
@@ -76,7 +76,7 @@ std::vector<std::shared_ptr<Variable>> Dense::getLearnableVariables()
 
 std::vector<std::shared_ptr<Variable>> Dense::getGradientVariables()
 {
-    if (mpNorm != nullptr)
+    if (mpNormVariable != nullptr)
     {
         return {mpNormVariable};
     }

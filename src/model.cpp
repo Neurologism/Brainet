@@ -59,9 +59,6 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
 {
     Dropout::deactivateAveraging();
 
-    std::visit([&](auto&& arg) {
-            arg.init(mLearnableVariables); }, optimizer);
-
     Variable::connectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     Variable::connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
     Variable::connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[1]);
@@ -109,7 +106,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
         // update weights
         std::visit([&](auto&& arg) {
             arg.update(mLearnableVariables); }, optimizer);
-
+        continue;
         // validation pass
         dataset.loadValidationSet();
         GRAPH->forward(graphInputs);
@@ -129,7 +126,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
         if (currentLoss < bestLoss)
         {
             bestLoss = currentLoss;
-            
+
             bestParameters.clear();
             for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
             {

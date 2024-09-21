@@ -12,7 +12,7 @@ class Momentum : public Optimizer
     std::vector<Tensor<double>> mVelocity; // velocity over time
     double mLearningRate;
     double mMomentum;
-
+    bool mInitialized = false;
 public:
 
     /**
@@ -29,7 +29,7 @@ public:
      * @brief Initializes the optimizer.
      * @param rLearnableParameters The learnable parameters.
      */
-    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
+    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters);
 
     /**
      * @brief Updates the learnable parameters using the momentum algorithm. 

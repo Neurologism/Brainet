@@ -18,7 +18,7 @@ void Momentum::init(const std::vector<std::shared_ptr<Variable>> & rLearnablePar
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mVelocity.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mVelocity.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mVelocity.size() != rLearnableParameters.size())
@@ -29,6 +29,11 @@ void Momentum::init(const std::vector<std::shared_ptr<Variable>> & rLearnablePar
 
 void Momentum::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
+    if (!mInitialized)
+    {
+        init(rLearnableParameters);
+        mInitialized = true;
+    }
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
         std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);

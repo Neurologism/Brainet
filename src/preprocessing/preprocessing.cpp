@@ -83,7 +83,7 @@ void Preprocessing::splitData(dataType const & input, dataType const & target, d
 
     std::vector<std::uint32_t> indices(input.size());
     std::iota(indices.begin(), indices.end(), 0);
-    std::shuffle(indices.begin(), indices.end(), std::mt19937{std::random_device{}()});
+    std::ranges::shuffle(indices, std::mt19937{std::random_device{}()});
 
     for (std::uint32_t i = 0; i < split_index; i++)
     {

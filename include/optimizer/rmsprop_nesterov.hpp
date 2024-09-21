@@ -7,12 +7,13 @@
  * @brief The RMSPropNesterov class represents the RMSProp optimizer with Nesterov momentum.
  * RMSProp is an optimizer that utilizes the magnitude of recent gradients to normalize the gradients.
  */
-class RMSPropNesterov : public Optimizer
+class RMSPropNesterov final : public Optimizer
 {
     double mLearningRate;
     double mDecayRate;
     double mDelta;
     double mMomentum;
+    bool mInitialized = false;
     std::vector<Tensor<double>> mCache;
     std::vector<Tensor<double>> mVelocity;
 
@@ -27,15 +28,14 @@ public:
      * @param initialCache The initial cache.
      * @param initialVelocity The initial velocity.
      */
-    RMSPropNesterov(double learningRate, double decayRate = 0.9, double delta = 1e-7, double momentum = 0.9, std::vector<Tensor<double>> initialCache = {}, std::vector<Tensor<double>> initialVelocity = {});
+    explicit RMSPropNesterov(double learningRate, double decayRate = 0.9, double delta = 1e-7, double momentum = 0.9, std::vector<Tensor<double>> initialCache = {}, std::vector<Tensor<double>> initialVelocity = {});
 
-    ~RMSPropNesterov() = default;
 
     /**
      * @brief Initializes the optimizer.
      * @param rLearnableParameters The learnable parameters.
      */
-    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
+    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters);
 
     /**
      * @brief Updates the learnable parameters using the RMSProp with Nesterov momentum algorithm.
