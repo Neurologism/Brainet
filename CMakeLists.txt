@@ -73,6 +73,8 @@ set(COMMON_SOURCES
         include/operation/parameter_norm_penalties/norm_variant.hpp
         include/operation/loss_functions/loss_variant.hpp
         include/optimizer/optimizer_variant.hpp
+        src/logger.cpp
+        include/logger.hpp
 )
 
 add_executable(example ${COMMON_SOURCES} tests/example.cpp)

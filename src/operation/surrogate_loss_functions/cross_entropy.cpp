@@ -25,15 +25,15 @@ void CrossEntropy::f(std::vector<std::shared_ptr<Variable>> &inputs)
     {
         if (mUseWithLog)
         {
-            error -= log(inputs[0]->getData()->at({i, (std::uint32_t)inputs[1]->getData()->at({i})}));
+            error -= log(inputs[0]->getData()->at({i, static_cast<std::uint32_t>(inputs[1]->getData()->at({i}))}));
         }
         else
         {
-            error -= inputs[0]->getData()->at({i, (std::uint32_t)inputs[1]->getData()->at({i})});
+            error -= inputs[0]->getData()->at({i, static_cast<std::uint32_t>(inputs[1]->getData()->at({i}))});
         }
     }
 
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[0]->getData()->shape(0)));
+    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / static_cast<double>(inputs[0]->getData()->shape(0))));
 }
 
 
@@ -62,11 +62,11 @@ std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<
         {
             if (mUseWithLog)
             {
-                _gradient->set({i, j}, -1 / inputs[0]->getData()->at({i, j}) * (j == static_cast<std::uint32_t>(inputs[1]->getData()->at({i}))));
+                _gradient->set({i, j}, -1 / inputs[0]->getData()->at({i, j}) * (j == static_cast<std::uint32_t>(inputs[1]->getData()->at({i}))) * gradient->at({0})); // the gradient of log(x) is -1/x
             }
             else
             {
-                _gradient->set({i, j}, -1*(j == (std::uint32_t)inputs[1]->getData()->at({i})));
+                _gradient->set({i, j}, -1*(j == static_cast<std::uint32_t>(inputs[1]->getData()->at({i}))) * gradient->at({0}));
             }
         }
     }

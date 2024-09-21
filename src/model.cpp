@@ -89,19 +89,10 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
         std::cout << " \t \"iteration\": " << iteration << ",\n";
         std::cout << " \t \"loss\": " << loss->at(0) << ",\n";
         std::cout << " \t \"surrogate_loss\": " << surrogateLoss->at(0) << "\n";
+        std::cout << "}\n";
 
         // backward pass
-        GRAPH->backprop( mLearnableVariables, mGradientVariables); // backward pass
-
-        // normalize the gradient
-        for(const auto & mLearnableVariable : mLearnableVariables)
-        {
-            const std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(mLearnableVariable);
-            for (std::uint32_t j = 0; j < mLearnableVariable->getData()->capacity(); j++)
-            {
-                gradient->divide(j, batchSize);
-            }
-        }
+        GRAPH->backprop( mLearnableVariables, mGradientVariables, static_cast<double>(1)/batchSize); // backward pass
 
         // update weights
         std::visit([&](auto&& arg) {
