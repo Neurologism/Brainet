@@ -7,7 +7,7 @@ To achieve this, Brainet features a simple, well-documented codebase. Additional
 
 Please note that the project is still in its early stages of development. As a result, the codebase might be challenging to understand, and the supporting book is not yet written. However, I am actively working on it and am happy to provide explanations if you reach out to me. 😊
 
-Currently, the best place to start is the example.cpp file, which contains a simple example of how to train a 2-layer neural network on the MNIST dataset.
+Currently, the best place to start is the example.cpp file, which can be found in the tests folder. This file contains an example of how to train a 2-layer Neural Network on the MNIST dataset.
 
 ## Overview 
 The following image shows a high-level overview of the Brainet architecture which is the first step to transparency:
@@ -27,9 +27,10 @@ The following image shows a high-level overview of the Brainet architecture whic
 
 ## Installation
 
-<!-- To use Brainet, you need to have a CUDA compatible GPU and the [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) installed. -->
-
-You'll need a C++ compiler that supports at least C++17. I recommend using the [GNU Compiler Collection](https://gcc.gnu.org/). (And git to download the source code.)
+You'll need a C++ compiler that supports at least C++20.
+I recommend using the [GNU Compiler Collection](https://gcc.gnu.org/).
+(And git to download the source code.)
+For easy compilation, you can use [CMake](https://cmake.org/).
 
 To download, run the following command in your terminal:
 
@@ -45,18 +46,16 @@ To use Brainet, you need to include the Brainet header file in your project.
 
 An example of how to train a 2-layer Neural Network on the MNIST dataset can be found in the example.cpp file.
 
-To compile the example file run the following command in your terminal:
+To compile the example file, navigate to the build folder and run the following command in your terminal:
 ```bash
-g++ -o example example.cpp -std=c++17 -O3
+cmake --build ./
 ```
 
-To run the compiled file, run the following command in your terminal:
+To run the compiled file, navigate to the bin folder and run the following command in your terminal:
 
 ```bash
 ./example
 ```
-
-The algorithm will print logs to the console, showing the training progress. After the training is done, the test error rate will be printed to the console.
 
 ## Extensions
 The only dataset that comes with Brainet is the MNIST dataset. 
