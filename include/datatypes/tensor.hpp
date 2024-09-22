@@ -39,6 +39,14 @@ public:
      */
     Tensor(const ShapeVector &dimensionality, const T &value);
 
+    /**
+     * @brief Construct a new Tensor object. The tensor is initialized with the data of another tensor.
+     * @param tensor The tensor to copy the data from.
+     */
+    Tensor(const Tensor &tensor);
+
+    Tensor& operator=(const Tensor &tensor);
+
     ~Tensor() = default;
 
     /**
@@ -196,6 +204,23 @@ Tensor<T>::Tensor(const ShapeVector &dimensionality, const T &value)
 {
     mData = DataVector(std::accumulate(dimensionality.begin(), dimensionality.end(), 1, std::multiplies<>()), value); // initialize the data vector
     mShape = dimensionality;                                                                                                // set the shape of the tensor
+}
+
+template <class T>
+Tensor<T>::Tensor(const Tensor &tensor)
+{
+    mData = tensor.mData; // copy the data
+    mShape = tensor.mShape; // copy the shape
+}
+
+template <class T>
+Tensor<T>& Tensor<T>::operator=(const Tensor &tensor)
+{
+    if (this == &tensor)
+        return *this;
+    mData = tensor.mData; // copy the data
+    mShape = tensor.mShape; // copy the shape
+    return *this;
 }
 
 template <class T>

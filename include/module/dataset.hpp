@@ -24,14 +24,18 @@ class Dataset final : public Module
     dataType mTestData;
     dataType mTestLabels;
 
+    std::uint32_t mIndex = 0;
+
 public:
     Dataset(const dataType &trainingData, const dataType &trainingLabels, const double &validationSplit, const dataType &testData, const dataType &testLabels, const std::string &name = "");
+    Dataset(const dataType &trainingData, const dataType &trainingLabels, const dataType &testData, const dataType &testLabels, const std::string &name = "");
 
 
-    [[nodiscard]] std::uint32_t getTrainingSize() const { return mTrainingData.size(); }
-    [[nodiscard]] std::uint32_t getValidationSize() const { return mValidationData.size(); }
+    [[nodiscard]] bool goodBatch(const std::uint32_t &batchSize) const;
+    [[nodiscard]] bool hasValidationSet() const;
 
-    void loadTrainingBatch(std::uint32_t batchSize) const;
+    void shuffleTrainingSet();
+    void loadTrainingBatch(const std::uint32_t &batchSize);
     void loadValidationSet() const;
     void loadTestSet() const;
 

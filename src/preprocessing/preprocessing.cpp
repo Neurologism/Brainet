@@ -4,29 +4,13 @@
 
 #include "preprocessing/preprocessing.hpp"
 
-void Preprocessing::createBatch(const dataType &data, const dataType &labels, const std::uint32_t &batchSize, dataType &dataBatch, dataType &labelBatch)
+void Preprocessing::addNoise(dataType &data, const double &mean, const double &stddev)
 {
-    // generate random batch
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, static_cast<std::int32_t>(data.size()) - 1);
-
-    for (std::uint32_t i = 0; i < batchSize; i++)
-    {
-        const std::uint32_t randomIndex = dis(gen);
-        dataBatch.push_back(data[randomIndex]);
-        labelBatch.push_back(labels[randomIndex]);
-    }
-}
-
-void Preprocessing::createBatch(const dataType &data, const dataType &labels, const std::uint32_t &batchSize, dataType &dataBatch, dataType &labelBatch, const double &mean, const double &stddev)
-{
-    createBatch(data, labels, batchSize, dataBatch, labelBatch);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<double> dist(mean, stddev);
 
-    for (auto & i : dataBatch)
+    for (auto & i : data)
     {
         for (double & j : i)
         {

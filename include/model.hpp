@@ -23,7 +23,8 @@ class Model
     std::vector<std::shared_ptr<Module>> mModules; // all modules of the model
     std::map<std::string, std::shared_ptr<Module>> mModuleMap; // map to access modules by name
 
-    void validate(Dataset &dataset);
+    bool earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor<double>>> &bestParameters);
+
 public:
 
     std::shared_ptr<Module> addModule(const ModuleVariant &module);

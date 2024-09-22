@@ -4,6 +4,33 @@
 
 #include "model.hpp"
 
+#include "logger.hpp"
+
+bool Model::earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor<double>>> &bestParameters)
+{
+    if (error < bestError)
+    {
+        bestError = error;
+        bestEpoch = epoch;
+
+        bestParameters.clear();
+        for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
+        {
+            bestParameters.push_back(std::make_shared<Tensor<double>>(*parameter->getData()));
+        }
+    }
+    else if (bestEpoch + earlyStoppingPatience <= epoch)
+    {
+        for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
+        {
+            parameter->setData(bestParameters[parameter->getId()]);
+        }
+        return true;
+    }
+    return false;
+}
+
+
 std::shared_ptr<Module> Model::addModule(const ModuleVariant &module)
 {
     const std::shared_ptr<Module> pModule = std::visit([]<typename T0>(T0&& arg) {
@@ -63,91 +90,54 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
     Variable::connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
     Variable::connectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[1]);
 
-
-    const std::uint32_t trainingIterations = epochs * dataset.getTrainingSize() / batchSize;
-
     std::vector<std::shared_ptr<Variable>> graphInputs = dataset.getOutputs();
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
-    std::cout << std::setprecision(5) << std::fixed;
+    double bestValidationSurrogateLoss = std::numeric_limits<double>::max();
+    std::uint32_t bestEpoch = 0;
 
-    double bestLoss = std::numeric_limits<double>::max();
-    std::vector<std::vector<double>> bestParameters;
-    std::uint32_t lastImprovement = 0;
+    std::vector<std::shared_ptr<Tensor<double>>> bestParameters;
 
-    for(std::uint32_t iteration = 0; iteration < trainingIterations; iteration++)
+
+    for (std::uint32_t epoch = 0; epoch < epochs; epoch++)
     {
-        // forward pass
-        dataset.loadTrainingBatch(batchSize);
-        GRAPH->forward(graphInputs);
+        dataset.shuffleTrainingSet();
 
-        // log results
-        const std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
-        const std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
 
-        std::cout << "{\n";
-        std::cout << " \t \"iteration\": " << iteration << ",\n";
-        std::cout << " \t \"loss\": " << loss->at(0) << ",\n";
-        std::cout << " \t \"surrogate_loss\": " << surrogateLoss->at(0) << "\n";
-        std::cout << "}\n";
-
-        // backward pass
-        GRAPH->backprop( mLearnableVariables, mGradientVariables, static_cast<double>(1)/batchSize); // backward pass
-
-        // update weights
-        std::visit([&](auto&& arg) {
-            arg.update(mLearnableVariables); }, optimizer);
-        continue;
-        // validation pass
-        dataset.loadValidationSet();
-        GRAPH->forward(graphInputs);
-
-        // log validation results
-        std::shared_ptr<Tensor<double>> validationLoss = mLossVariables[0]->getData();
-        std::shared_ptr<Tensor<double>> validationSurrogateLoss = mLossVariables[1]->getData();
-
-        std::cout << " \t \"validation_loss\": " << validationLoss->at(0) << ",\n";
-        std::cout << " \t \"validation_surrogate_loss\": " << validationSurrogateLoss->at(0) << "\n";
-        std::cout << "}"<< std::endl;
-
-        
-        // early stopping
-        double currentLoss = validationSurrogateLoss->at(0);
-
-        if (currentLoss < bestLoss)
+        while (dataset.goodBatch(batchSize))
         {
-            bestLoss = currentLoss;
+            dataset.loadTrainingBatch(batchSize);
 
-            bestParameters.clear();
-            for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
-            {
-                bestParameters.emplace_back();
-                for (std::uint32_t i = 0; i < parameter->getData()->capacity(); i++)
-                {
-                    bestParameters.back().push_back(parameter->getData()->at(i));
-                }
-            }
-            lastImprovement = iteration;
+            GRAPH->forward(graphInputs); // forward pass
+            GRAPH->backprop( mLearnableVariables, mGradientVariables, static_cast<double>(1)/batchSize); // backward pass
+
+            std::visit([&](auto&& arg) {
+                arg.update(mLearnableVariables); }, optimizer); // update parameters
+
+            // log and store results
+            const double loss = mLossVariables[0]->getData()->at(0);
+            const double surrogateLoss = mLossVariables[1]->getData()->at(0);
+
+            Logger::logIteration(loss, surrogateLoss);
         }
-        else if ( lastImprovement + earlyStoppingPatience <= iteration)
+
+        if (dataset.hasValidationSet())
         {
-            // std::cout << "Early stopping after " << iteration << " iterations.\t\t\t\t\t" << std::endl;
-            // std::cout << "Best validation loss: " << bestLoss << std::endl;
-            if (!bestParameters.empty())
+            dataset.loadValidationSet();
+            GRAPH->forward(graphInputs); // validate
+
+            // store results
+            const double validationLoss = mLossVariables[0]->getData()->at(0);
+            const double validationSurrogateLoss = mLossVariables[1]->getData()->at(0);
+
+            Logger::logEpoch(validationLoss, validationSurrogateLoss);
+
+            if (earlyStopping(epoch, bestEpoch, earlyStoppingPatience, validationSurrogateLoss, bestValidationSurrogateLoss, bestParameters))
             {
-                for (std::uint32_t i = 0; i < mLearnableVariables.size(); i++)
-                {
-                    for (std::uint32_t j = 0; j < mLearnableVariables[i]->getData()->capacity(); j++)
-                    {
-                        mLearnableVariables[i]->getData()->set(j, bestParameters[i][j]);
-                    }
-                }
+                break;
             }
-            break;
         }
     }
-
-    // std::cout<< "Training finished." << std::endl;
 
     Variable::disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     Variable::disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);

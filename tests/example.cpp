@@ -21,7 +21,7 @@ std::int32_t main()
         Loss(ErrorRate(), "loss")
     });
 
-    Dataset dataset(train_input, train_target, 0.99, test_input, test_target);
+    Dataset dataset(train_input, train_target, 0.8, test_input, test_target);
 
     model.train(dataset, "dense0", "loss", 10, 100, SGD(0.01, 1000), 200);
     model.test( dataset, "dense0", "loss");
