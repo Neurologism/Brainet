@@ -10,5 +10,6 @@
 #include "optimizer/optimizer.hpp"
 #include "preprocessing/preprocessing.hpp"
 #include "model.hpp"
+#include "logger.hpp"
 
 #endif //BRAINET_HPP

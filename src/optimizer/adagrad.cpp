@@ -28,9 +28,14 @@ void AdaGrad::init(const std::vector<std::shared_ptr<Variable>> & rLearnablePara
 
 void AdaGrad::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
+    if (!mInitialized)
+    {
+        init(rLearnableParameters);
+        mInitialized = true;
+    }
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = rLearnableParameters[i]->getData();
+        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for (std::size_t j = 0; j < gradient->capacity(); j++)
         {

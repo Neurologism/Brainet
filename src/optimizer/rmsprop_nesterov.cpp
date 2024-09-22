@@ -17,7 +17,7 @@ void RMSPropNesterov::init(const std::vector<std::shared_ptr<Variable>> & rLearn
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mCache.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mCache.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mCache.size() != rLearnableParameters.size())
@@ -29,7 +29,7 @@ void RMSPropNesterov::init(const std::vector<std::shared_ptr<Variable>> & rLearn
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mVelocity.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mVelocity.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mVelocity.size() != rLearnableParameters.size())
@@ -48,9 +48,14 @@ void RMSPropNesterov::init(const std::vector<std::shared_ptr<Variable>> & rLearn
 
 void RMSPropNesterov::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
+    if (!mInitialized)
+    {
+        init(rLearnableParameters);
+        mInitialized = true;
+    }
     for ( std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = rLearnableParameters[i]->getData();
+        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for ( std::size_t j = 0; j < rLearnableParameters[i]->getData()->capacity(); j++)
         {

@@ -43,10 +43,11 @@ public:
      * It uses the well-known general backpropagation algorithm
      * and is implemented in a dynamic programming fashion.
      * @param targetVariables The variables for which the gradients are calculated.
-     * @param outputVariables The target variables are computed with respect to the output variables.
+     * @param leafVariables The target variables are computed with respect to the output variables.
+     * @param leafInitValue The initial value of the leaf nodes.
      * @return The gradients of the target variables in the same order as the target variables.
      */
-    void backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & outputVariables);
+    void backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & leafVariables, double leafInitValue = 1.0);
 
     /**
      * @brief This function returns all variables in the graph.

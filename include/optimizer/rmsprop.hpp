@@ -12,6 +12,7 @@ class RMSProp : public Optimizer
     double mLearningRate;
     double mDecayRate;
     double mDelta;
+    bool mInitialized = false;
     std::vector<Tensor<double>> mCache;
 
 public:
@@ -31,7 +32,7 @@ public:
      * @brief Initializes the optimizer.
      * @param rLearnableParameters The learnable parameters.
      */
-    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
+    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters);
 
     /**
      * @brief Updates the learnable parameters using the RMSProp algorithm.

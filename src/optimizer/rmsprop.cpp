@@ -17,7 +17,7 @@ void RMSProp::init(const std::vector<std::shared_ptr<Variable>> & rLearnablePara
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mCache.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mCache.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mCache.size() != rLearnableParameters.size())
@@ -28,9 +28,14 @@ void RMSProp::init(const std::vector<std::shared_ptr<Variable>> & rLearnablePara
 
 void RMSProp::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
+    if (!mInitialized)
+    {
+        init(rLearnableParameters);
+        mInitialized = true;
+    }
     for ( std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = rLearnableParameters[i]->getData();
+        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for ( std::size_t j = 0; j < gradient->capacity(); j++)
         {

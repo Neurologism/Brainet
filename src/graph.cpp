@@ -65,17 +65,17 @@ void Graph::forward(std::vector<VariablePtr> & inputVariables) const
     }
 }
 
-void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & outputVariables)
+void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<VariablePtr> & leafVariables, double leafInitValue)
 {
     mGradTable.clear(); // clear the gradient table
     GradTable gradTable; // the gradient table for the variables
 
-    for(const VariablePtr& pVar : outputVariables) // initialize the gradient table with the output variables
+    for(const VariablePtr& pVar : leafVariables) // initialize the gradient table
     {
-        gradTable[pVar] = std::make_shared<Tensor<double>>(Tensor<double>(pVar->getData()->shape())); // initialize the gradient table with the output variables
+        gradTable[pVar] = std::make_shared<Tensor<double>>(Tensor<double>(pVar->getData()->shape())); // set leafs to leafInitValue
         for(std::uint32_t i = 0; i < pVar->getData()->capacity(); i++)
         {
-            gradTable[pVar]->set(i, 1); // output variables have a gradient of 1 and are considered as leaf nodes
+            gradTable[pVar]->set(i, leafInitValue);
         }
     }
 

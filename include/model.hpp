@@ -15,8 +15,6 @@
  */
 class Model
 {
-
-protected:
     // everything needed for the graph
     std::vector<std::shared_ptr<Variable>> mLearnableVariables; // all variables that can be learned by the learning algorithm
     std::vector<std::shared_ptr<Variable>> mGradientVariables;  // all variables that are used as starting point for the backpropagation and are leafs of the model subgraph
@@ -25,6 +23,7 @@ protected:
     std::vector<std::shared_ptr<Module>> mModules; // all modules of the model
     std::map<std::string, std::shared_ptr<Module>> mModuleMap; // map to access modules by name
 
+    bool earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor<double>>> &bestParameters);
 
 public:
 
@@ -44,7 +43,7 @@ public:
      * @param epochs the number of epochs
      * @param batchSize the size of the batch
      * @param optimizer the optimizer to use
-     * @param earlyStoppingPatience the number of iterations to wait for early stopping
+     * @param earlyStoppingPatience the number of epochs to wait before stopping the training
      */
     void train(Dataset &dataset, const std::string& inputModule, const std::string& lossModule, const std::uint32_t &epochs, const std::uint32_t &batchSize, OptimizerVariant optimizer, const std::uint32_t &earlyStoppingPatience);
 

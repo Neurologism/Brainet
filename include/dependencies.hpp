@@ -21,5 +21,6 @@
 #include <map>
 #include <array>
 #include <string>
+#include <chrono>
 
 #endif // DEPENDENCIES_HPP

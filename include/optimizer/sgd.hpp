@@ -8,7 +8,7 @@
  * @brief The SGD class represents the stochastic gradient descent optimizer.
  * @note Linearly decreases the learning rate from the initial learning rate to reach the final learning rate after a certain number of iterations.
  */
-class SGD : public Optimizer
+class SGD final : public Optimizer
 {
     double mInitialLearningRate; 
     double mFinalLearningRate;
@@ -29,13 +29,6 @@ public:
      * @param lastDecay The number of iterations after which the learning rate will be the final learning rate.
      */
     SGD(double initialLearningRate, std::uint32_t lastDecay);
-    ~SGD() = default;
-
-    /**
-     * @brief Initializes the optimizer.
-     * @param rLearnableParameters The learnable parameters.
-     */
-    void init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters) override;
 
     /**
      * @brief Updates the learnable parameters using the stochastic gradient descent algorithm.

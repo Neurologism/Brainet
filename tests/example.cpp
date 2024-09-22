@@ -16,14 +16,14 @@ std::int32_t main()
     Model model;
 
     model.addSequential({
-        Dense(ReLU(), 100, "dense0"),
+        Dense(ReLU(), 300,  "dense0"),
         Dense(Softmax(), 10, "output"),
         Loss(ErrorRate(), "loss")
     });
 
-    Dataset dataset(train_input, train_target, 0.998, test_input, test_target);
+    Dataset dataset(train_input, train_target, 0.8, test_input, test_target);
 
-    model.train(dataset, "dense0", "loss", 1, 32, SGD(0.1,100), 10);
+    model.train(dataset, "dense0", "loss", 10, 100, SGD(0.01, 1000), 200);
     model.test( dataset, "dense0", "loss");
 
     return 0;

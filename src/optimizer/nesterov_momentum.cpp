@@ -3,13 +3,22 @@
 //
 #include "optimizer/nesterov_momentum.hpp"
 
+NesterovMomentum::NesterovMomentum(double learningRate, double momentum, std::vector<Tensor<double>> initialVelocity) : mLearningRate(learningRate), mMomentum(momentum), mVelocity(initialVelocity)
+{
+    if(mLearningRate <= 0 || mMomentum <= 0 || mMomentum >= 1)
+    {
+        throw std::invalid_argument("NesterovMomentum::NesterovMomentum: The learning rate and momentum must be positive and the momentum must be less than 1");
+    }
+
+}
+
 void NesterovMomentum::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
     if (mVelocity.empty())
     {
         for (const auto & rLearnableParameter : rLearnableParameters)
         {
-            mVelocity.push_back(Tensor<double>(rLearnableParameter->getData()->shape(), 0.0));
+            mVelocity.emplace_back(rLearnableParameter->getData()->shape(), 0.0);
         }
     }
     else if (mVelocity.size() != rLearnableParameters.size())
@@ -28,6 +37,11 @@ void NesterovMomentum::init(const std::vector<std::shared_ptr<Variable>> & rLear
 
 void NesterovMomentum::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
+    if (!mInitialized)
+    {
+        init(rLearnableParameters);
+        mInitialized = true;
+    }
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
         std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);

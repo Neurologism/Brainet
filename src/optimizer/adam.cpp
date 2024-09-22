@@ -40,10 +40,15 @@ void Adam::init(const std::vector<std::shared_ptr<Variable>> & rLearnableParamet
 
 void Adam::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
+    if (!mInitialized)
+    {
+        init(rLearnableParameters);
+        mInitialized = true;
+    }
     mIteration++;
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = rLearnableParameters[i]->getData();
+        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
         for (std::size_t j = 0; j < gradient->capacity(); j++)
         {
             mFirstMomentEstimates[i].set(j, mDecayRate1 * mFirstMomentEstimates[i].at(j) + (1 - mDecayRate1) * gradient->at(j));
