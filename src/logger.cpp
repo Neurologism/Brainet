@@ -83,4 +83,9 @@ void Logger::logEpoch(const double &validationLoss, const double &validationSurr
         std::cout << "Training Set: lowest Loss: " << mMinimumLoss << " lowest Surrogate Loss: " << mMinimumSurrogateLoss << "\n";
         std::cout << "-------------------------------------------------------------------------------------" << std::endl;
     }
+
+    mEpoch++;
+    mIteration = 0;
+    mMinimumLoss = std::numeric_limits<double>::max();
+    mMinimumSurrogateLoss = std::numeric_limits<double>::max();
 }

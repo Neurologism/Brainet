@@ -6,12 +6,13 @@
 
 #include "logger.hpp"
 
-bool Model::earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor<double>>> &bestParameters)
+bool Model::earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor<double>>> &bestParameters, const double &trainingError, double &bestTrainingError)
 {
     if (error < bestError)
     {
         bestError = error;
         bestEpoch = epoch;
+        bestTrainingError = trainingError;
 
         bestParameters.clear();
         for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
@@ -93,19 +94,21 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
     std::vector<std::shared_ptr<Variable>> graphInputs = dataset.getOutputs();
     graphInputs.insert(graphInputs.end(), mLearnableVariables.begin(), mLearnableVariables.end());
 
+    double bestTrainingSurrogateLoss = std::numeric_limits<double>::max();
     double bestValidationSurrogateLoss = std::numeric_limits<double>::max();
     std::uint32_t bestEpoch = 0;
 
     std::vector<std::shared_ptr<Tensor<double>>> bestParameters;
 
-
     for (std::uint32_t epoch = 0; epoch < epochs; epoch++)
     {
         dataset.shuffleTrainingSet();
 
-
-        while (dataset.goodBatch(batchSize))
+        std::uint32_t iteration = 0;
+        double trainingSurrogateLoss = 0;
+        while (dataset.goodTrainingBatch(batchSize))
         {
+            iteration++;
             dataset.loadTrainingBatch(batchSize);
 
             GRAPH->forward(graphInputs); // forward pass
@@ -117,6 +120,8 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
             // log and store results
             const double loss = mLossVariables[0]->getData()->at(0);
             const double surrogateLoss = mLossVariables[1]->getData()->at(0);
+
+            trainingSurrogateLoss += surrogateLoss;
 
             Logger::logIteration(loss, surrogateLoss);
         }
@@ -132,12 +137,49 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
 
             Logger::logEpoch(validationLoss, validationSurrogateLoss);
 
-            if (earlyStopping(epoch, bestEpoch, earlyStoppingPatience, validationSurrogateLoss, bestValidationSurrogateLoss, bestParameters))
+            if (earlyStopping(epoch, bestEpoch, earlyStoppingPatience, validationSurrogateLoss, bestValidationSurrogateLoss, bestParameters, trainingSurrogateLoss / iteration, bestTrainingSurrogateLoss))
             {
                 break;
             }
         }
     }
+
+    if (dataset.hasValidationSet()) // train on complete training set
+    {
+        double trainingSurrogateLoss = 0;
+
+        do
+        {
+            dataset.shuffleTrainingSet(true); // shuffle complete training set
+
+            std::uint32_t iteration = 0;
+            trainingSurrogateLoss = 0;
+
+            while (dataset.goodTrainingBatch(batchSize))
+            {
+                iteration++;
+                dataset.loadTrainingBatch(batchSize);
+
+                GRAPH->forward(graphInputs); // forward pass
+                GRAPH->backprop( mLearnableVariables, mGradientVariables, static_cast<double>(1)/batchSize); // backward pass
+
+                std::visit([&](auto&& arg) {
+                    arg.update(mLearnableVariables); }, optimizer); // update parameters
+
+                // log and store results
+                const double loss = mLossVariables[0]->getData()->at(0);
+                const double surrogateLoss = mLossVariables[1]->getData()->at(0);
+
+                trainingSurrogateLoss += surrogateLoss;
+
+                Logger::logIteration(loss, surrogateLoss);
+            }
+
+            trainingSurrogateLoss /= iteration;
+        } while (trainingSurrogateLoss > bestTrainingSurrogateLoss);
+    }
+
+
 
     Variable::disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     Variable::disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
