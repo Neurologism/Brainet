@@ -57,6 +57,7 @@ void Dataset::shuffleTrainingSet()
 
     mTrainingData = shuffledTrainingData;
     mTrainingLabels = shuffledTrainingLabels;
+    mIndex = 0;
 }
 
 
