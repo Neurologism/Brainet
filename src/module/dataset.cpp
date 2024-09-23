@@ -30,9 +30,9 @@ Dataset::Dataset(const dataType &trainingData, const dataType &trainingLabels, c
     mLabelVariable = GRAPH->addVariable(std::make_shared<Variable>(Variable(nullptr, {}, {})));
 }
 
-bool Dataset::goodBatch(const std::uint32_t &batchSize) const
+bool Dataset::goodTrainingBatch(const std::uint32_t &batchSize) const
 {
-    return mIndex + batchSize < mTrainingData.size();
+    return mIndex + batchSize < mTrainingIndices.size();
 }
 
 bool Dataset::hasValidationSet() const
@@ -40,23 +40,12 @@ bool Dataset::hasValidationSet() const
     return !mValidationData.empty();
 }
 
-void Dataset::shuffleTrainingSet()
+void Dataset::shuffleTrainingSet(const bool completeTrainingSet)
 {
-    std::vector<std::uint32_t> indices(mTrainingData.size());
-    std::iota(indices.begin(), indices.end(), 0);
-    std::ranges::shuffle(indices, std::mt19937{std::random_device{}()});
+    mTrainingIndices.resize(mTrainingData.size() + (completeTrainingSet ? mValidationData.size() : 0));
+    std::iota(mTrainingIndices.begin(), mTrainingIndices.end(), 0);
+    std::ranges::shuffle(mTrainingIndices, std::mt19937(std::random_device()()));
 
-    dataType shuffledTrainingData(mTrainingData.size());
-    dataType shuffledTrainingLabels(mTrainingLabels.size());
-
-    for (std::uint32_t i = 0; i < mTrainingData.size(); i++)
-    {
-        shuffledTrainingData[i] = mTrainingData[indices[i]];
-        shuffledTrainingLabels[i] = mTrainingLabels[indices[i]];
-    }
-
-    mTrainingData = shuffledTrainingData;
-    mTrainingLabels = shuffledTrainingLabels;
     mIndex = 0;
 }
 
@@ -64,7 +53,7 @@ void Dataset::shuffleTrainingSet()
 
 void Dataset::loadTrainingBatch(const std::uint32_t &batchSize)
 {
-    if (mIndex + batchSize > mTrainingData.size())
+    if (mIndex + batchSize > mTrainingIndices.size())
     {
         throw std::invalid_argument("The batch size is larger than the remaining size of the training set.");
     }
@@ -73,8 +62,16 @@ void Dataset::loadTrainingBatch(const std::uint32_t &batchSize)
 
     while (dataBatch.size() < batchSize)
     {
-        dataBatch.push_back(mTrainingData[mIndex]);
-        labelBatch.push_back(mTrainingLabels[mIndex]);
+        if (mTrainingIndices[mIndex] < mTrainingData.size())
+        {
+            dataBatch.push_back(mTrainingData[mTrainingIndices[mIndex]]);
+            labelBatch.push_back(mTrainingLabels[mTrainingIndices[mIndex]]);
+        }
+        else
+        {
+            dataBatch.push_back(mValidationData[mTrainingIndices[mIndex] - mTrainingData.size()]);
+            labelBatch.push_back(mValidationLabels[mTrainingIndices[mIndex] - mTrainingData.size()]);
+        }
         mIndex++;
     }
 

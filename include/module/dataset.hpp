@@ -24,6 +24,7 @@ class Dataset final : public Module
     dataType mTestData;
     dataType mTestLabels;
 
+    std::vector<std::uint32_t> mTrainingIndices;
     std::uint32_t mIndex = 0;
 
 public:
@@ -31,10 +32,10 @@ public:
     Dataset(const dataType &trainingData, const dataType &trainingLabels, const dataType &testData, const dataType &testLabels, const std::string &name = "");
 
 
-    [[nodiscard]] bool goodBatch(const std::uint32_t &batchSize) const;
+    [[nodiscard]] bool goodTrainingBatch(const std::uint32_t &batchSize) const;
     [[nodiscard]] bool hasValidationSet() const;
 
-    void shuffleTrainingSet();
+    void shuffleTrainingSet(bool completeTrainingSet = false);
     void loadTrainingBatch(const std::uint32_t &batchSize);
     void loadValidationSet() const;
     void loadTestSet() const;
