@@ -3,7 +3,7 @@
 //
 #include "optimizer/momentum_sgd.hpp"
 
-Momentum::Momentum(double learningRate, double momentum, std::vector<Tensor<double>> initialVelocity) : mLearningRate(learningRate), mMomentum(momentum), mVelocity(initialVelocity)
+Momentum::Momentum(double learningRate, double momentum, std::vector<Tensor> initialVelocity) : mLearningRate(learningRate), mMomentum(momentum), mVelocity(initialVelocity)
 {
     if(mLearningRate <= 0 || mMomentum <= 0 || mMomentum >= 1)
     {
@@ -36,7 +36,7 @@ void Momentum::update(const std::vector<std::shared_ptr<Variable>> & rLearnableP
     }
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
+        std::shared_ptr<Tensor> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for (std::size_t j = 0; j < rLearnableParameters[i]->getData()->capacity(); j++)
         {

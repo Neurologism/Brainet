@@ -2,7 +2,7 @@
 
 std::int32_t main()
 {
-    typedef std::vector<std::vector<double>> dataType;
+    typedef std::vector<std::vector<Precision>> dataType;
 
     dataType train_input = Reader::read_idx("../data/mnist/train-images.idx3-ubyte");
     dataType train_target = Reader::read_idx("../data/mnist/train-labels.idx1-ubyte");
@@ -23,8 +23,8 @@ std::int32_t main()
 
     Dataset dataset(train_input, train_target, 0.8, test_input, test_target);
 
-    model.train(dataset, "dense0", "loss", 20, 100, SGD(0.01, 10000), 1);
-    model.test( dataset, "dense0", "loss");
+    model.train(dataset, "dense0", "loss", 1, 100, SGD(0.01, 10000), 1);
+    //model.test( dataset, "dense0", "loss");
 
     return 0;
 }

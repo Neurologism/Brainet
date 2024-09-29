@@ -34,7 +34,7 @@ public:
      * @param focus this is the only variable everything else is constant
      * @param gradient the sum of the consumers gradients
      */
-    virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient) = 0;
+    virtual std::shared_ptr<Tensor> bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor> &gradient) = 0;
 
     /**
      * @brief sets the variable of the operation

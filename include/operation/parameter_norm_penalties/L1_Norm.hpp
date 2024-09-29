@@ -25,7 +25,7 @@ public:
     * @param focus this is the only variable everything else is constant
     * @param gradient the sum of the gradients of the consumers
     */
-    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
+    std::shared_ptr<Tensor> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient) override;
 };
 
 #endif // L1_NORM_HPP

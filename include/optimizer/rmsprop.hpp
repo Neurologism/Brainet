@@ -13,7 +13,7 @@ class RMSProp : public Optimizer
     double mDecayRate;
     double mDelta;
     bool mInitialized = false;
-    std::vector<Tensor<double>> mCache;
+    std::vector<Tensor> mCache;
 
 public:
 
@@ -24,7 +24,7 @@ public:
      * @param delta The delta.
      * @param initialCache The initial cache.
      */
-    RMSProp(double learningRate, double decayRate = 0.9, double delta = 1e-7, std::vector<Tensor<double>> initialCache = {});
+    RMSProp(double learningRate, double decayRate = 0.9, double delta = 1e-7, std::vector<Tensor> initialCache = {});
 
     ~RMSProp() = default;
 

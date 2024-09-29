@@ -6,7 +6,7 @@
 
 #include "logger.hpp"
 
-bool Model::earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor<double>>> &bestParameters, const double &trainingError, double &bestTrainingError)
+bool Model::earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, const std::uint32_t &earlyStoppingPatience, const double &error, double &bestError, std::vector<std::shared_ptr<Tensor>> &bestParameters, const double &trainingError, double &bestTrainingError)
 {
     if (error < bestError)
     {
@@ -17,7 +17,7 @@ bool Model::earlyStopping(const std::uint32_t &epoch, std::uint32_t &bestEpoch, 
         bestParameters.clear();
         for (const std::shared_ptr<Variable>& parameter : mLearnableVariables)
         {
-            bestParameters.push_back(std::make_shared<Tensor<double>>(*parameter->getData()));
+            bestParameters.push_back(std::make_shared<Tensor>(*parameter->getData()));
         }
     }
     else if (bestEpoch + earlyStoppingPatience <= epoch)
@@ -98,7 +98,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
     double bestValidationSurrogateLoss = std::numeric_limits<double>::max();
     std::uint32_t bestEpoch = 0;
 
-    std::vector<std::shared_ptr<Tensor<double>>> bestParameters;
+    std::vector<std::shared_ptr<Tensor>> bestParameters;
 
     for (std::uint32_t epoch = 0; epoch < epochs; epoch++)
     {
@@ -200,8 +200,8 @@ void Model::test(Dataset &dataset, const std::string& inputModule, const std::st
     dataset.loadTestSet();
     GRAPH->forward(graphInputs); // forward pass
 
-    const std::shared_ptr<Tensor<double>> loss = mLossVariables[0]->getData();
-    const std::shared_ptr<Tensor<double>> surrogateLoss = mLossVariables[1]->getData();
+    const std::shared_ptr<Tensor> loss = mLossVariables[0]->getData();
+    const std::shared_ptr<Tensor> surrogateLoss = mLossVariables[1]->getData();
 
     std::cout << "{\n";
     std::cout << " \t \"test_loss\": " << loss->at(0) << ",\n";

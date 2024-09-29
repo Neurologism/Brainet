@@ -3,7 +3,7 @@
 //
 #include "optimizer/adam.hpp"
 
-Adam::Adam(double learningRate, double decayRate1, double decayRate2, double delta, std::vector<Tensor<double>> initialFirstMomentEstimates, std::vector<Tensor<double>> initialSecondMomentEstimates) : mLearningRate(learningRate), mDecayRate1(decayRate1), mDecayRate2(decayRate2), mDelta(delta), mFirstMomentEstimates(initialFirstMomentEstimates), mSecondMomentEstimates(initialSecondMomentEstimates)
+Adam::Adam(double learningRate, double decayRate1, double decayRate2, double delta, std::vector<Tensor> initialFirstMomentEstimates, std::vector<Tensor> initialSecondMomentEstimates) : mLearningRate(learningRate), mDecayRate1(decayRate1), mDecayRate2(decayRate2), mDelta(delta), mFirstMomentEstimates(initialFirstMomentEstimates), mSecondMomentEstimates(initialSecondMomentEstimates)
 {
     if(mLearningRate <= 0 || mDecayRate1 <= 0 || mDecayRate1 >= 1 || mDecayRate2 <= 0 || mDecayRate2 >= 1 || mDelta <= 0)
     {
@@ -48,7 +48,7 @@ void Adam::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParam
     mIteration++;
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
+        std::shared_ptr<Tensor> gradient = GRAPH->getGradient(rLearnableParameters[i]);
         for (std::size_t j = 0; j < gradient->capacity(); j++)
         {
             mFirstMomentEstimates[i].set(j, mDecayRate1 * mFirstMomentEstimates[i].at(j) + (1 - mDecayRate1) * gradient->at(j));

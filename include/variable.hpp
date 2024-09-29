@@ -14,7 +14,7 @@ class Variable
 {
     std::vector<std::shared_ptr<Variable>> mChildren, mParents; // the children and parents of the variable in the computational graph
     std::shared_ptr<Operation> mpOperation;                     // the operation that calculates the data
-    std::shared_ptr<Tensor<double>> mpDataTensor;               // the data of the variable
+    std::shared_ptr<Tensor> mpDataTensor;               // the data of the variable
     static std::uint32_t msCounter;                             // keep track of the number of variables created
     std::uint32_t mId;                                          // the unique id of the variable
     std::string mOperationName;                                 // the name of the operation that calculates the data
@@ -27,7 +27,7 @@ public:
      * @param children The children of the variable.
      * @param data The initial data of the variable.
      */
-    explicit Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents = {}, const std::vector<std::shared_ptr<Variable>> &children = {}, const std::shared_ptr<Tensor<double>> &data = nullptr);
+    explicit Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents = {}, const std::vector<std::shared_ptr<Variable>> &children = {}, const std::shared_ptr<Tensor> &data = nullptr);
 
     ~Variable() = default;
 
@@ -57,15 +57,15 @@ public:
 
     /**
      * @brief This function returns the data of the variable.
-     * @return std::shared_ptr<Tensor<double>> The data of the variable.
+     * @return std::shared_ptr<Tensor> The data of the variable.
      */
-    std::shared_ptr<Tensor<double>> &getData();
+    std::shared_ptr<Tensor> &getData();
 
     /**
      * @brief This function sets the data of the variable.
      * @param data The new data of the variable.
      */
-    void setData(const std::shared_ptr<Tensor<double>> &data);
+    void setData(const std::shared_ptr<Tensor> &data);
 
     /**
      * @brief This function returns the id of the variable.

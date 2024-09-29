@@ -3,7 +3,7 @@
 //
 #include "optimizer/nesterov_momentum.hpp"
 
-NesterovMomentum::NesterovMomentum(double learningRate, double momentum, std::vector<Tensor<double>> initialVelocity) : mLearningRate(learningRate), mMomentum(momentum), mVelocity(initialVelocity)
+NesterovMomentum::NesterovMomentum(double learningRate, double momentum, std::vector<Tensor> initialVelocity) : mLearningRate(learningRate), mMomentum(momentum), mVelocity(initialVelocity)
 {
     if(mLearningRate <= 0 || mMomentum <= 0 || mMomentum >= 1)
     {
@@ -44,7 +44,7 @@ void NesterovMomentum::update(const std::vector<std::shared_ptr<Variable>> & rLe
     }
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
+        std::shared_ptr<Tensor> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for (std::size_t j = 0; j < rLearnableParameters[i]->getData()->capacity(); j++)
         {

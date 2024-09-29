@@ -17,7 +17,7 @@ void ParametricReLU::f(std::vector<std::shared_ptr<Variable>>& inputs)
 
     // calculate the PReLU activation function
     double slope = inputs[0]->getData()->at(0);
-    std::shared_ptr<Tensor<double>> result = std::make_shared<Tensor<double>>(inputs[1]->getData()->shape());
+    std::shared_ptr<Tensor> result = std::make_shared<Tensor>(inputs[1]->getData()->shape());
 
     for(std::uint32_t i = 0; i < inputs[1]->getData()->capacity(); i++)
     {
@@ -29,7 +29,7 @@ void ParametricReLU::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = result;
 }
 
-std::shared_ptr<Tensor<double>> ParametricReLU::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> ParametricReLU::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     // security checks
     if(inputs.size() != 2)
@@ -51,13 +51,13 @@ std::shared_ptr<Tensor<double>> ParametricReLU::bprop(std::vector<std::shared_pt
             sum += input < 0 ? input * gradient->at(i) : 0;
         }
         // store the result
-        return std::make_shared<Tensor<double>>(Tensor<double>({1},sum));
+        return std::make_shared<Tensor>(Tensor({1},sum));
     }
     if(focus == inputs[1])
     {
         // calculate the gradient of the input
         double slope = inputs[0]->getData()->at(0);
-        std::shared_ptr<Tensor<double>> result = std::make_shared<Tensor<double>>(inputs[1]->getData()->shape());
+        std::shared_ptr<Tensor> result = std::make_shared<Tensor>(inputs[1]->getData()->shape());
 
         for(std::uint32_t i = 0; i < gradient->capacity(); i++)
         {

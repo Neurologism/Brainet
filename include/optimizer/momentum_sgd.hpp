@@ -9,7 +9,7 @@
  */
 class Momentum : public Optimizer
 {
-    std::vector<Tensor<double>> mVelocity; // velocity over time
+    std::vector<Tensor> mVelocity; // velocity over time
     double mLearningRate;
     double mMomentum;
     bool mInitialized = false;
@@ -21,7 +21,7 @@ public:
      * @param momentum The momentum.
      * @param initialVelocity The initial velocity.
      */
-    Momentum(double learningRate, double momentum = 0.9, std::vector<Tensor<double>> initialVelocity = {});
+    Momentum(double learningRate, double momentum = 0.9, std::vector<Tensor> initialVelocity = {});
 
     ~Momentum() = default;
 

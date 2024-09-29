@@ -11,7 +11,7 @@ void L2Norm::f(std::vector<std::shared_ptr<Variable>>& inputs)
     }
 
     auto input = inputs[0]->getData();
-    auto result = std::make_shared<Tensor<double>>(Tensor<double>({1}));
+    auto result = std::make_shared<Tensor>(Tensor({1}));
 
     double sum = 0;
     for (std::uint32_t i = 0; i < input->capacity(); i++)
@@ -29,7 +29,7 @@ void L2Norm::f(std::vector<std::shared_ptr<Variable>>& inputs)
 }
 
 
-std::shared_ptr<Tensor<double>> L2Norm::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> L2Norm::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     if (inputs.size() != 1)
     {
@@ -41,7 +41,7 @@ std::shared_ptr<Tensor<double>> L2Norm::bprop(std::vector<std::shared_ptr<Variab
     }
 
     auto input = inputs[0]->getData();
-    auto result = std::make_shared<Tensor<double>>(input->shape());
+    auto result = std::make_shared<Tensor>(input->shape());
 
     for (std::uint32_t i = 0; i < input->capacity(); i++)
     {

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.28)
 project(brainet LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/json_interface)
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 
 # List of C++ source files
 set(CPP_SOURCES
@@ -55,6 +57,9 @@ set(CPP_SOURCES
         src/optimizer/rmsprop.cpp
         src/optimizer/rmsprop_nesterov.cpp
         src/logger.cpp
+        src/datatypes/matrix.cpp
+        src/datatypes/tensor.cpp
+        src/datatypes/vector.cpp
 )
 
 # List of CUDA source files

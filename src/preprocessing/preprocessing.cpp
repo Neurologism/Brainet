@@ -12,7 +12,7 @@ void Preprocessing::addNoise(dataType &data, const double &mean, const double &s
 
     for (auto & i : data)
     {
-        for (double & j : i)
+        for (auto & j : i)
         {
             j += dist(gen);
         }
@@ -21,7 +21,7 @@ void Preprocessing::addNoise(dataType &data, const double &mean, const double &s
 
 Preprocessing::dataType Preprocessing::normalize(dataType const & input)
 {
-    dataType normalizedData(input.size(), std::vector<double>(input[0].size(), 0.0));
+    dataType normalizedData(input.size(), std::vector<Precision>(input[0].size(), 0.0));
 
     double max = std::numeric_limits<double>::min();
 

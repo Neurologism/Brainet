@@ -3,7 +3,7 @@
 //
 #include "optimizer/rmsprop.hpp"
 
-RMSProp::RMSProp(double learningRate, double decayRate, double delta, std::vector<Tensor<double>> initialCache) : mLearningRate(learningRate), mDecayRate(decayRate), mDelta(delta), mCache(initialCache)
+RMSProp::RMSProp(double learningRate, double decayRate, double delta, std::vector<Tensor> initialCache) : mLearningRate(learningRate), mDecayRate(decayRate), mDelta(delta), mCache(initialCache)
 {
     if(mLearningRate <= 0 || mDecayRate <= 0 || mDecayRate >= 1 || mDelta <= 0)
     {
@@ -35,7 +35,7 @@ void RMSProp::update(const std::vector<std::shared_ptr<Variable>> & rLearnablePa
     }
     for ( std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
+        std::shared_ptr<Tensor> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for ( std::size_t j = 0; j < gradient->capacity(); j++)
         {

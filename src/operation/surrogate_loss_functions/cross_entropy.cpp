@@ -33,11 +33,11 @@ void CrossEntropy::f(std::vector<std::shared_ptr<Variable>> &inputs)
         }
     }
 
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / static_cast<double>(inputs[0]->getData()->shape(0))));
+    this->getVariable()->getData() = std::make_shared<Tensor>(Tensor({1}, error / static_cast<double>(inputs[0]->getData()->shape(0))));
 }
 
 
-std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient)
+std::shared_ptr<Tensor> CrossEntropy::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor> &gradient)
 {
     if (inputs.size() != 2)
     {
@@ -54,7 +54,7 @@ std::shared_ptr<Tensor<double>> CrossEntropy::bprop(std::vector<std::shared_ptr<
         throw std::runtime_error("CrossEntropy: the gradient tensor must have shape {1}");
     }
 
-    auto _gradient = std::make_shared<Tensor<double>>(Tensor<double>(inputs[0]->getData()->shape()));
+    auto _gradient = std::make_shared<Tensor>(Tensor(inputs[0]->getData()->shape()));
 
     for (std::uint32_t i = 0; i < inputs[0]->getData()->shape(0); i++)
     {
