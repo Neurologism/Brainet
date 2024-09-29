@@ -124,6 +124,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
             trainingSurrogateLoss += surrogateLoss;
 
             Logger::logIteration(loss, surrogateLoss);
+            if(iteration==10)return;
         }
 
         if (dataset.hasValidationSet())

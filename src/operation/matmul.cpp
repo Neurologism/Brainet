@@ -46,7 +46,7 @@ void Matmul::f(std::vector<std::shared_ptr<Variable>>& inputs)
     // perform the matrix multiplication
     std::shared_ptr<Matrix> left_matrix = std::static_pointer_cast<Matrix>(inputs[0]->getData());
     std::shared_ptr<Matrix> right_matrix = std::static_pointer_cast<Matrix>(inputs[1]->getData());
-    if (this->getVariable()->getData() == nullptr)
+    if (this->getVariable()->getData() == nullptr || this->getVariable()->getData()->capacity() != left_matrix->shape(0) * right_matrix->shape(1))
     {
         this->getVariable()->setData(std::make_shared<Matrix>(Matrix({left_matrix->shape(0), right_matrix->shape(1)}, 0)));
     }
