@@ -20,7 +20,7 @@ protected:
      * @param result the result of the matrix multiplication
      * @param k the index of the coloum in the right matrix
      */
-    void blockmul(const std::shared_ptr<Matrix> &left_matrix, const std::shared_ptr<Matrix> &right_matrix, std::shared_ptr<Matrix> &result, const std::uint32_t &k);
+    void blockmul(Matrix &left_matrix, Matrix &right_matrix, Matrix &result, const std::uint32_t &k, const bool &left_transpose, const bool &right_transpose);
 
     /**
      * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
@@ -28,7 +28,7 @@ protected:
      * @param right_matrix the right matrix
      * @param result the result of the matrix multiplication
      */
-    void matmul(std::shared_ptr<Matrix> left_matrix, std::shared_ptr<Matrix> right_matrix, std::shared_ptr<Matrix> result);
+    void matmul(const std::shared_ptr<Matrix>& left_matrix, const std::shared_ptr<Matrix>& right_matrix, const std::shared_ptr<Matrix>& result, const bool &left_transpose = false, const bool &right_transpose = false);
 public:    
     Matmul(){mName = "Matmul";};
     ~Matmul(){};

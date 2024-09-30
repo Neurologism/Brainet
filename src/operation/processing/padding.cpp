@@ -19,16 +19,18 @@ void Padding::f(std::vector<std::shared_ptr<Variable>>& inputs)
     }
 
     // create a new tensor with the new size and copy the data from the input tensor
-    std::shared_ptr<Tensor> _data = std::make_shared<Tensor>(Tensor({inputs.front()->getData()->shape(0) + _x_padding, inputs.front()->getData()->shape(1) + _y_padding}, _padding_value));
-
+    std::shared_ptr<Matrix> matrix = std::make_shared<Matrix>(Matrix({inputs.front()->getData()->shape(0) + _x_padding, inputs.front()->getData()->shape(1) + _y_padding}, _padding_value));
+    Matrix &matrix_ref = *matrix;
+    Matrix &input_ref = *std::static_pointer_cast<Matrix>(inputs.front()->getData());
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape(0); i++)
     {
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape(1); j++)
+        const std::uint32_t shape = inputs.front()->getData()->shape(1);
+        for (std::uint32_t j = 0; j < shape; j++)
         {
-            _data->set({i, j}, inputs.front()->getData()->at({i, j}));
+            matrix_ref.set(i, j, input_ref.at(i, j));
         }
     }
-    this->getVariable()->getData() = _data;
+    this->getVariable()->getData() = matrix;
 };
 
 std::shared_ptr<Tensor> Padding::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
@@ -39,15 +41,17 @@ std::shared_ptr<Tensor> Padding::bprop(std::vector<std::shared_ptr<Variable>>& i
     }
 
     // create a new tensor with the new size and copy the selected data from the gradient tensor
-    std::shared_ptr<Tensor> _data = std::make_shared<Tensor>(inputs.front()->getData()->shape());
-
+    std::shared_ptr<Matrix> matrix = std::make_shared<Matrix>(inputs.front()->getData()->shape());
+    Matrix &matrix_ref = *matrix;
+    Matrix &gradient_ref = *std::static_pointer_cast<Matrix>(gradient);
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape(0); i++)
     {
-        for (std::uint32_t j = 0; j < inputs.front()->getData()->shape(1); j++)
+        const std::uint32_t shape = inputs.front()->getData()->shape(1);
+        for (std::uint32_t j = 0; j < shape; j++)
         {
-            _data->set({i, j}, gradient->at({i, j}));
+            matrix_ref.set(i, j, gradient_ref.at(i, j));
         }
     }
 
-    return _data;
+    return matrix;
 };

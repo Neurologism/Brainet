@@ -8,10 +8,11 @@
  */
 class Matrix : public Tensor
 {
+public:
     typedef std::vector<Precision> DataVector;
     typedef std::vector<size_t> ShapeVector;
 
-public:
+
     Matrix() = default;
 
     /**
@@ -52,17 +53,16 @@ public:
     void set(const std::uint32_t &row, const std::uint32_t &col, const Precision &value);
 
     /**
-     * @brief Transpose the matrix.
-     * @return A new matrix that is the transposed version of the original matrix.
+     * @brief Get the data of the matrix.
+     * @return The data of the matrix.
      */
-    std::shared_ptr<Matrix> transpose();
+    DataVector &getData();
 
     /**
-     * @brief Calculate the dot product of two matrices.
-     * @param other The other matrix to calculate the dot product with.
-     * @return The dot product of the two matrices.
+     * @brief Get the shape of the matrix.
+     * @return The shape of the matrix.
      */
-    std::shared_ptr<Matrix> dot(const Matrix &other);
+    ShapeVector &getShape();
 
     /**
      * @brief Resize the matrix to a new shape.
