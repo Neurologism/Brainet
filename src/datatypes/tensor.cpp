@@ -58,10 +58,6 @@ Precision Tensor::at(const ShapeVector &index)
 
 Precision Tensor::at(const size_t &index)
 {
-    if (mData.empty())
-        throw std::out_of_range("Tensor::at: Tensor is empty");
-    if (index >= mData.size())
-        throw std::out_of_range("Index out of range");
     return mData[index];
 }
 
@@ -96,8 +92,6 @@ void Tensor::subtract(const ShapeVector &index, const Precision &value)
 
 void Tensor::subtract(const size_t &index, const Precision &value)
 {
-    if (index >= mData.size())
-        throw std::out_of_range("Index out of range");
     mData[index] -= value;
 }
 

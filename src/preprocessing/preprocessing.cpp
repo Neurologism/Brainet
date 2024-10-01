@@ -21,27 +21,18 @@ void Preprocessing::addNoise(dataType &data, const double &mean, const double &s
 
 Preprocessing::dataType Preprocessing::normalize(dataType const & input)
 {
-    dataType normalizedData(input.size(), std::vector<Precision>(input[0].size(), 0.0));
+    dataType normalizedData(input.size(), std::vector<Precision>(input[0].size()));
 
-    double max = std::numeric_limits<double>::min();
+    Precision max = std::numeric_limits<double>::min();
 
-    for (std::uint32_t i = 0; i < input.size(); i++)
+    for (const auto & i : input)
     {
-        for (std::uint32_t j = 0; j < input[i].size(); j++)
-        {
-            if (input[i][j] > max)
-            {
-                max = input[i][j];
-            }
-        }
+        max=std::max(*std::ranges::max_element(i),max);
     }
 
     for (std::uint32_t i = 0; i < input.size(); i++)
     {
-        for (std::uint32_t j = 0; j < input[i].size(); j++)
-        {
-            normalizedData[i][j] = input[i][j] / max;
-        }
+        std::ranges::transform(input[i], normalizedData[i].begin(), [max](Precision const & value) { return value / max; });
     }
 
     return normalizedData;

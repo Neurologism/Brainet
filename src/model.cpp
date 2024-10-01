@@ -146,6 +146,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
 
     if (dataset.hasValidationSet()) // train on complete training set
     {
+        std::cout << "Training on complete training set..." << std::endl;
         double trainingSurrogateLoss = 0;
 
         do
