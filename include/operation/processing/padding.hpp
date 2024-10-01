@@ -30,7 +30,7 @@ public:
     /**
      * @brief Remove padding from the gradient tensor.
      */
-    virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)override;
+    virtual std::shared_ptr<Tensor> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)override;
 };
 
 #endif // PADDING_HPP

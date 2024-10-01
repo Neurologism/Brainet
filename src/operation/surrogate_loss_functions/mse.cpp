@@ -27,11 +27,11 @@ void MSE::f(std::vector<std::shared_ptr<Variable>>& inputs)
     }
     sum /= inputs[0]->getData()->capacity();
     // store the result
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1},sum));
+    this->getVariable()->getData() = std::make_shared<Tensor>(Tensor({1},sum));
 }
 
 
-std::shared_ptr<Tensor<double>> MSE::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> MSE::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     // security checks
     if(inputs.size() != 2)
@@ -48,7 +48,7 @@ std::shared_ptr<Tensor<double>> MSE::bprop(std::vector<std::shared_ptr<Variable>
     }
 
     // calculate the gradient of the mean squared error function
-    std::shared_ptr<Tensor<double>> _gradient = std::make_shared<Tensor<double>>(Tensor<double>(inputs[0]->getData()->shape()));
+    std::shared_ptr<Tensor> _gradient = std::make_shared<Tensor>(Tensor(inputs[0]->getData()->shape()));
 
     for(std::uint32_t i = 0; i < inputs[0]->getData()->capacity(); i++)
     {

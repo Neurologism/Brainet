@@ -13,7 +13,7 @@ void Dropout::f(std::vector<std::shared_ptr<Variable>>& inputs)
     }
 
     auto input = inputs[0]->getData();
-    auto result = std::make_shared<Tensor<double>>(Tensor<double>(input->shape()));
+    auto result = std::make_shared<Tensor>(Tensor(input->shape()));
 
     if(msAveraging)
     {
@@ -39,7 +39,7 @@ void Dropout::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = result;
 }
 
-std::shared_ptr<Tensor<double>> Dropout::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> Dropout::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     if(inputs.size() != 1)
     {
@@ -51,7 +51,7 @@ std::shared_ptr<Tensor<double>> Dropout::bprop(std::vector<std::shared_ptr<Varia
     }
 
     auto input = inputs[0]->getData();
-    auto result = std::make_shared<Tensor<double>>(Tensor<double>(input->shape()));
+    auto result = std::make_shared<Tensor>(Tensor(input->shape()));
 
     for(std::uint32_t i = 0; i < input->capacity(); i++)
     {

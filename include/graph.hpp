@@ -10,7 +10,7 @@
 class Graph 
 {
     typedef std::shared_ptr<Variable> VariablePtr;
-    typedef std::map<VariablePtr, std::shared_ptr<Tensor<double>>> GradTable;
+    typedef std::map<VariablePtr, std::shared_ptr<Tensor>> GradTable;
 
     std::vector<VariablePtr> mVariableVec; // all variables in the graph
     GradTable mGradTable; // the gradient table for the variables
@@ -60,7 +60,7 @@ public:
      * @param pVar The variable for which the gradient is calculated.
      * @return The gradient of the variable.
      */
-    std::shared_ptr<Tensor<double>> getGradient(const VariablePtr& pVar);
+    std::shared_ptr<Tensor> getGradient(const VariablePtr& pVar);
 
     /**
      * @brief This function adds a variable to the graph.

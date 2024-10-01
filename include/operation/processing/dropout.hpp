@@ -15,7 +15,7 @@ class Dropout : public Operation
 public:
     Dropout(double dropoutRate) : mDropoutRate(dropoutRate) { mName = "DROPOUT"; }
     void f(std::vector<std::shared_ptr<Variable>>& inputs) override;
-    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
+    std::shared_ptr<Tensor> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient) override;
     static void activateAveraging() { msAveraging = true; }
     static void deactivateAveraging() { msAveraging = false; }
 };

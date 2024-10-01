@@ -14,8 +14,8 @@ class RMSPropNesterov final : public Optimizer
     double mDelta;
     double mMomentum;
     bool mInitialized = false;
-    std::vector<Tensor<double>> mCache;
-    std::vector<Tensor<double>> mVelocity;
+    std::vector<Tensor> mCache;
+    std::vector<Tensor> mVelocity;
 
 public:
 
@@ -28,7 +28,7 @@ public:
      * @param initialCache The initial cache.
      * @param initialVelocity The initial velocity.
      */
-    explicit RMSPropNesterov(double learningRate, double decayRate = 0.9, double delta = 1e-7, double momentum = 0.9, std::vector<Tensor<double>> initialCache = {}, std::vector<Tensor<double>> initialVelocity = {});
+    explicit RMSPropNesterov(double learningRate, double decayRate = 0.9, double delta = 1e-7, double momentum = 0.9, std::vector<Tensor> initialCache = {}, std::vector<Tensor> initialVelocity = {});
 
 
     /**

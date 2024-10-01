@@ -5,11 +5,11 @@
 #ifndef PREPROCESSING_HPP
 #define PREPROCESSING_HPP
 
-#include "dependencies.hpp"
+#include "datatypes/tensor.hpp"
 
 class Preprocessing
 {
-    typedef std::vector<std::vector<double>> dataType;
+    typedef std::vector<std::vector<Precision>> dataType;
 public:
     static void createBatch(const dataType &data, const dataType &labels, const std::uint32_t &batchSize, dataType &dataBatch, dataType &labelBatch);
     static void addNoise(dataType &data, const double &mean, const double &stddev);

@@ -16,7 +16,7 @@ class Dataset final : public Module
     std::shared_ptr<Variable> mDataVariable; // storing the data
     std::shared_ptr<Variable> mLabelVariable; // storing the labels
 
-    typedef std::vector<std::vector<double>> dataType;
+    typedef std::vector<std::vector<Precision>> dataType;
     dataType mTrainingData;
     dataType mTrainingLabels;
     dataType mValidationData;

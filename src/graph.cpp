@@ -72,7 +72,7 @@ void Graph::backprop(std::vector<VariablePtr> & targetVariables, std::vector<Var
 
     for(const VariablePtr& pVar : leafVariables) // initialize the gradient table
     {
-        gradTable[pVar] = std::make_shared<Tensor<double>>(Tensor<double>(pVar->getData()->shape())); // set leafs to leafInitValue
+        gradTable[pVar] = std::make_shared<Tensor>(Tensor(pVar->getData()->shape())); // set leafs to leafInitValue
         for(std::uint32_t i = 0; i < pVar->getData()->capacity(); i++)
         {
             gradTable[pVar]->set(i, leafInitValue);
@@ -106,14 +106,14 @@ void Graph::mBuildGrad(VariablePtr pFocus, GradTable & gradTable) // NOLINT
         throw std::runtime_error("Variable has no data");
     }
 
-    std::shared_ptr<Tensor<double>> pGradient;
+    std::shared_ptr<Tensor> pGradient;
     for (std::uint32_t i = 0; i < pFocus->getConsumers().size(); i++) // the sum the consumer gradients is the gradient of the variable
     {
         // load stuff
         VariablePtr pConsumer = pFocus->getConsumers().at(i);
         std::shared_ptr<Operation> pOperation = pConsumer->getOperation();
         mBuildGrad(pConsumer, gradTable); // build the gradient table for the consumer
-        std::shared_ptr<Tensor<double>> pGradientPart = pOperation->bprop(pConsumer->getInputs(), pFocus, gradTable[pConsumer]); // calculate the gradient of the consumer with respect to the focus variable
+        std::shared_ptr<Tensor> pGradientPart = pOperation->bprop(pConsumer->getInputs(), pFocus, gradTable[pConsumer]); // calculate the gradient of the consumer with respect to the focus variable
         if (pGradientPart->shape() != pFocus->getData()->shape())
         {
             throw std::runtime_error("Gradient shape does not match variable shape");
@@ -139,7 +139,7 @@ std::vector<std::shared_ptr<Variable>> Graph::getVariableVec()
     return mVariableVec;
 }
 
-std::shared_ptr<Tensor<double>> Graph::getGradient(const VariablePtr& pVar)
+std::shared_ptr<Tensor> Graph::getGradient(const VariablePtr& pVar)
 {
     if(!mGradTable.contains(pVar)) throw std::runtime_error("Variable not in gradient table");
     return mGradTable[pVar];

@@ -75,20 +75,20 @@ void Dataset::loadTrainingBatch(const std::uint32_t &batchSize)
         mIndex++;
     }
 
-    mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(dataBatch)));
-    mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(labelBatch)));
+    mDataVariable->setData(std::make_shared<Tensor>(Matrix(dataBatch)));
+    mLabelVariable->setData(std::make_shared<Tensor>(Matrix(labelBatch)));
 }
 
 void Dataset::loadValidationSet() const
 {
-    mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mValidationData)));
-    mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mValidationLabels)));
+    mDataVariable->setData(std::make_shared<Tensor>(Matrix(mValidationData)));
+    mLabelVariable->setData(std::make_shared<Tensor>(Matrix(mValidationLabels)));
 }
 
 void Dataset::loadTestSet() const
 {
-    mDataVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestData)));
-    mLabelVariable->setData(std::make_shared<Tensor<double>>(Matrix<double>(mTestLabels)));
+    mDataVariable->setData(std::make_shared<Tensor>(Matrix(mTestData)));
+    mLabelVariable->setData(std::make_shared<Tensor>(Matrix(mTestLabels)));
 }
 
 std::vector<std::shared_ptr<Variable>> Dataset::getInputs()

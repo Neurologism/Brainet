@@ -2,6 +2,7 @@
 #define MATMUL_HPP
 
 #include "operation.hpp"
+#include "matmul.cuh"
 
 
 /**
@@ -19,15 +20,15 @@ protected:
      * @param result the result of the matrix multiplication
      * @param k the index of the coloum in the right matrix
      */
-    void blockmul(std::shared_ptr<Tensor<double>> & left_matrix, std::shared_ptr<Tensor<double>> & right_matrix, std::shared_ptr<Tensor<double>> & result, std::uint32_t k);
+    void blockmul(Matrix &left_matrix, Matrix &right_matrix, Matrix &result, const std::uint32_t &k, const bool &left_transpose, const bool &right_transpose);
 
     /**
      * @brief spawning threads for every coloum in the right matrix to execute the blockmul function in parallel
      * @param left_matrix the left matrix
      * @param right_matrix the right matrix
-     * @return the result of the matrix multiplication
+     * @param result the result of the matrix multiplication
      */
-    std::shared_ptr<Tensor<double>> matmul(std::shared_ptr<Tensor<double>> & left_matrix, std::shared_ptr<Tensor<double>> & right_matrix);
+    void matmul(const std::shared_ptr<Matrix>& left_matrix, const std::shared_ptr<Matrix>& right_matrix, const std::shared_ptr<Matrix>& result, const bool &left_transpose = false, const bool &right_transpose = false);
 public:    
     Matmul(){mName = "Matmul";};
     ~Matmul(){};
@@ -42,7 +43,7 @@ public:
      * @param focus the variable to calculate the gradient for
      * @param gradient the sum of the gradients of the consumers
      */
-    std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) override;
+    std::shared_ptr<Tensor> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient) override;
 };
 
 #endif // MATMUL_HPP

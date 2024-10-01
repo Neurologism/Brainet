@@ -11,7 +11,7 @@ class AdaGrad : public Optimizer
     double mLearningRate;
     double mDelta;
     bool mInitialized = false;
-    std::vector<Tensor<double>> mSquaredGradients;
+    std::vector<Tensor> mSquaredGradients;
 
 public:
 
@@ -21,7 +21,7 @@ public:
      * @param delta The delta value.
      * @param initialSquaredGradients The initial squared gradients.
      */
-    AdaGrad(double learningRate, double delta = 1e-7, std::vector<Tensor<double>> initialSquaredGradients = {});
+    AdaGrad(double learningRate, double delta = 1e-7, std::vector<Tensor> initialSquaredGradients = {});
 
     ~AdaGrad() = default;
 

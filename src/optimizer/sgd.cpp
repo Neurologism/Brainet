@@ -3,7 +3,7 @@
 //
 #include "optimizer/sgd.hpp"
 
-SGD::SGD(double initialLearningRate, double finalLearningRate, std::uint32_t lastDecay) : mInitialLearningRate(initialLearningRate), mFinalLearningRate(finalLearningRate), mLastDecay(lastDecay)
+SGD::SGD(Precision initialLearningRate, Precision finalLearningRate, std::uint32_t lastDecay) : mInitialLearningRate(initialLearningRate), mFinalLearningRate(finalLearningRate), mLastDecay(lastDecay)
 {
     if(mInitialLearningRate <= 0 || mFinalLearningRate <= 0 || mLastDecay <= 0)
     {
@@ -15,27 +15,30 @@ SGD::SGD(double initialLearningRate, double finalLearningRate, std::uint32_t las
     }
 }
 
-SGD::SGD(double initialLearningRate, std::uint32_t lastDecay) : SGD(initialLearningRate, initialLearningRate / 100, lastDecay)
+SGD::SGD(Precision initialLearningRate, std::uint32_t lastDecay) : SGD(initialLearningRate, initialLearningRate / 100, lastDecay)
 {
 }
 
 void SGD::update(const std::vector<std::shared_ptr<Variable>> & rLearnableParameters)
 {
-    double learningRate;
+    Precision learningRate;
     if(mIteration > mLastDecay)
     {
         learningRate = mFinalLearningRate;
     }
     else
     {
-        double decay = mIteration / mLastDecay;
+        Precision decay = mIteration / mLastDecay;
         learningRate = (1 - decay) * mInitialLearningRate + decay * mFinalLearningRate;
     }
-    for(std::uint32_t i = 0; i < rLearnableParameters.size(); i++)
+    for(const auto & rLearnableParameter : rLearnableParameters)
     {
-        for(std::uint32_t j = 0; j < rLearnableParameters[i]->getData()->capacity(); j++)
+        Tensor &parameterGradient = *GRAPH->getGradient(rLearnableParameter);
+        Tensor &parameter = *rLearnableParameter->getData();
+
+        for(std::uint64_t j = 0; j < parameter.capacity(); ++j)
         {
-            rLearnableParameters[i]->getData()->subtract(j, learningRate * GRAPH->getGradient(rLearnableParameters[i])->at(j));
+            parameter.subtract(j, learningRate * parameterGradient.at(j));
         }
     }
     mIteration++;

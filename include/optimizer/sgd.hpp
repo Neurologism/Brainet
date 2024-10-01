@@ -10,10 +10,10 @@
  */
 class SGD final : public Optimizer
 {
-    double mInitialLearningRate; 
-    double mFinalLearningRate;
-    double mLastDecay;
-    double mIteration = 0;
+    Precision mInitialLearningRate; 
+    Precision mFinalLearningRate;
+    Precision mLastDecay;
+    Precision mIteration = 0;
 
 public:
     /**
@@ -22,13 +22,13 @@ public:
      * @param finalLearningRate The final learning rate.
      * @param lastDecay The number of iterations after which the learning rate will be the final learning rate.
      */
-    SGD(double initialLearningRate, double finalLearningRate, std::uint32_t lastDecay);
+    SGD(Precision initialLearningRate, Precision finalLearningRate, std::uint32_t lastDecay);
     /**
      * @brief Constructs a new SGD object.
      * @param initialLearningRate The initial learning rate.
      * @param lastDecay The number of iterations after which the learning rate will be the final learning rate.
      */
-    SGD(double initialLearningRate, std::uint32_t lastDecay);
+    SGD(Precision initialLearningRate, std::uint32_t lastDecay);
 
     /**
      * @brief Updates the learnable parameters using the stochastic gradient descent algorithm.

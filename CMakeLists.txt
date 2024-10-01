@@ -1,36 +1,26 @@
-cmake_minimum_required(VERSION 3.29)
-project(brainet)
+cmake_minimum_required(VERSION 3.28)
+project(brainet LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src, ${CMAKE_SOURCE_DIR}/json_interface)
+include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/json_interface)
 
-set(COMMON_SOURCES
-        include/datatypes/tensor.hpp
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+
+# List of C++ source files
+set(CPP_SOURCES
         src/variable.cpp
         src/model.cpp
-        include/model.hpp
-        include/variable.hpp
         src/graph.cpp
-        include/graph.hpp
-        include/dependencies.hpp
         src/reader.cpp
-        include/reader.hpp
-        include/datatypes/matrix.hpp
         src/preprocessing/preprocessing.cpp
-        include/preprocessing/preprocessing.hpp
         src/module/dataset.cpp
         src/module/dense.cpp
         src/module/layer.cpp
         src/module/loss.cpp
         src/module/module.cpp
-        include/module/dataset.hpp
-        include/module/module.hpp
-        include/module/dense.hpp
-        include/module/layer.hpp
-        include/module/loss.hpp
         src/operation/activation_function/activation_function.cpp
         src/operation/activation_function/heavyside_step.cpp
         src/operation/activation_function/hyperbolic_tangent.cpp
@@ -40,7 +30,6 @@ set(COMMON_SOURCES
         src/operation/activation_function/sigmoid.cpp
         src/operation/activation_function/softmax.cpp
         src/operation/loss_functions/error_rate.cpp
-        include/operation/loss_functions/error_rate.hpp
         src/operation/loss_functions/loss_function.cpp
         src/operation/parameter_norm_penalties/L1_Norm.cpp
         src/operation/parameter_norm_penalties/L2_Norm.cpp
@@ -55,9 +44,9 @@ set(COMMON_SOURCES
         src/operation/weight_initialization/he_initialization.cpp
         src/operation/weight_initialization/normal_distribution_initializer.cpp
         src/operation/weight_initialization/normalized_initialization.cpp
-        src/operation/weight_initialization/uniform_distribution_initializer.hpp.cpp
         src/operation/weight_initialization/weight_initializer.cpp
         src/operation/weight_initialization/weight_matrix_initializer.cpp
+        src/operation/weight_initialization/uniform_distribution_initializer.cpp
         src/operation/matmul.cpp
         src/operation/operation.cpp
         src/optimizer/sgd.cpp
@@ -67,16 +56,30 @@ set(COMMON_SOURCES
         src/optimizer/nesterov_momentum.cpp
         src/optimizer/rmsprop.cpp
         src/optimizer/rmsprop_nesterov.cpp
-        include/brainet.hpp
-        include/module/module_variant.hpp
-        include/operation/activation_function/activation_function_variant.hpp
-        include/operation/parameter_norm_penalties/norm_variant.hpp
-        include/operation/loss_functions/loss_variant.hpp
-        include/optimizer/optimizer_variant.hpp
         src/logger.cpp
-        include/logger.hpp
+        src/datatypes/matrix.cpp
+        src/datatypes/tensor.cpp
+        src/datatypes/vector.cpp
 )
 
-add_executable(example ${COMMON_SOURCES} tests/example.cpp)
-add_executable(example2 ${COMMON_SOURCES} tests/example2.cpp)
-add_executable(json ${COMMON_SOURCES} json_interface/run_json.cpp)
+# List of CUDA source files
+set(CUDA_SOURCES
+        src/operation/matmul.cu
+)
+
+# Create a library target for C++ sources
+add_library(brainet_cpp STATIC ${CPP_SOURCES})
+
+# Create a library target for CUDA sources
+add_library(brainet_cuda STATIC ${CUDA_SOURCES})
+
+# Link the CUDA library with the C++ library
+target_link_libraries(brainet_cpp brainet_cuda)
+
+# Create executables
+add_executable(example tests/example.cpp)
+add_executable(json json_interface/run_json.cpp)
+
+# Link the executables with the C++ library (which is already linked with the CUDA library)
+target_link_libraries(example brainet_cpp)
+target_link_libraries(json brainet_cpp)

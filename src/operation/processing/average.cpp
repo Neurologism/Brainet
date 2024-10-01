@@ -19,7 +19,7 @@ void Average::f(std::vector<std::shared_ptr<Variable>>& inputs)
         }
     }
 
-    auto result = std::make_shared<Tensor<double>>(Tensor<double>(inputs[0]->getData()->shape()));
+    auto result = std::make_shared<Tensor>(Tensor(inputs[0]->getData()->shape()));
 
     for (std::uint32_t i = 0; i < size; i++)
     {
@@ -34,7 +34,7 @@ void Average::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = result;
 }
 
-std::shared_ptr<Tensor<double>> Average::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> Average::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     throw std::runtime_error("Average: backward pass is currently not supported");
 }

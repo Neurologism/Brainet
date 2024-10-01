@@ -8,7 +8,7 @@
 std::uint32_t Variable::msCounter = 0;
 
 
-Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents, const std::vector<std::shared_ptr<Variable>> &children, const std::shared_ptr<Tensor<double>> &data)
+Variable::Variable(const std::shared_ptr<Operation> &op, const std::vector<std::shared_ptr<Variable>> &parents, const std::vector<std::shared_ptr<Variable>> &children, const std::shared_ptr<Tensor> &data)
 {
     mId = msCounter++;
     mpOperation = op;
@@ -45,12 +45,12 @@ std::vector<std::shared_ptr<Variable>> &Variable::getInputs()
     return mParents;
 }
 
-std::shared_ptr<Tensor<double>> &Variable::getData()
+std::shared_ptr<Tensor> &Variable::getData()
 {
     return mpDataTensor;
 }
 
-void Variable::setData(const std::shared_ptr<Tensor<double>> &data)
+void Variable::setData(const std::shared_ptr<Tensor> &data)
 {
     mpDataTensor = data;
 }

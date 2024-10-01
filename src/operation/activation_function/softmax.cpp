@@ -11,7 +11,7 @@ void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::invalid_argument("Softmax::f: Invalid number of input variables.");
     }
 
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape()); // create a new tensor to store the result
+    std::shared_ptr<Tensor> _data = std::make_shared<Tensor>(inputs.front()->getData()->shape()); // create a new tensor to store the result
 
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {
@@ -50,7 +50,7 @@ void Softmax::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = _data; // store the result in the variable
 }
 
-std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> Softmax::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     // always check for right number of inputs
     if (inputs.size() != 1)
@@ -62,8 +62,8 @@ std::shared_ptr<Tensor<double>> Softmax::bprop(std::vector<std::shared_ptr<Varia
         throw std::invalid_argument("Softmax::bprop: The focus variable is not the input variable.");
     }
 
-    std::shared_ptr<Tensor<double>> data = this->getVariable()->getData(); // get the data of the variable
-    std::shared_ptr<Tensor<double>> grad = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape()); // create a new tensor to store the gradient
+    std::shared_ptr<Tensor> data = this->getVariable()->getData(); // get the data of the variable
+    std::shared_ptr<Tensor> grad = std::make_shared<Tensor>(inputs.front()->getData()->shape()); // create a new tensor to store the gradient
 
     for (std::uint32_t i = 0; i < inputs.front()->getData()->shape()[0]; i++)
     {

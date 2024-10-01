@@ -48,5 +48,5 @@ void ErrorRate::f(std::vector<std::shared_ptr<Variable>> &inputs)
     // {
     //     std::cout << "Digit " << i << " Prediction: " << prediction[i] << " Target: " << target[i] << std::endl;
     // }
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1}, error / inputs[0]->getData()->shape(0)*100));
+    this->getVariable()->getData() = std::make_shared<Tensor>(Tensor({1}, error / inputs[0]->getData()->shape(0)*100));
 }

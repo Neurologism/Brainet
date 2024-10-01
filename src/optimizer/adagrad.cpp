@@ -3,7 +3,7 @@
 //
 #include "optimizer/adagrad.hpp"
 
-AdaGrad::AdaGrad(double learningRate, double delta, std::vector<Tensor<double>> initialSquaredGradients) : mLearningRate(learningRate), mDelta(delta), mSquaredGradients(initialSquaredGradients)
+AdaGrad::AdaGrad(double learningRate, double delta, std::vector<Tensor> initialSquaredGradients) : mLearningRate(learningRate), mDelta(delta), mSquaredGradients(initialSquaredGradients)
 {
     if(mLearningRate <= 0 || mDelta <= 0)
     {
@@ -35,7 +35,7 @@ void AdaGrad::update(const std::vector<std::shared_ptr<Variable>> & rLearnablePa
     }
     for (std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
+        std::shared_ptr<Tensor> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for (std::size_t j = 0; j < gradient->capacity(); j++)
         {

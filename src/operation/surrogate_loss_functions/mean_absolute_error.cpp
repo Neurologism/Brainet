@@ -27,10 +27,10 @@ void MeanAbsoluteError::f(std::vector<std::shared_ptr<Variable>>& inputs)
     }
     sum /= inputs[0]->getData()->capacity();
     // store the result
-    this->getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({1},sum));
+    this->getVariable()->getData() = std::make_shared<Tensor>(Tensor({1},sum));
 }
 
-std::shared_ptr<Tensor<double>> MeanAbsoluteError::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> MeanAbsoluteError::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     // security checks
     if(inputs.size() != 2)
@@ -47,7 +47,7 @@ std::shared_ptr<Tensor<double>> MeanAbsoluteError::bprop(std::vector<std::shared
     }
 
     // calculate the gradient
-    std::shared_ptr<Tensor<double>> result = std::make_shared<Tensor<double>>(inputs[0]->getData()->shape());
+    std::shared_ptr<Tensor> result = std::make_shared<Tensor>(inputs[0]->getData()->shape());
     for(std::uint32_t i = 0; i < inputs[0]->getData()->capacity(); i++)
     {
         if(inputs[0]->getData()->at(i) > inputs[1]->getData()->at(i))

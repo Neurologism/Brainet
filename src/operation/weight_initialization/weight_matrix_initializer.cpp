@@ -5,7 +5,7 @@
 
 void WeightMatrixInitializer::createWeightMatrix(std::uint32_t n, std::uint32_t m)
 {
-    getVariable()->getData() = std::make_shared<Tensor<double>>(Tensor<double>({n, m})); // initialize the weights randomly
+    getVariable()->getData() = std::make_shared<Tensor>(Tensor({n, m})); // initialize the weights randomly
 
     // initialize the weights randomly
     mpWeightInitializer->createRandomEngine(n-1, m);
@@ -36,7 +36,7 @@ void WeightMatrixInitializer::f(std::vector<std::shared_ptr<Variable>> &inputs)
     getVariable()->setOperation(nullptr); // one time use only
 }
 
-std::shared_ptr<Tensor<double>> WeightMatrixInitializer::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor<double>> &gradient)
+std::shared_ptr<Tensor> WeightMatrixInitializer::bprop(std::vector<std::shared_ptr<Variable>> &inputs, std::shared_ptr<Variable> &focus, std::shared_ptr<Tensor> &gradient)
 {
     throw std::runtime_error("WeightMatrixInitializer::bprop: This function should never be called.");
 }

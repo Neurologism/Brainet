@@ -21,7 +21,7 @@ public:
     ~ParameterNormPenalty() = default;
 
     virtual void f(std::vector<std::shared_ptr<Variable>>& inputs) = 0;
-    virtual std::shared_ptr<Tensor<double>> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient) = 0;
+    virtual std::shared_ptr<Tensor> bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient) = 0;
 };
 
 #endif // PARAMETER_NORM_PENALTY_HPP

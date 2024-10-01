@@ -11,7 +11,7 @@ void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
         throw std::invalid_argument("ActivationFunction::f: Invalid number of input variables.");
     }
 
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(inputs.front()->getData()->shape()); // create a new tensor to store the result
+    std::shared_ptr<Tensor> _data = std::make_shared<Tensor>(inputs.front()->getData()->shape()); // create a new tensor to store the result
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply activation function to all elements
     {
@@ -21,7 +21,7 @@ void ActivationFunction::f(std::vector<std::shared_ptr<Variable>>& inputs)
     this->getVariable()->getData() = _data; // store the result in the variable
 }
 
-std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor<double>> & gradient)
+std::shared_ptr<Tensor> ActivationFunction::bprop(std::vector<std::shared_ptr<Variable>>& inputs, std::shared_ptr<Variable> & focus, std::shared_ptr<Tensor> & gradient)
 {
     // always check for the right number of inputs
     if (inputs.size() != 1)
@@ -30,7 +30,7 @@ std::shared_ptr<Tensor<double>> ActivationFunction::bprop(std::vector<std::share
     }
 
     // load derivative of activation into data 
-    std::shared_ptr<Tensor<double>> _data = std::make_shared<Tensor<double>>(focus->getData()->shape());
+    std::shared_ptr<Tensor> _data = std::make_shared<Tensor>(focus->getData()->shape());
 
     for (std::uint32_t i=0; i < _data->capacity(); i++) // apply derivative of activation function to all elements
     {

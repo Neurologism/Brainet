@@ -40,7 +40,7 @@ Reader::data_type Reader::read_idx(const std::string& path)
             shape[i] = static_cast<size_t>(dimension[0]) << 24 | static_cast<size_t>(dimension[1]) << 16 | static_cast<size_t>(dimension[2]) << 8 | static_cast<size_t>(dimension[3]);
         }
 
-        tensor = Reader::data_type(shape[0], std::vector<double>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<>()), 0));
+        tensor = Reader::data_type(shape[0], std::vector<Precision>(std::accumulate(shape.begin() + 1, shape.end(), 1, std::multiplies<>()), 0));
 
         for (auto & i : tensor)
         {
@@ -48,7 +48,7 @@ Reader::data_type Reader::read_idx(const std::string& path)
             {
                 throw std::invalid_argument("IDX_READER::read_idx: Unexpected end of file");
             }
-            for (double & j : i)
+            for (Precision & j : i)
             {
                 j = static_cast<double>(static_cast<std::byte>(*file_iterator++));
             }
@@ -62,7 +62,7 @@ Reader::data_type Reader::read_idx(const std::string& path)
     return tensor;
 }
 
-void Reader::read_bin(std::vector<std::vector<double>> const & designMatrix, std::vector<std::vector<double>> const & label, const std::string &path)
+void Reader::read_bin(std::vector<std::vector<Precision>> const & designMatrix, std::vector<std::vector<Precision>> const & label, const std::string &path)
 {
     throw std::invalid_argument("Under maintenance");
     // typedef std::vector<std::vector<double>> data_type;

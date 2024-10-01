@@ -14,8 +14,8 @@ class Adam : public Optimizer
     double mDecayRate2;
     double mDelta;
     bool mInitialized = false;
-    std::vector<Tensor<double>> mFirstMomentEstimates;
-    std::vector<Tensor<double>> mSecondMomentEstimates;
+    std::vector<Tensor> mFirstMomentEstimates;
+    std::vector<Tensor> mSecondMomentEstimates;
     std::uint32_t mIteration = 0;
 
 public:
@@ -29,7 +29,7 @@ public:
      * @param initialFirstMomentEstimates The initial first moment estimates.
      * @param initialSecondMomentEstimates The initial second moment estimates.
      */
-    Adam(double learningRate, double decayRate1 = 0.9, double decayRate2 = 0.999, double delta = 1e-8, std::vector<Tensor<double>> initialFirstMomentEstimates = {}, std::vector<Tensor<double>> initialSecondMomentEstimates = {});
+    Adam(double learningRate, double decayRate1 = 0.9, double decayRate2 = 0.999, double delta = 1e-8, std::vector<Tensor> initialFirstMomentEstimates = {}, std::vector<Tensor> initialSecondMomentEstimates = {});
 
     ~Adam() = default;
 

@@ -3,7 +3,7 @@
 //
 #include "optimizer/rmsprop_nesterov.hpp"
 
-RMSPropNesterov::RMSPropNesterov(double learningRate, double decayRate, double delta, double momentum, std::vector<Tensor<double>> initialCache, std::vector<Tensor<double>> initialVelocity) : mLearningRate(learningRate), mDecayRate(decayRate), mDelta(delta), mMomentum(momentum), mCache(initialCache), mVelocity(initialVelocity)
+RMSPropNesterov::RMSPropNesterov(double learningRate, double decayRate, double delta, double momentum, std::vector<Tensor> initialCache, std::vector<Tensor> initialVelocity) : mLearningRate(learningRate), mDecayRate(decayRate), mDelta(delta), mMomentum(momentum), mCache(initialCache), mVelocity(initialVelocity)
 {
     if(mLearningRate <= 0 || mDecayRate <= 0 || mDecayRate >= 1 || mDelta <= 0 || mMomentum <= 0 || mMomentum >= 1)
     {
@@ -55,7 +55,7 @@ void RMSPropNesterov::update(const std::vector<std::shared_ptr<Variable>> & rLea
     }
     for ( std::size_t i = 0; i < rLearnableParameters.size(); i++)
     {
-        std::shared_ptr<Tensor<double>> gradient = GRAPH->getGradient(rLearnableParameters[i]);
+        std::shared_ptr<Tensor> gradient = GRAPH->getGradient(rLearnableParameters[i]);
 
         for ( std::size_t j = 0; j < rLearnableParameters[i]->getData()->capacity(); j++)
         {

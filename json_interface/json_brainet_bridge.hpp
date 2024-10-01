@@ -124,7 +124,7 @@ namespace JSON
         auto trainingParams = std::get<std::vector<JsonNode>>(std::get<JsonNode>(child.m_children["train"]).m_children["parameters"]);
 
         // mnist dataset is only dataset supported
-        typedef std::vector<std::vector<double>> dataType;
+        typedef std::vector<std::vector<Precision>> dataType;
         dataType train_input = Reader::read_idx("../data/mnist/train-images.idx3-ubyte");
         dataType train_target = Reader::read_idx("../data/mnist/train-labels.idx1-ubyte");
 
