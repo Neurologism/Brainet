@@ -2,7 +2,6 @@
 #define MATMUL_HPP
 
 #include "operation.hpp"
-#include "matmul.cuh"
 
 
 /**
