@@ -1,7 +1,7 @@
 #ifndef DEPENDENCIES_HPP
 #define DEPENDENCIES_HPP
 
-// all external libraries are included here
+// all libraries part of the standard library
 #include <vector>
 #include <stdexcept>
 #include <exception>
@@ -22,5 +22,8 @@
 #include <array>
 #include <string>
 #include <chrono>
+
+// cuDNN
+#include <cudnn.h>
 
 #endif // DEPENDENCIES_HPP

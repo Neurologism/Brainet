@@ -1,0 +1,6 @@
+[submodule "build/cudnn-frontend"]
+	path = build/cudnn-frontend
+	url = https://github.com/NVIDIA/cudnn-frontend/
+[submodule "cudnn-frontend"]
+	path = cudnn-frontend
+	url = https://github.com/NVIDIA/cudnn-frontend/
