@@ -16,7 +16,8 @@ std::int32_t main()
     Model model;
 
     model.addSequential({
-        Dense(ReLU(), 300,  "dense0"),
+        Dense(ReLU(), 800,  "dense0"),
+        Dense(ReLU(), 100,  "dense1"),
         Dense(Softmax(), 10, "output"),
         Loss(ErrorRate(), "loss")
     });

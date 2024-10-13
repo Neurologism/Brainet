@@ -24,6 +24,6 @@
 #include <chrono>
 
 // cuDNN
-#include <cudnn.h>
+// #include <cudnn.h>
 
 #endif // DEPENDENCIES_HPP

@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.28)
-project(brainet LANGUAGES CXX CUDA)
+project(brainet LANGUAGES CXX )
+
+#find_package(CUDAToolkit REQUIRED)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CUDA_STANDARD 11)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/json_interface)
@@ -69,6 +73,9 @@ set(CPP_SOURCES
 
 # Create a library target for C++ sources
 add_library(brainet_cpp STATIC ${CPP_SOURCES})
+
+
+#target_link_libraries(brainet_cpp CUDA::cudart CUDA::nvrtc)
 
 # Create a library target for CUDA sources
 #add_library(brainet_cuda STATIC ${CUDA_SOURCES})
