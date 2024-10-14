@@ -64,6 +64,10 @@ set(CPP_SOURCES
         src/datatypes/matrix.cpp
         src/datatypes/tensor.cpp
         src/datatypes/vector.cpp
+        src/Operation.cpp
+        src/Tensor.cpp
+        include/Node.h
+        src/Node.cpp
 )
 
 # List of CUDA source files
