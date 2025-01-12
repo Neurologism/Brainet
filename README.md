@@ -1,16 +1,12 @@
 ﻿
 # Brainet
 
-Brainet is a deep learning engine developed in C++ and CUDA, without relying on external libraries. Its primary goal is to offer a transparent framework that allows users to fully understand the underlying mechanisms. Unlike alternatives such as TensorFlow, PyTorch, or Caffe, which often feel like black boxes due to their high level of abstraction, Brainet focuses on explaining how everything works under the hood.
-
-To achieve this, Brainet features a simple, well-documented codebase. Additionally, a small book will be available to explain the design choices and mechanisms of Brainet and deep learning in general.
-
-Please note that the project is still in its early stages of development. As a result, the codebase might be challenging to understand, and the supporting book is not yet written. However, I am actively working on it and am happy to provide explanations if you reach out to me. 😊
+Brainet is a deep learning engine developed in C++, without relying on external libraries. Its primary goal is to offer a transparent framework that allows users to fully understand the underlying mechanisms. Unlike alternatives such as TensorFlow, PyTorch, or Caffe, which often feel like black boxes due to their high level of abstraction, Brainet wants to focus on explaining how everything works under the hood.
 
 Currently, the best place to start is the example.cpp file, which can be found in the tests folder. This file contains an example of how to train a 2-layer Neural Network on the MNIST dataset.
 
 ## Overview 
-The following image shows a high-level overview of the Brainet architecture which is the first step to transparency:
+The following image shows a high-level overview of the Brainet architecture:
 
 
 ![alt text](image.png)
@@ -21,8 +17,8 @@ The following image shows a high-level overview of the Brainet architecture whic
 - [MNIST](https://yann.lecun.com/exdb/mnist/): 
 
     | Model | Test Error Rate | Training Time |
-    |-------|----------|---------------|
-    | 2-layer NN, 300 hidden units, cross-entopy | 8.66% | 30 min |
+    |-------|-----------------|---------------|
+    | 2-layer NN, 300 hidden units, cross-entopy | 5.9%            | 8 min         |
     
 
 ## Installation
@@ -72,7 +68,3 @@ To use them, you will also need a tool to extract gzip and tar files. I recommen
 ## Authors
 
 - [@Servant-of-Scietia](https://github.com/Servant-of-Scietia)
-
-## Feedback
-Feedback is greatly appreciated. If you have any questions or suggestions, please feel free to reach out to me.
-If you find a bug or have a feature request, please open an issue on GitHub.

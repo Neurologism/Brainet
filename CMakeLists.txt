@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(brainet LANGUAGES CXX CUDA)
+project(brainet LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -63,18 +63,18 @@ set(CPP_SOURCES
 )
 
 # List of CUDA source files
-set(CUDA_SOURCES
-        src/operation/matmul.cu
-)
+#set(CUDA_SOURCES
+#        src/operation/matmul.cu
+#)
 
 # Create a library target for C++ sources
 add_library(brainet_cpp STATIC ${CPP_SOURCES})
 
 # Create a library target for CUDA sources
-add_library(brainet_cuda STATIC ${CUDA_SOURCES})
+#add_library(brainet_cuda STATIC ${CUDA_SOURCES})
 
 # Link the CUDA library with the C++ library
-target_link_libraries(brainet_cpp brainet_cuda)
+#target_link_libraries(brainet_cpp brainet_cuda)
 
 # Create executables
 add_executable(example tests/example.cpp)
