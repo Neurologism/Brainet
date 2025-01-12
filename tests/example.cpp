@@ -23,7 +23,7 @@ std::int32_t main()
 
     Dataset dataset(train_input, train_target, 0.8, test_input, test_target);
 
-    model.train(dataset, "dense0", "loss", 100, 128, Adam(0.001), 10);
+    model.train(dataset, "dense0", "loss", 20, 128, Adam(0.001), 10);
     model.test( dataset, "dense0", "loss");
 
     return 0;

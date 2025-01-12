@@ -146,7 +146,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
 
     if (dataset.hasValidationSet()) // train on complete training set
     {
-        std::cout << "Training on complete training set..." << std::endl;
+        std::cout << "Training on complete training set until Validation Surrogate Loss is reached..." << std::endl;
         double trainingSurrogateLoss = 0;
 
         do
@@ -178,6 +178,7 @@ void Model::train(Dataset &dataset, const std::string& inputModule, const std::s
 
             trainingSurrogateLoss /= iteration;
         } while (trainingSurrogateLoss > bestTrainingSurrogateLoss);
+        std::cout << "\nTraining on complete training set finished." << std::endl;
     }
 
 
@@ -204,10 +205,9 @@ void Model::test(Dataset &dataset, const std::string& inputModule, const std::st
     const std::shared_ptr<Tensor> loss = mLossVariables[0]->getData();
     const std::shared_ptr<Tensor> surrogateLoss = mLossVariables[1]->getData();
 
-    std::cout << "{\n";
-    std::cout << " \t \"test_loss\": " << loss->at(0) << ",\n";
-    std::cout << " \t \"test_surrogate_loss\": " << surrogateLoss->at(0) << "\n";
-    std::cout << "}"<< std::endl;
+    std::cout << "Test Results:\n";
+    std::cout << "Test Loss: " << loss->at(0) << "\n";
+    std::cout << "Test Surrogate Loss: " << surrogateLoss->at(0) << "\n";
 
     Variable::disconnectVariables(dataset.getOutputs()[0], mModuleMap[inputModule]->getInputs()[0]);
     Variable::disconnectVariables(dataset.getOutputs()[1], mModuleMap[lossModule]->getInputs()[0]);
