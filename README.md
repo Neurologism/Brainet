@@ -12,7 +12,7 @@ The following image shows a high-level overview of the Brainet architecture:
 ![alt text](image.png)
 
 
-## Performance
+## Performance Example
 
 - [MNIST](https://yann.lecun.com/exdb/mnist/): 
 
