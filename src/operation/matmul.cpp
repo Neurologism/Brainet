@@ -5,8 +5,8 @@
 
 void Matmul::blockmul(Matrix &left_matrix, Matrix &right_matrix, Matrix &result, const std::uint32_t &k, const bool &left_transpose, const bool &right_transpose)
 {
-    std::vector<float> &left_data = left_matrix.getData();
-    std::vector<float> &right_data = right_matrix.getData();
+    std::vector<Precision> &left_data = left_matrix.getData();
+    std::vector<Precision> &right_data = right_matrix.getData();
     std::vector<size_t> &left_shape = left_matrix.getShape();
     std::vector<size_t> &right_shape = right_matrix.getShape();
     std::uint32_t left_index = 0;
